@@ -140,10 +140,8 @@ jobs:
           RC_SEARCHES = [
               {"park": "Crystal Cove (Moro)", "place_id": 635, "arrive": datetime(2026, 5, 30), "nights": 1},
               {"park": "Crystal Cove (Moro)", "place_id": 635, "arrive": datetime(2026, 5, 31), "nights": 1},
-              {"park": "Crystal Cove (Moro)", "place_id": 635, "arrive": datetime(2026, 6, 1),  "nights": 1},
               {"park": "Leo Carrillo SP",     "place_id": 665, "arrive": datetime(2026, 5, 30), "nights": 1},
               {"park": "Leo Carrillo SP",     "place_id": 665, "arrive": datetime(2026, 5, 31), "nights": 1},
-              {"park": "Leo Carrillo SP",     "place_id": 665, "arrive": datetime(2026, 6, 1),  "nights": 1},
           ]
 
           def send_rc_email(park_name, place_id, arrive, nights):
