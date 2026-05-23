@@ -93,7 +93,7 @@ jobs:
                       s["short_label"].strip()
                       for s in sites
                       if s.get("type_name") == "Hookup - Partial"
-                      and str(s.get("reservable")) == "1"
+                      and str(s.get("reservable")) == "0"
                   ]
 
                   if available:
