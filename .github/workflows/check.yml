@@ -45,6 +45,7 @@ jobs:
               {"park": "Jalama Beach",  "parent_idno": "2", "selected_idno": "2", "arrive": datetime(2026, 6, 12), "nights": 1},
               {"park": "Jalama Beach",  "parent_idno": "2", "selected_idno": "2", "arrive": datetime(2026, 6, 12), "nights": 2},
               {"park": "Jalama Beach",  "parent_idno": "2", "selected_idno": "2", "arrive": datetime(2026, 7, 3),  "nights": 2},
+              {"park": "Jalama Beach",  "parent_idno": "2", "selected_idno": "2", "arrive": datetime(2026, 7, 3),  "nights": 3},
               {"park": "Jalama Beach",  "parent_idno": "2", "selected_idno": "2", "arrive": datetime(2026, 7, 4),  "nights": 2},
           ]
 
@@ -116,4 +117,106 @@ jobs:
 
               except Exception as e:
                   print(f"  Error: {search['park']} {fmt_date(search['arrive'])}: {e}")
+
+
+          # =====================================================================
+          # RESERVE CALIFORNIA — Crystal Cove & Leo Carrillo
+          # =====================================================================
+
+          RC_API_URL = "https://california-rdr.prod.cali.rd12.recreation-management.tylerapp.com/rdr/search/place"
+
+          RC_HEADERS = {
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+              "Content-Type": "application/json",
+              "Origin": "https://www.reservecalifornia.com",
+              "Referer": "https://www.reservecalifornia.com/",
+          }
+
+          RC_BOOK_URLS = {
+              635: "https://www.reservecalifornia.com/Web/#!park/635",
+              665: "https://www.reservecalifornia.com/Web/#!park/665",
+          }
+
+          RC_SEARCHES = [
+              {"park": "Crystal Cove (Moro)", "place_id": 635, "arrive": datetime(2026, 5, 30), "nights": 1},
+              {"park": "Crystal Cove (Moro)", "place_id": 635, "arrive": datetime(2026, 5, 31), "nights": 1},
+              {"park": "Crystal Cove (Moro)", "place_id": 635, "arrive": datetime(2026, 6, 1),  "nights": 1},
+              {"park": "Leo Carrillo SP",     "place_id": 665, "arrive": datetime(2026, 5, 30), "nights": 1},
+              {"park": "Leo Carrillo SP",     "place_id": 665, "arrive": datetime(2026, 5, 31), "nights": 1},
+              {"park": "Leo Carrillo SP",     "place_id": 665, "arrive": datetime(2026, 6, 1),  "nights": 1},
+          ]
+
+          def send_rc_email(park_name, place_id, arrive, nights):
+              arrive_str = arrive.strftime("%b %-d")
+              depart_str = (arrive + timedelta(days=nights)).strftime("%b %-d")
+              book_url = RC_BOOK_URLS[place_id]
+              msg = MIMEMultipart("alternative")
+              msg["Subject"] = f"⛺ Camping available! {park_name} {arrive_str}"
+              msg["From"] = GMAIL_SENDER
+              msg["To"] = NOTIFY_EMAIL
+              body = f"""<html><body style='font-family:sans-serif'>
+              <h2 style='color:#2a7a4b'>⛺ Campsite available!</h2>
+              <table style='font-size:15px;margin-bottom:16px'>
+                <tr><td style='color:#666;padding-right:12px'>Park</td><td><b>{park_name}</b></td></tr>
+                <tr><td style='color:#666;padding-right:12px'>Site type</td><td>Tent / Car camping</td></tr>
+                <tr><td style='color:#666;padding-right:12px'>Arrive</td><td>{arrive_str}</td></tr>
+                <tr><td style='color:#666;padding-right:12px'>Depart</td><td>{depart_str} ({nights} night{'s' if nights>1 else ''})</td></tr>
+              </table>
+              <a href='{book_url}' style='background:#2a7a4b;color:white;padding:12px 24px;
+              text-decoration:none;border-radius:6px;display:inline-block;margin-top:8px'>
+              ⛺ Book on ReserveCalifornia</a>
+              <p style='color:#999;font-size:12px'>Act fast — sites go quickly!</p>
+              </body></html>"""
+              msg.attach(MIMEText(body, "html"))
+              with smtplib.SMTP_SSL("smtp.gmail.com", 465) as s:
+                  s.login(GMAIL_SENDER, GMAIL_PASSWORD)
+                  s.sendmail(GMAIL_SENDER, NOTIFY_EMAIL, msg.as_string())
+              print(f"  ⛺ RC Alert sent: {park_name} {arrive_str} ({nights} nights)")
+
+          for search in RC_SEARCHES:
+              try:
+                  arrive = search["arrive"]
+                  nights = search["nights"]
+                  payload = {
+                      "PlaceId": search["place_id"],
+                      "Latitude": 0,
+                      "Longitude": 0,
+                      "Nights": str(nights),
+                      "StartDate": arrive.strftime("%Y-%m-%d"),
+                      "CountNearby": False,
+                      "CountUnits": True,
+                      "CustomerId": 0,
+                      "InSeasonOnly": True,
+                      "IsADA": False,
+                      "MinVehicleLength": 0,
+                      "NearbyCountLimit": 0,
+                      "NearbyLimit": 0,
+                      "NearbyOnlyAvailable": False,
+                      "RestrictADA": False,
+                      "SleepingUnitId": 0,
+                      "Sort": "distance",
+                      "UnitCategoryId": 1,
+                      "UnitTypesGroupIds": [],
+                      "WebOnly": True,
+                      "AmenityIds": [],
+                      "customerClassificationId": 1,
+                      "isSearchAllParks": False,
+                      "HighlightedPlaceId": 0,
+                  }
+                  resp = requests.post(RC_API_URL, headers=RC_HEADERS, json=payload, timeout=20)
+                  resp.raise_for_status()
+                  result = resp.json()
+
+                  selected = result.get("SelectedPlace", {})
+                  available = selected.get("Available", False)
+                  count = selected.get("AvailableUnitCount", 0)
+
+                  if available and count > 0:
+                      print(f"  ⛺ FOUND: {search['park']} {arrive.strftime('%b %-d')} ({nights} nights) - {count} sites available")
+                      send_rc_email(search["park"], search["place_id"], arrive, nights)
+                  else:
+                      print(f"  — No availability: {search['park']} {arrive.strftime('%b %-d')} ({nights} nights)")
+
+              except Exception as e:
+                  print(f"  Error: {search['park']} {search['arrive'].strftime('%b %-d')}: {e}")
           EOF
