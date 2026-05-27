@@ -26,102 +26,6 @@ jobs:
           GMAIL_SENDER = "nikobellight@gmail.com"
           GMAIL_PASSWORD = os.environ["GMAIL_PASSWORD"]
           NOTIFY_EMAIL = "nikobellight@gmail.com"
-          BOOK_URL = "https://santabarbara.camava.com/reservation/camping/index.asp"
-
-          HEADERS = {
-              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
-              "Accept": "application/json, text/javascript, */*; q=0.01",
-              "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-              "X-Requested-With": "XMLHttpRequest",
-              "Referer": "https://santabarbara.camava.com/reservation/camping/index.asp",
-              "Origin": "https://santabarbara.camava.com",
-          }
-
-          def fmt_date(d):
-              return f"{d.month}/{d.day}/{d.year}"
-
-          SEARCHES = [
-              {"park": "Cachuma Lake", "parent_idno": "1", "selected_idno": "1", "arrive": datetime(2026, 6, 12), "nights": 2},
-              {"park": "Jalama Beach",  "parent_idno": "2", "selected_idno": "2", "arrive": datetime(2026, 6, 12), "nights": 1},
-              {"park": "Jalama Beach",  "parent_idno": "2", "selected_idno": "2", "arrive": datetime(2026, 6, 12), "nights": 2},
-              {"park": "Jalama Beach",  "parent_idno": "2", "selected_idno": "2", "arrive": datetime(2026, 7, 3),  "nights": 2},
-              {"park": "Jalama Beach",  "parent_idno": "2", "selected_idno": "2", "arrive": datetime(2026, 7, 3),  "nights": 3},
-              {"park": "Jalama Beach",  "parent_idno": "2", "selected_idno": "2", "arrive": datetime(2026, 7, 4),  "nights": 2},
-          ]
-
-          def send_email(park_name, arrive, nights, sites):
-              arrive_str = arrive.strftime("%b %-d")
-              depart_str = (arrive + timedelta(days=nights)).strftime("%b %-d")
-              msg = MIMEMultipart("alternative")
-              msg["Subject"] = f"⛺ Camping available! {park_name} {arrive_str}"
-              msg["From"] = GMAIL_SENDER
-              msg["To"] = NOTIFY_EMAIL
-              sites_html = "".join(f"<li>Site {s}</li>" for s in sites)
-              body = f"""<html><body style='font-family:sans-serif'>
-              <h2 style='color:#2a7a4b'>⛺ Campsite available!</h2>
-              <table style='font-size:15px;margin-bottom:16px'>
-                <tr><td style='color:#666;padding-right:12px'>Park</td><td><b>{park_name}</b></td></tr>
-                <tr><td style='color:#666;padding-right:12px'>Site type</td><td>Hookup – Partial</td></tr>
-                <tr><td style='color:#666;padding-right:12px'>Arrive</td><td>{arrive_str}</td></tr>
-                <tr><td style='color:#666;padding-right:12px'>Depart</td><td>{depart_str} ({nights} night{'s' if nights>1 else ''})</td></tr>
-              </table>
-              <p>Available sites:<ul>{sites_html}</ul></p>
-              <a href='{BOOK_URL}' style='background:#2a7a4b;color:white;padding:12px 24px;
-              text-decoration:none;border-radius:6px;display:inline-block;margin-top:8px'>
-              ⛺ Book now</a>
-              <p style='color:#999;font-size:12px'>Act fast — sites go quickly!</p>
-              </body></html>"""
-              msg.attach(MIMEText(body, "html"))
-              with smtplib.SMTP_SSL("smtp.gmail.com", 465) as s:
-                  s.login(GMAIL_SENDER, GMAIL_PASSWORD)
-                  s.sendmail(GMAIL_SENDER, NOTIFY_EMAIL, msg.as_string())
-              print(f"  ⛺ Alert sent: {park_name} {arrive_str} ({nights} nights)")
-
-          session = requests.Session()
-
-          for search in SEARCHES:
-              try:
-                  arrive = search["arrive"]
-                  nights = search["nights"]
-                  depart = arrive + timedelta(days=nights)
-                  data = {
-                      "parent_idno": search["parent_idno"],
-                      "selected_idno": search["selected_idno"],
-                      "arrive_date": fmt_date(arrive),
-                      "depart_date": fmt_date(depart),
-                      "cust_type_idno": "0",
-                      "isBuilder": "0",
-                      "typeUrl": "camping",
-                      "showsites": "",
-                  }
-                  resp = session.post(
-                      "https://santabarbara.camava.com/reservation/getresults.asp",
-                      headers=HEADERS, data=data, timeout=20
-                  )
-                  result = resp.json()
-                  sites = result.get("jsonPadicons", [])
-
-                  available = [
-                      s["short_label"].strip()
-                      for s in sites
-                      if s.get("type_name") == "Hookup - Partial"
-                      and str(s.get("reservable")) == "1"
-                  ]
-
-                  if available:
-                      print(f"  ⛺ FOUND: {search['park']} {fmt_date(arrive)} ({nights} nights) - {available}")
-                      send_email(search["park"], arrive, nights, available)
-                  else:
-                      hookup_sites = [s for s in sites if s.get("type_name") == "Hookup - Partial"]
-                      print(f"  — No availability: {search['park']} {fmt_date(arrive)} ({nights} nights) - {len(hookup_sites)} sites all booked")
-
-              except Exception as e:
-                  print(f"  Error: {search['park']} {fmt_date(search['arrive'])}: {e}")
-
-
-          # =====================================================================
-          # RESERVE CALIFORNIA — Crystal Cove & Leo Carrillo
-          # =====================================================================
 
           RC_API_URL = "https://california-rdr.prod.cali.rd12.recreation-management.tylerapp.com/rdr/search/place"
 
@@ -135,11 +39,13 @@ jobs:
           RC_BOOK_URLS = {
               635: "https://www.reservecalifornia.com/Web/#!park/635",
               665: "https://www.reservecalifornia.com/Web/#!park/665",
+              6:   "https://www.reservecalifornia.com/Web/#!park/6",
           }
 
           RC_SEARCHES = [
               {"park": "Crystal Cove (Moro)", "place_id": 635, "arrive": datetime(2026, 5, 30), "nights": 1},
               {"park": "Leo Carrillo SP",     "place_id": 665, "arrive": datetime(2026, 5, 30), "nights": 1},
+              {"park": "Carpinteria SB",      "place_id": 6,   "arrive": datetime(2026, 7, 4),  "nights": 2},
           ]
 
           def send_rc_email(park_name, place_id, arrive, nights):
@@ -167,7 +73,7 @@ jobs:
               with smtplib.SMTP_SSL("smtp.gmail.com", 465) as s:
                   s.login(GMAIL_SENDER, GMAIL_PASSWORD)
                   s.sendmail(GMAIL_SENDER, NOTIFY_EMAIL, msg.as_string())
-              print(f"  ⛺ RC Alert sent: {park_name} {arrive_str} ({nights} nights)")
+              print(f"  ⛺ Alert sent: {park_name} {arrive_str} ({nights} nights)")
 
           for search in RC_SEARCHES:
               try:
