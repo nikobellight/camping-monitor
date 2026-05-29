@@ -43,8 +43,6 @@ jobs:
           }
 
           RC_SEARCHES = [
-              {"park": "Crystal Cove (Moro)", "place_id": 635, "arrive": datetime(2026, 5, 30), "nights": 1},
-              {"park": "Leo Carrillo SP",     "place_id": 665, "arrive": datetime(2026, 5, 30), "nights": 1},
               {"park": "Carpinteria SB",      "place_id": 6,   "arrive": datetime(2026, 7, 4),  "nights": 2},
           ]
 
