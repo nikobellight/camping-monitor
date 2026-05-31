@@ -10,78 +10,100 @@ headers_base = {
     'X-Requested-With': 'XMLHttpRequest'
 }
 
-systems = [
-    {
-        'name': 'Santa Barbara (santabarbara.camava.com)',
-        'url': 'https://santabarbara.camava.com/reservation/getresults.asp',
-        'origin': 'https://santabarbara.camava.com',
-        'referer': 'https://santabarbara.camava.com/reservation/camping/index.asp',
-        'park_ids': list(range(1, 30)) + [50, 100, 150, 200]
-    },
-    {
-        'name': 'Santa Clara (gooutsideandplay.org)',
-        'url': 'https://gooutsideandplay.org/reservation/getresults.asp',
-        'origin': 'https://gooutsideandplay.org',
-        'referer': 'https://gooutsideandplay.org/reservation/camping/index.asp',
-        'park_ids': list(range(1, 30)) + [50, 100, 150, 200]
-    },
-    {
-        'name': 'San Diego (parksres.sandiegocounty.gov)',
-        'url': 'https://parksres.sandiegocounty.gov/reservation/getresults.asp',
-        'origin': 'https://parksres.sandiegocounty.gov',
-        'referer': 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp',
-        'park_ids': list(range(1, 30)) + [50, 100, 150, 200, 9494211, 9494212, 9494213, 9494214, 9494215, 9494216, 9494217, 9494218, 9494219, 9494220]
-    }
+PARKS = [
+    # Santa Barbara Camava
+    {'system': 'Santa Barbara', 'url': 'https://santabarbara.camava.com/reservation/getresults.asp',
+     'origin': 'https://santabarbara.camava.com', 'referer': 'https://santabarbara.camava.com/reservation/camping/index.asp',
+     'name': 'Cachuma Lake', 'parent_idno': '1'},
+    {'system': 'Santa Barbara', 'url': 'https://santabarbara.camava.com/reservation/getresults.asp',
+     'origin': 'https://santabarbara.camava.com', 'referer': 'https://santabarbara.camava.com/reservation/camping/index.asp',
+     'name': 'Jalama Beach', 'parent_idno': '2'},
+
+    # Santa Clara
+    {'system': 'Santa Clara', 'url': 'https://gooutsideandplay.org/reservation/getresults.asp',
+     'origin': 'https://gooutsideandplay.org', 'referer': 'https://gooutsideandplay.org/reservation/camping/index.asp',
+     'name': 'Coyote Lake', 'parent_idno': '3'},
+    {'system': 'Santa Clara', 'url': 'https://gooutsideandplay.org/reservation/getresults.asp',
+     'origin': 'https://gooutsideandplay.org', 'referer': 'https://gooutsideandplay.org/reservation/camping/index.asp',
+     'name': 'Joseph Grant Park', 'parent_idno': '6'},
+    {'system': 'Santa Clara', 'url': 'https://gooutsideandplay.org/reservation/getresults.asp',
+     'origin': 'https://gooutsideandplay.org', 'referer': 'https://gooutsideandplay.org/reservation/camping/index.asp',
+     'name': 'Mt Madonna Park', 'parent_idno': '8'},
+    {'system': 'Santa Clara', 'url': 'https://gooutsideandplay.org/reservation/getresults.asp',
+     'origin': 'https://gooutsideandplay.org', 'referer': 'https://gooutsideandplay.org/reservation/camping/index.asp',
+     'name': 'Sanborn', 'parent_idno': '9'},
+    {'system': 'Santa Clara', 'url': 'https://gooutsideandplay.org/reservation/getresults.asp',
+     'origin': 'https://gooutsideandplay.org', 'referer': 'https://gooutsideandplay.org/reservation/camping/index.asp',
+     'name': 'Uvas Canyon Park', 'parent_idno': '12'},
+
+    # San Diego
+    {'system': 'San Diego', 'url': 'https://parksres.sandiegocounty.gov/reservation/getresults.asp',
+     'origin': 'https://parksres.sandiegocounty.gov', 'referer': 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp',
+     'name': 'Agua Caliente', 'parent_idno': '1'},
+    {'system': 'San Diego', 'url': 'https://parksres.sandiegocounty.gov/reservation/getresults.asp',
+     'origin': 'https://parksres.sandiegocounty.gov', 'referer': 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp',
+     'name': 'Dos Picos', 'parent_idno': '2'},
+    {'system': 'San Diego', 'url': 'https://parksres.sandiegocounty.gov/reservation/getresults.asp',
+     'origin': 'https://parksres.sandiegocounty.gov', 'referer': 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp',
+     'name': 'Guajome', 'parent_idno': '3'},
+    {'system': 'San Diego', 'url': 'https://parksres.sandiegocounty.gov/reservation/getresults.asp',
+     'origin': 'https://parksres.sandiegocounty.gov', 'referer': 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp',
+     'name': 'Lake Morena', 'parent_idno': '5'},
+    {'system': 'San Diego', 'url': 'https://parksres.sandiegocounty.gov/reservation/getresults.asp',
+     'origin': 'https://parksres.sandiegocounty.gov', 'referer': 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp',
+     'name': 'Potrero', 'parent_idno': '6'},
+    {'system': 'San Diego', 'url': 'https://parksres.sandiegocounty.gov/reservation/getresults.asp',
+     'origin': 'https://parksres.sandiegocounty.gov', 'referer': 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp',
+     'name': 'Sweetwater', 'parent_idno': '7'},
+    {'system': 'San Diego', 'url': 'https://parksres.sandiegocounty.gov/reservation/getresults.asp',
+     'origin': 'https://parksres.sandiegocounty.gov', 'referer': 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp',
+     'name': 'Tijuana River Valley', 'parent_idno': '9494211'},
+    {'system': 'San Diego', 'url': 'https://parksres.sandiegocounty.gov/reservation/getresults.asp',
+     'origin': 'https://parksres.sandiegocounty.gov', 'referer': 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp',
+     'name': 'Vallecito', 'parent_idno': '8'},
+    {'system': 'San Diego', 'url': 'https://parksres.sandiegocounty.gov/reservation/getresults.asp',
+     'origin': 'https://parksres.sandiegocounty.gov', 'referer': 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp',
+     'name': 'William Heise', 'parent_idno': '9'},
 ]
 
-for system in systems:
-    print(f"\n{'='*60}")
-    print(f"SYSTEM: {system['name']}")
-    print(f"{'='*60}")
-    
+for park in PARKS:
     h = headers_base.copy()
-    h['Origin'] = system['origin']
-    h['Referer'] = system['referer']
-    
-    found_parks = []
-    
-    for park_id in system['park_ids']:
-        data = {
-            'parent_idno': str(park_id),
-            'selected_idno': str(park_id),
-            'arrive_date': '07/04/2026',
-            'depart_date': '07/05/2026',
-            'cust_type_idno': '0',
-            'isBuilder': '1',
-            'typeUrl': 'camping',
-            'showsites': 'Y'
-        }
-        
-        try:
-            response = requests.post(system['url'], headers=h, data=data, timeout=10)
-            
-            if response.status_code == 200 and len(response.text) > 100:
-                try:
-                    result = json.loads(response.text)
-                    if 'jsonPadicons' in result and len(result['jsonPadicons']) > 0:
-                        sites = result['jsonPadicons']
-                        site_types = list(set([s.get('type_name', 'unknown') for s in sites]))
-                        available = [s for s in sites if s.get('reason_code') not in ['Booked', 'Not Reservable Online', 'Closed', 'Unavailable']]
-                        found_parks.append(park_id)
-                        print(f"\n✅ PARK ID {park_id}:")
-                        print(f"   Total sites: {len(sites)}")
-                        print(f"   Site types: {site_types}")
-                        print(f"   Available now: {len(available)}")
-                        if available:
-                            print(f"   Available sites: {[s.get('short_label') for s in available[:5]]}")
-                except json.JSONDecodeError:
-                    pass
-        except Exception as e:
-            print(f"Park ID {park_id}: error {e}")
-        
-        time.sleep(random.uniform(0.5, 1.5))
-    
-    print(f"\n📊 Summary for {system['name']}:")
-    print(f"   Valid park IDs found: {found_parks}")
+    h['Origin'] = park['origin']
+    h['Referer'] = park['referer']
 
-print("\n✅ Discovery complete!")
+    data = {
+        'parent_idno': park['parent_idno'],
+        'selected_idno': park['parent_idno'],
+        'arrive_date': '07/04/2026',
+        'depart_date': '07/05/2026',
+        'cust_type_idno': '0',
+        'isBuilder': '1',
+        'typeUrl': 'camping',
+        'showsites': 'Y'
+    }
+
+    try:
+        response = requests.post(park['url'], headers=h, data=data, timeout=15)
+        if response.status_code == 200:
+            result = json.loads(response.text)
+            sites = result.get('jsonPadicons', [])
+            # Filter only camping-related site types (exclude picnic, admin etc)
+            camping_types = sorted(set([
+                s.get('type_name', '')
+                for s in sites
+                if s.get('type_name') and
+                any(k in s.get('type_name', '').lower() for k in ['camp', 'rv', 'hookup', 'tent', 'hike', 'yurt', 'cabin', 'non-hookup', 'caravan'])
+            ]))
+            print(f"\n{'='*50}")
+            print(f"[{park['system']}] {park['name']} (ID: {park['parent_idno']})")
+            print(f"Camping site types:")
+            for t in camping_types:
+                print(f"  - {t}")
+        else:
+            print(f"\n[{park['system']}] {park['name']}: status {response.status_code}")
+    except Exception as e:
+        print(f"\n[{park['system']}] {park['name']}: error {e}")
+
+    time.sleep(random.uniform(1, 2))
+
+print("\n✅ Done!")
