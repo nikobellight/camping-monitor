@@ -16,6 +16,9 @@ headers = {
 PARKS = [
     {'name': 'Leo Carrillo State Beach', 'place_id': 665},
     {'name': 'Carpinteria State Beach',  'place_id': 6},
+    {'name': 'El Capitan State Beach',   'place_id': 8},
+    {'name': 'Doheny State Beach',       'place_id': 639},
+    {'name': 'San Clemente State Beach', 'place_id': 708},
 ]
 
 URL = 'https://california-rdr.prod.cali.rd12.recreation-management.tylerapp.com/rdr/search/place'
@@ -43,8 +46,26 @@ for park in PARKS:
     try:
         response = requests.post(URL, headers=headers, json=payload, timeout=15)
         data = json.loads(response.text)
-        # Print full raw response to understand structure
-        p(f"Full response: {json.dumps(data, indent=2)[:3000]}")
+        selected = data.get('SelectedPlace', {})
+        facilities = selected.get('Facilities', {})
+
+        # Facilities is a dict — iterate over values
+        all_unit_types = {}
+        for fac_id, facility in facilities.items():
+            fac_name = facility.get('Name', '')
+            unit_types = facility.get('UnitTypes', {})
+            # UnitTypes is also a dict — iterate over values
+            for ut_id, ut in unit_types.items():
+                ut_name = ut.get('Name', '')
+                ut_type_id = ut.get('UnitTypeId', '')
+                ut_category = ut.get('UnitCategoryId', '')
+                key = f"{ut_name} (UnitTypeId:{ut_type_id} CategoryId:{ut_category})"
+                all_unit_types[key] = True
+                p(f"  Facility: {fac_name} → UnitType: {ut_name} | UnitTypeId: {ut_type_id} | CategoryId: {ut_category}")
+
+        p(f"\nSummary — unique unit types:")
+        for k in sorted(all_unit_types.keys()):
+            p(f"  {k}")
 
     except Exception as e:
         p(f"ERROR: {e}")
