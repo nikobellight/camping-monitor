@@ -13,7 +13,6 @@ headers = {
     'Referer': 'https://www.reservecalifornia.com/',
 }
 
-# Our 5 ReserveCalifornia parks
 PARKS = [
     {'name': 'Leo Carrillo State Beach', 'place_id': 665},
     {'name': 'Carpinteria State Beach',  'place_id': 6},
@@ -36,58 +35,28 @@ for park in PARKS:
         "Nights": 1,
         "CountNearby": False,
         "NearbyLimit": 0,
-        "NearbyOnlyAvailable": False,
-        "NearbyCountLimit": 10,
         "CustomerID": "0",
-        "RefPlaceId": 0,
         "UnitCategoryId": 0,
         "UnitTypeId": 0,
-        "UnitTypeName": "",
-        "SleepingUnitId": 0,
-        "MinVehicleLength": 0,
-        "MaxVehicleLength": 0,
         "IsADA": False,
-        "UnitSort": "orderby",
-        "IsFiltered": False,
         "InSeasonOnly": True,
         "ShowNearby": False
     }
 
     try:
         response = requests.post(URL, headers=headers, json=payload, timeout=15)
-        p(f"Status: {response.status_code} | Length: {len(response.text)}")
+        data = json.loads(response.text)
+        selected = data.get('SelectedPlace', {})
+        facilities = selected.get('Facilities', [])
 
-        if response.status_code == 200:
-            data = json.loads(response.text)
-
-            # Get selected place info
-            selected = data.get('SelectedPlace', {})
-            p(f"Available: {selected.get('Available')} | Units: {selected.get('AvailableUnitCount')}")
-
-            # Get all unit types from the response
-            facilities = data.get('SelectedPlace', {}).get('Facilities', [])
-            p(f"Facilities count: {len(facilities)}")
-
-            unit_types = set()
-            unit_type_ids = set()
-            for facility in facilities:
-                for unit in facility.get('Units', []):
-                    unit_type = unit.get('UnitTypeName', '')
-                    unit_type_id = unit.get('UnitTypeId', '')
-                    if unit_type:
-                        unit_types.add(unit_type)
-                        unit_type_ids.add(f"{unit_type} (id:{unit_type_id})")
-
-            p(f"Unit types found: {sorted(unit_type_ids)}")
-
-            # Also check nearby places
-            nearby = data.get('NearbyPlaces', [])
-            p(f"Nearby places: {len(nearby)}")
-
-            # Print raw first 500 chars to understand structure
-            p(f"Raw response preview: {response.text[:800]}")
+        p(f"Facilities count: {len(facilities)}")
+        # Print full raw structure of first facility to understand it
+        if facilities:
+            p(f"First facility raw: {json.dumps(facilities[0], indent=2)[:2000]}")
 
     except Exception as e:
         p(f"ERROR: {e}")
+        import traceback
+        p(traceback.format_exc())
 
 p("\nDone!")
