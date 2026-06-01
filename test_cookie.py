@@ -16,9 +16,6 @@ headers = {
 PARKS = [
     {'name': 'Leo Carrillo State Beach', 'place_id': 665},
     {'name': 'Carpinteria State Beach',  'place_id': 6},
-    {'name': 'El Capitan State Beach',   'place_id': 8},
-    {'name': 'Doheny State Beach',       'place_id': 639},
-    {'name': 'San Clemente State Beach', 'place_id': 708},
 ]
 
 URL = 'https://california-rdr.prod.cali.rd12.recreation-management.tylerapp.com/rdr/search/place'
@@ -46,13 +43,8 @@ for park in PARKS:
     try:
         response = requests.post(URL, headers=headers, json=payload, timeout=15)
         data = json.loads(response.text)
-        selected = data.get('SelectedPlace', {})
-        facilities = selected.get('Facilities', [])
-
-        p(f"Facilities count: {len(facilities)}")
-        # Print full raw structure of first facility to understand it
-        if facilities:
-            p(f"First facility raw: {json.dumps(facilities[0], indent=2)[:2000]}")
+        # Print full raw response to understand structure
+        p(f"Full response: {json.dumps(data, indent=2)[:3000]}")
 
     except Exception as e:
         p(f"ERROR: {e}")
