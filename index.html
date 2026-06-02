@@ -1196,7 +1196,7 @@
     // Send ONE confirmation email covering all parks
     if (allOk && emailPayload) {
       const allParkNames = parks.map(p => p.park_name).join(', ');
-      fetch('/.netlify/functions/send-confirmation', {
+      fetch('https://send-confirmation.nikobellight.workers.dev', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...emailPayload, park_name: allParkNames, all_parks: parks }),
