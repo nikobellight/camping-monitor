@@ -226,6 +226,19 @@ def match_county(available_sites, customer_site_types):
             matched.append(site)
     return matched
 
+# RC unit type ID to display label mapping
+RC_TYPE_LABELS = {
+    '4303': 'Standard Campsite',
+    '4305': 'Standard Campsite',
+    '4427': 'Standard Campsite',
+    '4328': 'Tent Only Campsite',
+    '4321': 'Hookup — Electric',
+    '4322': 'Hookup — Electric + Water',
+    '4324': 'Hookup — Full (E/W/S)',
+    '4444': 'Hookup — Full (E/W/S)',
+    '4320': 'Hike / Bike Campsite',
+}
+
 def match_rc(available_units, customer_site_types):
     # customer_site_types for RC are comma-separated UnitTypeIds like '4303,4427,4328'
     matched = []
@@ -236,7 +249,9 @@ def match_rc(available_units, customer_site_types):
 
     for unit in available_units:
         if unit['unit_type_id'] in allowed_ids:
-            matched.append(unit)
+            # Use our display label instead of API type name
+            display_label = RC_TYPE_LABELS.get(unit['unit_type_id'], unit['type_name'])
+            matched.append({**unit, 'type_name': display_label})
     return matched
 
 # ============================================================
