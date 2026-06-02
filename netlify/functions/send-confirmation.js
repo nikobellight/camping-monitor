@@ -7,6 +7,10 @@ exports.handler = async function(event) {
     const payload = JSON.parse(event.body);
     const { email, park_name, arrival_date, nights, plan, site_types, cancel_token, expires_at } = payload;
 
+    console.log('Sending email to:', email);
+    console.log('RESEND_API_KEY present:', !!process.env.RESEND_API_KEY);
+    console.log('RESEND_API_KEY starts with:', process.env.RESEND_API_KEY?.substring(0, 10));
+
     const planWeeks = { basic: 4, standard: 8, premium: 16 };
     const weeks = planWeeks[plan] || 4;
     const siteDesc = Array.isArray(site_types) ? site_types.join(', ') : site_types;
@@ -17,7 +21,7 @@ exports.handler = async function(event) {
         <h1 style="color:#F2E8D5;margin:0;font-size:22px;">🏕 Alert confirmed!</h1>
       </div>
       <div style="background:#F9F6F0;padding:32px;border-radius:0 0 12px 12px;">
-        <p style="font-size:16px;color:#2C4A3E;">We're now watching <strong>${park_name}</strong> for you. We'll email you the moment a spot opens.</p>
+        <p style="font-size:16px;color:#2C4A3E;">We're now watching <strong>${park_name}</strong> for you.</p>
         <table style="width:100%;border-collapse:collapse;margin:24px 0;">
           <tr><td style="padding:8px 0;color:#8B5E3C;font-weight:bold;">Park</td><td>${park_name}</td></tr>
           <tr><td style="padding:8px 0;color:#8B5E3C;font-weight:bold;">Arrival</td><td>${arrival_date}</td></tr>
@@ -26,9 +30,6 @@ exports.handler = async function(event) {
           <tr><td style="padding:8px 0;color:#8B5E3C;font-weight:bold;">Plan</td><td>${plan} (${weeks} weeks)</td></tr>
           <tr><td style="padding:8px 0;color:#8B5E3C;font-weight:bold;">Monitoring until</td><td>${expires_at}</td></tr>
         </table>
-        <div style="background:#E8F0EC;border-radius:10px;padding:16px;margin-bottom:24px;font-size:13px;color:#2C4A3E;line-height:1.6;">
-          💡 <strong>Tip:</strong> Create your account on the park booking website now so you can book in seconds when the alert arrives.
-        </div>
         <a href="${cancelUrl}" style="font-size:13px;color:#8B5E3C;">✅ Cancel my alert</a>
       </div>
     </div>`;
@@ -48,9 +49,12 @@ exports.handler = async function(event) {
     });
 
     const data = await res.json();
+    console.log('Resend response status:', res.status);
+    console.log('Resend response:', JSON.stringify(data));
     return { statusCode: res.status, body: JSON.stringify(data) };
 
   } catch(e) {
+    console.log('Error:', e.message);
     return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
   }
 };
