@@ -5,7 +5,7 @@ exports.handler = async function(event) {
 
   try {
     const payload = JSON.parse(event.body);
-    const { email, park_name, arrival_date, nights, plan, site_types, cancel_token, expires_at } = payload;
+    const { email, park_name, arrival_date, nights, plan, site_types, cancel_token, expires_at, all_parks } = payload;
 
     console.log('Sending email to:', email);
     console.log('RESEND_API_KEY present:', !!process.env.RESEND_API_KEY);
@@ -42,8 +42,8 @@ exports.handler = async function(event) {
     </div>
 
     <!-- Subject bar -->
-    <div style="background:#E8F0EC;padding:12px 32px;border-left:4px solid #7CC8A0;">
-      <span style="font-size:13px;color:#2C4A3E;font-weight:600;">Subject: ✅ Your alert is active — ${park_name}, ${arrivalFormatted}</span>
+    <div style="background:#FFF3EE;padding:12px 32px;border-left:4px solid #D4622A;">
+      <span style="font-size:13px;color:#D4622A;font-weight:600;">Subject: ✅ Your alert is active — ${park_name}, ${arrivalFormatted}</span>
     </div>
 
     <!-- Main card -->
@@ -77,7 +77,7 @@ exports.handler = async function(event) {
           </tr>
           <tr>
             <td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;border-bottom:1px solid #EDE8DF;">Monitoring until</td>
-            <td style="padding:10px 0;font-size:14px;border-bottom:1px solid #EDE8DF;"><span style="color:#D4622A;font-weight:600;">${expiresFormatted} (day before arrival)</span></td>
+            <td style="padding:10px 0;font-size:14px;border-bottom:1px solid #EDE8DF;"><span style="color:#2C7A4E;font-weight:600;">${expiresFormatted} (day before arrival)</span></td>
           </tr>
           <tr>
             <td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;">Current check speed</td>
