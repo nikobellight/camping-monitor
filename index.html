@@ -1234,7 +1234,7 @@
 
     // Premium — goes to Lemon Squeezy (payment first)
     if (plan === 'premium') {
-      window.open('https://YOUR_LEMONSQUEEZY_PREMIUM_LINK', '_blank');
+      window.open('https://campsitealert-app.lemonsqueezy.com/checkout/buy/29a92863-fc6b-4889-887a-2b8efd53b155', '_blank');
       btn.textContent = 'Pay $20 & Set Up My Alert →';
       btn.disabled = false;
       return;
@@ -1242,7 +1242,7 @@
 
     // Paid Basic/Standard after free period ends — Lemon Squeezy
     if (!isFree) {
-      const link = plan === 'basic' ? 'https://YOUR_LEMONSQUEEZY_BASIC_LINK' : 'https://YOUR_LEMONSQUEEZY_STANDARD_LINK';
+      const link = plan === 'basic' ? 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/c24ec1c6-7dda-4c37-91a0-215874653a17' : 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/42ce96de-62dc-4f71-9536-00c222a21030';
       window.open(link, '_blank');
       btn.textContent = plan === 'basic' ? 'Pay $5 & Set Up My Alert →' : 'Pay $10 & Set Up My Alert →';
       btn.disabled = false;
