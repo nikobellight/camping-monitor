@@ -305,7 +305,7 @@ def send_alert_email(customer, park_name, park_system, available_sites, arrival_
                 'html': html,
             }
         )
-        return r.status_code == 200
+        return r.status_code in (200, 201)
     except Exception as e:
         p(f"Email error: {e}")
         return False
