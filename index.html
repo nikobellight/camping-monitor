@@ -1101,10 +1101,17 @@
     const plan = document.getElementById('planSelect').value;
     const promoCode = document.getElementById('promoField').value.trim().toUpperCase() || null;
 
-    // Expiry: basic=4w, standard=8w, premium=16w
+    // Expiry: basic=4w, standard=8w, premium=16w — capped at arrival date - 1 day
     const weekMap = { basic: 4, standard: 8, premium: 16 };
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + (weekMap[plan] || 4) * 7);
+    if (arrivalDate) {
+      const dayBeforeArrival = new Date(arrivalDate);
+      dayBeforeArrival.setDate(dayBeforeArrival.getDate() - 1);
+      if (dayBeforeArrival < expiresAt) {
+        expiresAt.setTime(dayBeforeArrival.getTime());
+      }
+    }
 
     // Collect parks (up to 3 slots)
     const parks = [];
