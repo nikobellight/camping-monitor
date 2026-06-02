@@ -44,8 +44,13 @@ def supabase_get(table, params={}):
         'apikey': SUPABASE_KEY,
         'Authorization': f'Bearer {SUPABASE_KEY}',
         'Content-Type': 'application/json',
+        'Prefer': 'return=representation',
     }
     r = requests.get(f'{SUPABASE_URL}/rest/v1/{table}', headers=headers, params=params)
+    p(f"Supabase GET status: {r.status_code}")
+    if r.status_code != 200:
+        p(f"Supabase GET error: {r.text[:200]}")
+        return []
     return r.json()
 
 def supabase_patch(table, match_params, data):
@@ -62,30 +67,43 @@ def supabase_patch(table, match_params, data):
 # ============================================================
 def get_active_alerts():
     today = date.today().isoformat()
-    now = datetime.now()
 
     # Filter by arrival date proximity based on MODE
-    alerts = supabase_get('alerts', {
+    result = supabase_get('alerts', {
         'active': 'eq.true',
         'expires_at': f'gte.{today}',
         'select': '*'
     })
 
+    p(f"Supabase response type: {type(result)}")
+    p(f"Supabase response: {str(result)[:200]}")
+
+    # Handle error response
+    if not isinstance(result, list):
+        p(f"ERROR: Supabase returned unexpected response: {result}")
+        return []
+
+    if len(result) == 0:
+        p("No active alerts in database.")
+        return []
+
     if MODE == '8am':
-        # Only ReserveCalifornia parks
-        return [a for a in alerts if a['park_system'] == 'reserve_california']
+        return [a for a in result if a.get('park_system') == 'reserve_california']
 
     filtered = []
-    for alert in alerts:
-        arrival = date.fromisoformat(alert['arrival_date'])
-        days_until = (arrival - date.today()).days
+    for alert in result:
+        try:
+            arrival = date.fromisoformat(alert['arrival_date'])
+            days_until = (arrival - date.today()).days
 
-        if MODE == '5min' and days_until <= 14:
-            filtered.append(alert)
-        elif MODE == '10min' and 14 < days_until <= 28:
-            filtered.append(alert)
-        elif MODE == '15min' and days_until > 28:
-            filtered.append(alert)
+            if MODE == '5min' and days_until <= 14:
+                filtered.append(alert)
+            elif MODE == '10min' and 14 < days_until <= 28:
+                filtered.append(alert)
+            elif MODE == '15min' and days_until > 28:
+                filtered.append(alert)
+        except Exception as e:
+            p(f"Error processing alert {alert.get('id')}: {e}")
 
     return filtered
 
