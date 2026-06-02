@@ -1121,7 +1121,8 @@
       if (!sel || !sel.value) continue;
       const opt = sel.options[sel.selectedIndex];
       const siteTypeCheckboxes = document.querySelectorAll(`#siteTypeCheckboxes_${i} input[type="checkbox"]:checked`);
-      const siteTypes = Array.from(siteTypeCheckboxes).map(cb => { const label = cb.parentElement; return label ? label.textContent.trim() : cb.value; });
+      const system = opt.dataset.system || '';
+      const siteTypes = Array.from(siteTypeCheckboxes).map(cb => system === 'reserve_california' ? cb.value : (cb.parentElement ? cb.parentElement.textContent.trim() : cb.value));
       parks.push({
         park_name: opt.value,
         park_system: opt.dataset.system || '',
@@ -1195,7 +1196,7 @@
     // Send ONE confirmation email covering all parks
     if (allOk && emailPayload) {
       const allParkNames = parks.map(p => p.park_name).join(', ');
-      fetch('https://send-confirmation.nikobellight.workers.dev', {
+      fetch('/.netlify/functions/send-confirmation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...emailPayload, park_name: allParkNames, all_parks: parks }),
