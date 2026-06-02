@@ -1121,8 +1121,7 @@
       if (!sel || !sel.value) continue;
       const opt = sel.options[sel.selectedIndex];
       const siteTypeCheckboxes = document.querySelectorAll(`#siteTypeCheckboxes_${i} input[type="checkbox"]:checked`);
-      const system = opt.dataset.system || '';
-      const siteTypes = Array.from(siteTypeCheckboxes).map(cb => system === 'reserve_california' ? cb.value : (cb.parentElement ? cb.parentElement.textContent.trim() : cb.value));
+      const siteTypes = Array.from(siteTypeCheckboxes).map(cb => { const label = cb.parentElement; return label ? label.textContent.trim() : cb.value; });
       parks.push({
         park_name: opt.value,
         park_system: opt.dataset.system || '',
