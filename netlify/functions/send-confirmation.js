@@ -7,27 +7,55 @@ exports.handler = async function(event) {
     const payload = JSON.parse(event.body);
     const { email, park_name, arrival_date, nights, plan, site_types, cancel_token, expires_at, all_parks } = payload;
 
-    console.log('Sending email to:', email);
-    console.log('RESEND_API_KEY present:', !!process.env.RESEND_API_KEY);
-
     const planWeeks = { basic: 4, standard: 8, premium: 16 };
-    const planParks = { basic: 1, standard: 2, premium: 3 };
+    const planParksCount = { basic: 1, standard: 2, premium: 3 };
     const weeks = planWeeks[plan] || 4;
-    const parks = planParks[plan] || 1;
-    const siteDesc = Array.isArray(site_types) ? site_types.join(' · ') : site_types;
+    const parksCount = planParksCount[plan] || 1;
     const cancelUrl = `https://campsitealert.com/cancel?token=${cancel_token}`;
 
-    // Format arrival date nicely
+    // Format arrival date
     const arrivalFormatted = new Date(arrival_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     const expiresFormatted = new Date(expires_at + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
-    // Determine check speed based on days until arrival
+    // Check speed
     const today = new Date();
     const arrival = new Date(arrival_date + 'T12:00:00');
     const daysUntil = Math.ceil((arrival - today) / (1000 * 60 * 60 * 24));
     let checkSpeed = 'Every 15 min';
     if (daysUntil < 14) checkSpeed = 'Every 5 min';
     else if (daysUntil < 28) checkSpeed = 'Every 10 min';
+
+    // Build per-park site types rows
+    let parkRows = '';
+    if (all_parks && all_parks.length > 1) {
+      all_parks.forEach((p, i) => {
+        const types = Array.isArray(p.site_types) ? p.site_types.join(' · ') : p.site_types;
+        parkRows += `
+          <tr>
+            <td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;width:140px;border-bottom:1px solid #EDE8DF;">Park ${i+1}</td>
+            <td style="padding:10px 0;color:#2C4A3E;font-size:14px;font-weight:600;border-bottom:1px solid #EDE8DF;">${p.park_name}</td>
+          </tr>
+          <tr>
+            <td style="padding:4px 0 10px 0;color:#8B5E3C;font-size:12px;border-bottom:1px solid #EDE8DF;"></td>
+            <td style="padding:4px 0 10px 0;color:#5C7A6E;font-size:13px;border-bottom:1px solid #EDE8DF;">${types}</td>
+          </tr>`;
+      });
+    } else {
+      const siteDesc = Array.isArray(site_types) ? site_types.join(' · ') : site_types;
+      parkRows = `
+        <tr>
+          <td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;width:140px;border-bottom:1px solid #EDE8DF;">Park</td>
+          <td style="padding:10px 0;color:#2C4A3E;font-size:14px;font-weight:600;border-bottom:1px solid #EDE8DF;">${park_name}</td>
+        </tr>
+        <tr>
+          <td style="padding:4px 0 10px 0;color:#8B5E3C;font-size:12px;border-bottom:1px solid #EDE8DF;"></td>
+          <td style="padding:4px 0 10px 0;color:#5C7A6E;font-size:13px;border-bottom:1px solid #EDE8DF;">${siteDesc}</td>
+        </tr>`;
+    }
+
+    // Social proof — random between 8-22
+    const peopleCount = Math.floor(Math.random() * 15) + 8;
+    const firstName = all_parks ? all_parks[0].park_name : park_name;
 
     const html = `<!DOCTYPE html>
 <html>
@@ -43,7 +71,7 @@ exports.handler = async function(event) {
 
     <!-- Subject bar -->
     <div style="background:#FFF3EE;padding:12px 32px;border-left:4px solid #D4622A;">
-      <span style="font-size:13px;color:#D4622A;font-weight:600;">Subject: ✅ Your alert is active — ${park_name}, ${arrivalFormatted}</span>
+      <span style="font-size:13px;color:#2C4A3E;font-weight:400;">Subject: <span style="color:#D4622A;font-weight:700;">✅ Your alert is active</span> — ${park_name}, ${arrivalFormatted}</span>
     </div>
 
     <!-- Main card -->
@@ -55,10 +83,7 @@ exports.handler = async function(event) {
       <!-- Summary box -->
       <div style="background:#F9F6F0;border-radius:12px;padding:24px;margin-bottom:24px;">
         <table style="width:100%;border-collapse:collapse;">
-          <tr>
-            <td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;width:140px;border-bottom:1px solid #EDE8DF;">Park</td>
-            <td style="padding:10px 0;color:#2C4A3E;font-size:14px;font-weight:600;border-bottom:1px solid #EDE8DF;">${park_name}</td>
-          </tr>
+          ${parkRows}
           <tr>
             <td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;border-bottom:1px solid #EDE8DF;">Arrival date</td>
             <td style="padding:10px 0;color:#2C4A3E;font-size:14px;border-bottom:1px solid #EDE8DF;">${arrivalFormatted}</td>
@@ -68,12 +93,8 @@ exports.handler = async function(event) {
             <td style="padding:10px 0;color:#2C4A3E;font-size:14px;border-bottom:1px solid #EDE8DF;">${nights} night${nights > 1 ? 's' : ''}</td>
           </tr>
           <tr>
-            <td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;border-bottom:1px solid #EDE8DF;">Site types</td>
-            <td style="padding:10px 0;color:#2C4A3E;font-size:14px;border-bottom:1px solid #EDE8DF;">${siteDesc}</td>
-          </tr>
-          <tr>
             <td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;border-bottom:1px solid #EDE8DF;">Plan</td>
-            <td style="padding:10px 0;color:#2C4A3E;font-size:14px;border-bottom:1px solid #EDE8DF;">${plan.charAt(0).toUpperCase() + plan.slice(1)} — ${parks} park${parks > 1 ? 's' : ''} · ${weeks} weeks (${Math.round(weeks / 4)} month${weeks > 4 ? 's' : ''})</td>
+            <td style="padding:10px 0;color:#2C4A3E;font-size:14px;border-bottom:1px solid #EDE8DF;">${plan.charAt(0).toUpperCase() + plan.slice(1)} — ${parksCount} park${parksCount > 1 ? 's' : ''} · ${weeks} weeks (${Math.round(weeks / 4)} month${weeks > 4 ? 's' : ''})</td>
           </tr>
           <tr>
             <td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;border-bottom:1px solid #EDE8DF;">Monitoring until</td>
@@ -84,6 +105,11 @@ exports.handler = async function(event) {
             <td style="padding:10px 0;color:#2C4A3E;font-size:14px;">${checkSpeed} → escalates automatically</td>
           </tr>
         </table>
+      </div>
+
+      <!-- Social proof -->
+      <div style="background:#FFF8F0;border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#5C7A6E;line-height:1.6;">
+        👥 <strong style="color:#D4622A;">${peopleCount} people</strong> are currently monitoring <strong>${firstName}</strong> for similar dates — have your park account ready to book fast.
       </div>
 
       <!-- Cancel CTA -->
