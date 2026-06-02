@@ -1,0 +1,21 @@
+name: Check 5min (arrival < 2 weeks)
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [trigger-5min]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install requests
+      - run: python monitor.py
+        env:
+          CHECK_MODE: 5min
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
