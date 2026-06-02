@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampSiteAlert — Never Miss a California Campsite Again</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232C4A3E'/><text y='.9em' font-size='80' x='10'>🏕</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand: #F2E8D5;
+    --forest: #2C4A3E;
+    --moss: #4A7C59;
+    --sunset: #D4622A;
+    --cream: #FAF6EF;
+    --bark: #8B5E3C;
+    --mist: #E8F0EC;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--forest); overflow-x: hidden; }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; transition: background 0.3s, padding 0.3s; }
+  nav.scrolled { background: rgba(44,74,62,0.97); padding: 14px 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.2); }
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--sand); text-decoration: none; }
+  .nav-logo span { color: #7CC8A0; }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a { color: rgba(242,232,213,0.7); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--sand); }
+  .nav-cta { background: var(--sunset) !important; color: white !important; padding: 10px 24px; border-radius: 100px; font-weight: 500 !important; }
+
+  .hero { min-height: 100vh; background: var(--forest); position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px 24px; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 20% 50%, rgba(74,124,89,0.3) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(27,79,114,0.25) 0%, transparent 50%); }
+  .stars { position: absolute; inset: 0; overflow: hidden; }
+  .star { position: absolute; background: rgba(255,255,255,0.6); border-radius: 50%; animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s); }
+  @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
+  .mountains { position: absolute; bottom: 0; left: 0; right: 0; height: 45%; }
+  .mountains svg { width: 100%; height: 100%; }
+  .hero-content { position: relative; z-index: 10; max-width: 780px; }
+  .badge { display: inline-block; background: rgba(212,98,42,0.9); color: white; font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; padding: 6px 16px; border-radius: 100px; margin-bottom: 28px; animation: fadeUp 0.6s ease both; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px, 7vw, 88px); font-weight: 900; color: var(--sand); line-height: 1.0; margin-bottom: 12px; animation: fadeUp 0.7s ease both 0.1s; }
+  .hero h1 em { font-style: italic; color: #7CC8A0; }
+  .hero-sub { font-size: clamp(16px, 2.5vw, 22px); color: rgba(242,232,213,0.75); font-weight: 300; margin-bottom: 48px; line-height: 1.6; animation: fadeUp 0.7s ease both 0.2s; }
+  .speed-stats { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; animation: fadeUp 0.7s ease both 0.25s; }
+  .speed-stat strong { display: block; font-family: 'Playfair Display', serif; font-size: 28px; color: #7CC8A0; font-weight: 700; }
+  .speed-stat span { font-size: 12px; color: rgba(242,232,213,0.55); letter-spacing: 1px; text-transform: uppercase; }
+  .hero-cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; animation: fadeUp 0.7s ease both 0.3s; }
+  .btn-primary { background: var(--sunset); color: white; border: none; padding: 18px 40px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500; border-radius: 100px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 8px 32px rgba(212,98,42,0.4); text-decoration: none; display: inline-block; }
+  .btn-primary:hover { transform: translateY(-2px); }
+  .btn-secondary { background: transparent; color: var(--sand); border: 1.5px solid rgba(242,232,213,0.4); padding: 18px 40px; font-family: 'DM Sans', sans-serif; font-size: 16px; border-radius: 100px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+  .btn-secondary:hover { border-color: var(--sand); background: rgba(242,232,213,0.08); }
+  .scroll-hint { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); color: rgba(242,232,213,0.4); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; animation: bounce 2s ease-in-out infinite; z-index: 10; }
+  @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: var(--sunset); margin-bottom: 20px; }
+
+  .problem { background: var(--sand); padding: 100px 24px; text-align: center; }
+  .problem h2 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 56px); font-weight: 700; color: var(--forest); max-width: 700px; margin: 0 auto 24px; line-height: 1.15; }
+  .problem p { font-size: 18px; color: var(--bark); max-width: 560px; margin: 0 auto; line-height: 1.7; font-weight: 300; }
+  .pain-points { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-top: 64px; max-width: 900px; margin-left: auto; margin-right: auto; }
+  .pain-card { background: white; border-radius: 20px; padding: 32px 28px; flex: 1; min-width: 220px; max-width: 260px; text-align: left; box-shadow: 0 4px 24px rgba(44,74,62,0.08); }
+  .pain-icon { font-size: 32px; margin-bottom: 16px; }
+  .pain-card h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--forest); margin-bottom: 10px; }
+  .pain-card p { font-size: 14px; color: var(--bark); line-height: 1.6; font-weight: 300; }
+
+  .how { background: var(--forest); padding: 100px 24px; text-align: center; }
+  .how h2 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 52px); font-weight: 700; color: var(--sand); margin-bottom: 16px; }
+  .how > p { color: rgba(242,232,213,0.65); font-size: 18px; font-weight: 300; margin-bottom: 72px; }
+  .steps { display: flex; gap: 0; justify-content: center; flex-wrap: wrap; max-width: 960px; margin: 0 auto; }
+  .step { flex: 1; min-width: 180px; max-width: 220px; padding: 32px 20px; position: relative; text-align: center; }
+  .step-num { width: 56px; height: 56px; background: var(--moss); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: white; margin: 0 auto 20px; }
+  .step h3 { font-family: 'Playfair Display', serif; font-size: 19px; color: var(--sand); margin-bottom: 10px; font-weight: 700; }
+  .step p { font-size: 13px; color: rgba(242,232,213,0.6); line-height: 1.6; font-weight: 300; }
+  .step-arrow { position: absolute; right: -12px; top: 44%; transform: translateY(-50%); color: var(--moss); font-size: 24px; }
+
+  /* SPEED EXPLAINER */
+  .speed-explainer { background: rgba(255,255,255,0.05); border: 1px solid rgba(242,232,213,0.1); border-radius: 16px; padding: 28px 32px; max-width: 700px; margin: 60px auto 0; text-align: left; }
+  .speed-explainer h4 { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--sand); margin-bottom: 16px; font-weight: 700; }
+  .speed-explainer p { font-size: 13px; color: rgba(242,232,213,0.6); margin-bottom: 16px; font-weight: 300; line-height: 1.6; }
+  .speed-timeline { display: flex; flex-direction: column; gap: 10px; }
+  .speed-row { display: flex; align-items: center; gap: 16px; }
+  .speed-bar-wrap { flex: 1; background: rgba(255,255,255,0.08); border-radius: 100px; height: 8px; overflow: hidden; }
+  .speed-bar { height: 100%; border-radius: 100px; background: var(--moss); }
+  .speed-label { font-size: 12px; color: rgba(242,232,213,0.5); width: 120px; flex-shrink: 0; }
+  .speed-value { font-size: 12px; color: #7CC8A0; font-weight: 500; width: 80px; flex-shrink: 0; text-align: right; }
+
+  .email-preview-section { background: var(--sand); padding: 100px 24px; text-align: center; }
+  .email-preview-section h2 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 46px); font-weight: 700; color: var(--forest); margin-bottom: 12px; }
+  .email-preview-section > p { color: var(--bark); font-size: 17px; font-weight: 300; margin-bottom: 40px; }
+  .email-toggle { display: flex; gap: 12px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+  .email-toggle button { padding: 10px 24px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .email-mockup { background: white; border-radius: 20px; max-width: 520px; margin: 0 auto; box-shadow: 0 12px 48px rgba(44,74,62,0.14); overflow: hidden; text-align: left; }
+  .email-header { background: var(--forest); padding: 24px 32px; }
+  .email-logo { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--sand); font-weight: 700; }
+  .email-logo span { color: #7CC8A0; }
+  .email-subject { background: var(--mist); padding: 14px 32px; font-size: 13px; color: var(--forest); font-weight: 500; border-bottom: 1px solid rgba(44,74,62,0.08); }
+  .email-subject strong { color: var(--sunset); }
+  .email-body { padding: 32px; }
+  .email-body h3 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--forest); margin-bottom: 8px; font-weight: 700; }
+  .email-body p { font-size: 14px; color: var(--bark); line-height: 1.7; margin-bottom: 20px; font-weight: 300; }
+  .email-details { background: var(--mist); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .email-detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(44,74,62,0.08); font-size: 13px; }
+  .email-detail-row:last-child { border-bottom: none; }
+  .email-detail-row span:first-child { color: var(--bark); }
+  .email-detail-row span:last-child { color: var(--forest); font-weight: 500; }
+  .competition-box { background: rgba(212,98,42,0.06); border: 1.5px solid rgba(212,98,42,0.25); border-radius: 12px; padding: 18px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; }
+  .competition-icon { font-size: 28px; flex-shrink: 0; }
+  .competition-text { font-size: 13px; color: var(--forest); line-height: 1.5; }
+  .competition-text strong { color: var(--sunset); }
+  .email-btn { display: block; color: white; text-align: center; padding: 14px; border-radius: 100px; font-size: 14px; font-weight: 500; text-decoration: none; margin-bottom: 8px; }
+  .email-footer-note { font-size: 11px; color: rgba(139,94,60,0.6); text-align: center; line-height: 1.5; }
+  .stop-alerts-box { background: var(--mist); border-radius: 12px; padding: 20px; margin-bottom: 16px; text-align: center; }
+  .stop-alerts-box p { font-size: 13px; color: var(--forest); margin-bottom: 12px; font-weight: 400; }
+  .stop-alerts-btn { display: inline-block; background: white; border: 1.5px solid rgba(44,74,62,0.2); color: var(--forest); padding: 10px 24px; border-radius: 100px; font-size: 13px; font-weight: 500; text-decoration: none; }
+
+  .parks { background: var(--mist); padding: 100px 24px; text-align: center; }
+  .parks h2 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 52px); font-weight: 700; color: var(--forest); margin-bottom: 16px; }
+  .parks > p { color: var(--bark); font-size: 18px; font-weight: 300; margin-bottom: 32px; }
+  .parks-legend { display: flex; gap: 24px; justify-content: center; font-size: 12px; color: var(--bark); margin-bottom: 40px; flex-wrap: wrap; }
+  .parks-legend span { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .parks-grid { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; max-width: 800px; margin: 0 auto 32px; }
+  .park-tag { background: white; border: 1.5px solid rgba(44,74,62,0.15); color: var(--forest); padding: 10px 20px; border-radius: 100px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: all 0.2s; text-decoration: none; }
+  .park-tag:hover { background: var(--forest); color: var(--sand); border-color: var(--forest); }
+  .park-tag.coming-soon { opacity: 0.5; cursor: default; pointer-events: none; border-style: dashed; }
+  .park-dot { width: 8px; height: 8px; background: var(--moss); border-radius: 50%; flex-shrink: 0; }
+  .park-dot.soon { background: var(--bark); }
+
+  /* PRICING */
+  .pricing { background: var(--cream); padding: 100px 24px; text-align: center; }
+  .pricing h2 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 52px); font-weight: 700; color: var(--forest); margin-bottom: 16px; }
+  .pricing > p { color: var(--bark); font-size: 18px; font-weight: 300; margin-bottom: 16px; }
+  .pricing-note { font-size: 13px; color: var(--bark); margin-bottom: 64px; background: var(--mist); display: inline-block; padding: 10px 20px; border-radius: 100px; }
+  .pricing-cards { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; max-width: 1020px; margin: 0 auto; }
+  .pricing-card { background: white; border-radius: 24px; padding: 40px 32px; flex: 1; min-width: 260px; max-width: 310px; text-align: left; border: 1.5px solid rgba(44,74,62,0.1); position: relative; transition: transform 0.2s, box-shadow 0.2s; }
+  .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(44,74,62,0.12); }
+  .pricing-card.featured { background: var(--forest); border-color: var(--forest); transform: scale(1.04); }
+  .pricing-card.featured:hover { transform: scale(1.04) translateY(-4px); }
+  .pricing-card.active-plan { border-color: var(--sunset); box-shadow: 0 0 0 2px rgba(212,98,42,0.3); }
+  .featured-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--sunset); color: white; font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; padding: 5px 16px; border-radius: 100px; white-space: nowrap; }
+  .plan-name { font-size: 12px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--moss); margin-bottom: 16px; }
+  .featured .plan-name { color: rgba(242,232,213,0.6); }
+  .plan-price { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900; color: var(--forest); line-height: 1; margin-bottom: 4px; }
+  .featured .plan-price { color: var(--sand); }
+  .plan-price span { font-size: 20px; font-weight: 400; font-family: 'DM Sans', sans-serif; }
+  .plan-desc { font-size: 13px; color: var(--bark); margin-bottom: 20px; font-weight: 300; }
+  .featured .plan-desc { color: rgba(242,232,213,0.55); }
+
+  /* SPEED ESCALATION in card */
+  .plan-speed-title { font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--moss); margin-bottom: 10px; }
+  .featured .plan-speed-title { color: rgba(124,200,160,0.8); }
+  .plan-speed-rows { margin-bottom: 20px; }
+  .plan-speed-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 8px; margin-bottom: 4px; background: rgba(44,74,62,0.04); font-size: 12px; }
+  .featured .plan-speed-row { background: rgba(255,255,255,0.07); }
+  .plan-speed-row span:first-child { color: var(--bark); }
+  .featured .plan-speed-row span:first-child { color: rgba(242,232,213,0.5); }
+  .plan-speed-row span:last-child { color: var(--forest); font-weight: 500; }
+  .featured .plan-speed-row span:last-child { color: #7CC8A0; }
+  .plan-speed-row.fast { background: rgba(74,124,89,0.08); }
+  .featured .plan-speed-row.fast { background: rgba(124,200,160,0.15); }
+
+  .plan-features { list-style: none; margin-bottom: 24px; border-top: 1px solid rgba(44,74,62,0.08); padding-top: 16px; }
+  .featured .plan-features { border-top-color: rgba(242,232,213,0.1); }
+  .plan-features li { font-size: 14px; color: var(--forest); padding: 7px 0; border-bottom: 1px solid rgba(44,74,62,0.06); display: flex; align-items: center; gap: 10px; }
+  .featured .plan-features li { color: rgba(242,232,213,0.8); border-bottom-color: rgba(242,232,213,0.1); }
+  .check { width: 18px; height: 18px; background: var(--mist); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; color: var(--moss); font-weight: 700; }
+  .featured .check { background: rgba(74,124,89,0.3); color: #7CC8A0; }
+  .plan-select-hint { font-size: 12px; color: var(--bark); text-align: center; font-style: italic; }
+  .featured .plan-select-hint { color: rgba(242,232,213,0.45); }
+
+  .form-section { background: var(--sand); padding: 100px 24px; text-align: center; }
+  .form-section h2 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 52px); font-weight: 700; color: var(--forest); margin-bottom: 12px; }
+  .form-section > p { color: var(--bark); font-size: 18px; font-weight: 300; margin-bottom: 48px; }
+  .alert-form { background: white; border-radius: 28px; padding: 48px 40px; max-width: 580px; margin: 0 auto; box-shadow: 0 8px 48px rgba(44,74,62,0.1); text-align: left; }
+  .form-row { margin-bottom: 20px; }
+  .form-row label { display: block; font-size: 12px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--forest); margin-bottom: 8px; }
+  .form-row input, .form-row select { width: 100%; padding: 14px 18px; border: 1.5px solid rgba(44,74,62,0.15); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--forest); background: var(--cream); outline: none; transition: border-color 0.2s; appearance: none; }
+  .form-row input:focus, .form-row select:focus { border-color: var(--moss); background: white; }
+  .form-row-double { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .founding-banner { background: var(--forest); color: var(--sand); border-radius: 12px; padding: 16px 20px; font-size: 13px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+  .founding-banner strong { color: #7CC8A0; }
+  .founding-loading { opacity: 0.5; font-size: 12px; }
+  .site-type-note { font-size: 12px; color: var(--moss); margin-top: 8px; font-weight: 500; }
+  .live-competition { background: rgba(212,98,42,0.06); border: 1.5px solid rgba(212,98,42,0.2); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: var(--forest); display: none; align-items: center; gap: 10px; line-height: 1.5; }
+  .live-competition.visible { display: flex; }
+  .live-dot { width: 8px; height: 8px; background: var(--sunset); border-radius: 50%; flex-shrink: 0; animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+  .form-submit { width: 100%; padding: 18px; background: var(--sunset); color: white; border: none; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 24px rgba(212,98,42,0.35); margin-top: 8px; }
+  .form-submit:hover { transform: translateY(-2px); }
+  .form-note { text-align: center; font-size: 12px; color: var(--bark); margin-top: 16px; font-weight: 300; }
+  .success-msg { display: none; background: var(--mist); border: 1.5px solid var(--moss); border-radius: 16px; padding: 32px; text-align: center; }
+  .success-msg.visible { display: block; }
+  .success-msg h3 { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--forest); margin-bottom: 10px; }
+  .success-msg p { font-size: 14px; color: var(--bark); font-weight: 300; line-height: 1.6; }
+
+  .disclaimer { background: var(--forest); padding: 60px 24px; }
+  .disclaimer-inner { max-width: 760px; margin: 0 auto; }
+  .disclaimer h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--sand); margin-bottom: 20px; font-weight: 700; }
+  .disclaimer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .disclaimer-grid { grid-template-columns: 1fr; } .form-row-double { grid-template-columns: 1fr; } .nav-links { display: none; } .pricing-card { max-width: 100%; } }
+  .disclaimer-item { display: flex; gap: 12px; align-items: flex-start; }
+  .disclaimer-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  .disclaimer-item p { font-size: 13px; color: rgba(242,232,213,0.6); line-height: 1.6; font-weight: 300; }
+  .disclaimer-item p strong { color: rgba(242,232,213,0.85); font-weight: 500; }
+
+  footer { background: #1a2e27; padding: 40px 24px; text-align: center; color: rgba(242,232,213,0.4); font-size: 13px; font-weight: 300; }
+  footer strong { color: var(--sand); font-family: 'Playfair Display', serif; font-size: 20px; display: block; margin-bottom: 12px; font-weight: 700; }
+  footer a { color: rgba(242,232,213,0.4); text-decoration: none; }
+  footer a:hover { color: var(--sand); }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="/" class="nav-logo">CampSite<span>Alert</span></a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#parks">Parks</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#alert" class="nav-cta">Get Alerted</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="stars" id="stars"></div>
+  <div class="mountains">
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,320 L0,200 L120,120 L240,180 L360,80 L480,160 L600,60 L720,140 L840,40 L960,130 L1080,70 L1200,150 L1320,90 L1440,160 L1440,320 Z" fill="rgba(27,79,114,0.25)"/>
+      <path d="M0,320 L0,240 L180,160 L300,220 L420,140 L540,200 L660,120 L780,190 L900,110 L1020,180 L1140,130 L1260,200 L1380,150 L1440,180 L1440,320 Z" fill="rgba(44,74,62,0.4)"/>
+      <path d="M0,320 L0,280 L240,220 L360,260 L480,200 L600,250 L720,190 L840,240 L960,200 L1080,250 L1200,210 L1320,260 L1440,230 L1440,320 Z" fill="rgba(44,74,62,0.6)"/>
+      <path d="M680,280 L720,220 L760,280 Z" fill="rgba(212,98,42,0.9)"/>
+      <path d="M715,280 L715,250" stroke="rgba(242,232,213,0.6)" stroke-width="1.5"/>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="badge">🎁 Free Early Access — <span id="spotsRemainingHero">...</span> spots left</div>
+    <h1>Never miss a<br><em>California campsite</em><br>again.</h1>
+    <p class="hero-sub">Coastal state beaches & county parks — all in one alert service.<br>21 California parks. One simple email when a spot opens.</p>
+    <div class="speed-stats">
+      <div class="speed-stat"><strong>5 min</strong><span>fastest check</span></div>
+      <div class="speed-stat"><strong>24/7</strong><span>monitoring</span></div>
+      <div class="speed-stat"><strong>2 min</strong><span>to set up</span></div>
+    </div>
+    <div class="hero-cta">
+      <a href="#alert" class="btn-primary">Get My Alert — from $5</a>
+      <a href="#how" class="btn-secondary">How it works ↓</a>
+    </div>
+  </div>
+  <div class="scroll-hint">↓ scroll</div>
+</section>
+
+<section class="problem">
+  <p class="section-label">The struggle is real</p>
+  <h2>Jalama Beach sold out in minutes. Again.</h2>
+  <p>California's best campsites — state beaches and county parks — vanish the moment they open. Refreshing the page all day isn't a strategy — it's a full-time job.</p>
+  <div class="pain-points">
+    <div class="pain-card"><div class="pain-icon">😩</div><h3>Sold out instantly</h3><p>Parks like Leo Carrillo, Jalama Beach & Doheny book up within minutes of opening — sometimes months in advance.</p></div>
+    <div class="pain-card"><div class="pain-icon">🔄</div><h3>Constant refreshing</h3><p>Cancellations happen daily — but you'd have to be glued to the website 24/7 to catch them.</p></div>
+    <div class="pain-card"><div class="pain-icon">😤</div><h3>Miss the moment</h3><p>A spot opens, someone else books it in seconds. You find out hours later. Too late.</p></div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <p class="section-label" style="color:rgba(124,200,160,0.8)">4 steps, that's all</p>
+  <h2>How it works</h2>
+  <p>Set it up in 2 minutes. We handle everything else.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Pick your park</h3>
+      <p>Choose your campsite, dates, site type and monitoring plan.</p>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Get confirmed</h3>
+      <p>Instant confirmation email with your details and how many others are monitoring the same spot.</p>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>We watch 24/7</h3>
+      <p>Our system checks automatically — and gets faster as your arrival date approaches.</p>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3>Alert + Book</h3>
+      <p>Within minutes of a spot opening you get an email with a direct link. You book it yourself on the park website.</p>
+    </div>
+  </div>
+
+  <div class="speed-explainer">
+    <h4>⚡ Smart speed escalation — on every plan</h4>
+    <p>Check frequency automatically increases as your arrival date gets closer — because that's when it matters most.</p>
+    <div class="speed-timeline">
+      <div class="speed-row">
+        <span class="speed-label">More than 4 weeks before arrival</span>
+        <div class="speed-bar-wrap"><div class="speed-bar" style="width:33%; background:var(--moss);"></div></div>
+        <span class="speed-value">every 15 min</span>
+      </div>
+      <div class="speed-row">
+        <span class="speed-label">2 to 4 weeks before arrival</span>
+        <div class="speed-bar-wrap"><div class="speed-bar" style="width:66%; background:#5a9e6a;"></div></div>
+        <span class="speed-value">every 10 min</span>
+      </div>
+      <div class="speed-row">
+        <span class="speed-label">Last 2 weeks before arrival</span>
+        <div class="speed-bar-wrap"><div class="speed-bar" style="width:100%; background:#7CC8A0;"></div></div>
+        <span class="speed-value">every 5 min</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="email-preview-section" id="email">
+  <p class="section-label">What you receive</p>
+  <h2>Two emails. That's it.</h2>
+  <p>A confirmation when you set up — and an alert the moment your campsite opens.</p>
+
+  <div class="email-toggle">
+    <button onclick="showEmail('confirm')" id="btn-confirm" style="background:var(--forest); color:var(--sand); border:1.5px solid var(--forest);">1 — Confirmation</button>
+    <button onclick="showEmail('alert')" id="btn-alert" style="background:transparent; color:var(--forest); border:1.5px solid rgba(44,74,62,0.3);">2 — Alert</button>
+  </div>
+
+  <!-- Email 1: Confirmation -->
+  <div id="email-confirm" class="email-mockup">
+    <div class="email-header">
+      <div class="email-logo">CampSite<span>Alert</span></div>
+      <div style="font-size:11px; color:rgba(242,232,213,0.5); margin-top:2px;">alerts@campsitealert.com</div>
+    </div>
+    <div class="email-subject">Subject: <strong>✅ Your alert is active</strong> — Jalama Beach, July 4th</div>
+    <div class="email-body">
+      <h3>You're all set! 🏕</h3>
+      <p>We're now monitoring Jalama Beach on your behalf. Here's a summary of your alert:</p>
+      <div class="email-details">
+        <div class="email-detail-row"><span>Park 1</span><span>Jalama Beach</span></div>
+        <div class="email-detail-row"><span>Park 2</span><span>Cachuma Lake</span></div>
+        <div class="email-detail-row"><span>Arrival date</span><span>July 4, 2026</span></div>
+        <div class="email-detail-row"><span>Nights</span><span>2 nights</span></div>
+        <div class="email-detail-row"><span>Site types</span><span>Basic Campsite · Hookup - Partial</span></div>
+        <div class="email-detail-row"><span>Plan</span><span>Standard — 2 parks · 8 weeks (2 months) · up to 2 site types</span></div>
+        <div class="email-detail-row"><span>Monitoring started</span><span>May 29, 2026</span></div>
+        <div class="email-detail-row" style="background:rgba(74,124,89,0.06); border-radius:8px; padding:8px 10px; margin-top:4px;">
+          <span style="color:var(--moss); font-weight:500;">✓ Monitoring until</span>
+          <span style="color:var(--moss); font-weight:600;">July 3, 2026 (day before arrival)</span>
+        </div>
+        <div class="email-detail-row"><span>Current check speed</span><span>Every 15 min → escalates automatically</span></div>
+      </div>
+      <div class="competition-box">
+        <div class="competition-icon">👀</div>
+        <div class="competition-text"><strong>14 people</strong> are currently monitoring Jalama Beach for similar dates — have your <strong>Santa Barbara County Parks</strong> account ready to book fast.</div>
+      </div>
+      <div class="stop-alerts-box">
+        <p>Already found a spot another way?</p>
+        <a href="#" class="stop-alerts-btn">✅ I booked it — stop my alerts</a>
+      </div>
+      <div style="border-top:1px solid rgba(44,74,62,0.08); padding-top:18px; margin-top:8px; display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; align-items:flex-start; gap:10px;">
+          <span style="font-size:16px; flex-shrink:0;">⚡</span>
+          <div>
+            <div style="font-size:13px; color:var(--forest); font-weight:400;">Check speed escalates automatically as your arrival date approaches</div>
+            <a href="#how" style="font-size:12px; color:var(--moss); text-decoration:none; font-weight:500;">see how it works ↑</a>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:16px; flex-shrink:0;">🛑</span>
+          <div style="font-size:13px; color:var(--forest); font-weight:400;">Alerts stop when you click "I booked it" or on your arrival date</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:16px; flex-shrink:0;">🔄</span>
+          <div style="font-size:13px; color:var(--forest); font-weight:400;">If plan expires before arrival with no spot found, we'll notify you with an option to renew</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Email 2: Alert -->
+  <div id="email-alert" class="email-mockup" style="display:none;">
+    <div class="email-header">
+      <div class="email-logo">CampSite<span>Alert</span></div>
+      <div style="font-size:11px; color:rgba(242,232,213,0.5); margin-top:2px;">alerts@campsitealert.com</div>
+    </div>
+    <div class="email-subject">Subject: <strong>🏕 Spot available!</strong> — Jalama Beach, July 4th</div>
+    <div class="email-body">
+      <h3>A site just opened up! 🎉</h3>
+      <p>A <strong>Basic Campsite</strong> just became available at <strong>Jalama Beach</strong> for your dates. Move fast — these spots go quickly!</p>
+      <div class="email-details">
+        <div class="email-detail-row"><span>Park</span><span>Jalama Beach</span></div>
+        <div class="email-detail-row"><span>Date available</span><span>July 4, 2026</span></div>
+        <div class="email-detail-row"><span>Site type</span><span>Basic Campsite</span></div>
+        <div class="email-detail-row"><span>Detected at</span><span>June 12, 2026 — 8:43am</span></div>
+      </div>
+      <a href="https://santabarbara.camava.com/reservation/camping/index.asp" target="_blank" class="email-btn" style="background:var(--sunset);">→ Book now on Santa Barbara County Parks</a>
+      <p style="font-size:11px; color:rgba(139,94,60,0.7); text-align:center; margin-top:-4px; margin-bottom:16px;">Opens the county park booking page — select your park and dates to complete your reservation.</p>
+      <div class="stop-alerts-box">
+        <p>Already booked your spot?</p>
+        <a href="#" class="stop-alerts-btn">✅ I booked it — stop my alerts</a>
+      </div>
+      <p class="email-footer-note">We'll keep monitoring in case you miss this one. Click "I booked it" to stop future alerts for this search.</p>
+    </div>
+  </div>
+
+
+</section>
+
+<section class="parks" id="parks">
+  <p class="section-label">Coverage</p>
+  <h2>Parks we cover</h2>
+  <p>21 California parks — coastal state beaches & county parks. Click any pin on the map or park name below to view availability.</p>
+  <div class="parks-legend">
+    <span><span class="legend-dot" style="background:#1B6CA8;"></span> CA State Parks</span>
+    <span><span class="legend-dot" style="background:#4A7C59;"></span> Santa Barbara</span>
+    <span><span class="legend-dot" style="background:#2C4A3E;"></span> Santa Clara</span>
+    <span><span class="legend-dot" style="background:#D4622A;"></span> San Diego</span>
+  </div>
+  <div id="campsitealert-map" style="width:100%; max-width:860px; height:420px; border-radius:20px; margin:0 auto 40px; box-shadow:0 8px 32px rgba(44,74,62,0.15); overflow:hidden;"></div>
+  <div style="margin-bottom:32px;">
+    <p style="font-size:12px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:var(--moss); margin-bottom:16px;">California State Parks (ReserveCalifornia)</p>
+    <div class="parks-grid">
+      <a href="https://www.reservecalifornia.com/park/665" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>Leo Carrillo State Beach</a>
+      <a href="https://www.reservecalifornia.com/park/6" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>Carpinteria State Beach</a>
+      <a href="https://www.reservecalifornia.com/park/8" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>El Capitan State Beach</a>
+      <a href="https://www.reservecalifornia.com/park/639" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>Doheny State Beach</a>
+      <a href="https://www.reservecalifornia.com/park/708" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>San Clemente State Beach</a>
+    </div>
+  </div>
+  <div style="margin-bottom:32px;">
+    <p style="font-size:12px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:var(--moss); margin-bottom:16px;">Santa Barbara County Parks</p>
+    <div class="parks-grid">
+      <a href="https://santabarbara.camava.com/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#4A7C59;"></span>Jalama Beach</a>
+      <a href="https://santabarbara.camava.com/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#4A7C59;"></span>Cachuma Lake</a>
+    </div>
+  </div>
+  <div style="margin-bottom:32px;">
+    <p style="font-size:12px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:var(--moss); margin-bottom:16px;">Santa Clara County Parks</p>
+    <div class="parks-grid">
+      <a href="https://gooutsideandplay.org/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#2C4A3E;"></span>Coyote Lake</a>
+      <a href="https://gooutsideandplay.org/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#2C4A3E;"></span>Joseph Grant Park</a>
+      <a href="https://gooutsideandplay.org/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#2C4A3E;"></span>Mt Madonna Park</a>
+      <a href="https://gooutsideandplay.org/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#2C4A3E;"></span>Sanborn</a>
+      <a href="https://gooutsideandplay.org/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#2C4A3E;"></span>Uvas Canyon Park</a>
+    </div>
+  </div>
+  <div style="margin-bottom:32px;">
+    <p style="font-size:12px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:var(--moss); margin-bottom:16px;">San Diego County Parks</p>
+    <div class="parks-grid">
+      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Agua Caliente</a>
+      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Dos Picos</a>
+      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Guajome</a>
+      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Lake Morena</a>
+      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Potrero</a>
+      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Sweetwater</a>
+      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Tijuana River Valley</a>
+      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Vallecito</a>
+      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>William Heise</a>
+    </div>
+  </div>
+  <p style="font-size:13px; color:var(--bark); font-weight:300;">Don't see your park? <a href="#alert" style="color:var(--moss); text-decoration:none; font-weight:500;">Request it →</a></p>
+</section>
+
+<section class="pricing" id="pricing">
+  <p class="section-label">Pricing</p>
+  <div style="background:linear-gradient(135deg, var(--forest), var(--moss)); border-radius:20px; padding:32px 40px; max-width:600px; margin:0 auto 48px; text-align:center;">
+    <div style="font-size:28px; margin-bottom:8px;">🎁</div>
+    <h3 style="font-family:'Playfair Display',serif; font-size:24px; color:var(--sand); margin-bottom:8px; font-weight:700;">First 15 users get Basic & Standard for free</h3>
+    <p style="color:#7CC8A0; font-size:14px; font-weight:500; margin:0;"><span id="spotsRemainingPricing">...</span> spots remaining</p>
+  </div>
+  <h2>Simple. No subscriptions.</h2>
+  <p>Pay once. Choose your monitoring window and number of parks.</p>
+  <div class="pricing-note">⚡ All plans include smart speed escalation — checks get faster as your arrival date approaches</div>
+  <div class="pricing-cards" id="pricingCards">
+
+    <div class="pricing-card" id="card-basic">
+      <div class="plan-name">Basic</div>
+      <div class="plan-price" id="basicPrice"><span>$</span>5</div>
+      <div class="plan-desc">1 park · 4 weeks (1 month)</div>
+      <p style="font-size:12px; color:var(--bark); font-style:italic; margin-bottom:4px;">One park, one chance</p>
+      <p style="font-size:12px; color:var(--bark); margin-bottom:16px; line-height:1.5;">Best if your arrival date is within the next month.</p>
+      <div class="plan-speed-rows">
+        <div class="plan-speed-row"><span>2 to 4 weeks before arrival</span><span>every 10 min</span></div>
+        <div class="plan-speed-row fast"><span>Last 2 weeks before arrival</span><span>🚀 every 5 min</span></div>
+      </div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span>1 park monitored</li>
+        <li><span class="check">✓</span>1 site type monitored</li>
+        <li><span class="check">✓</span>Confirmation email</li>
+        <li><span class="check">✓</span>Instant alert with park link</li>
+        <li><span class="check">✓</span>Competition count shown</li>
+      </ul>
+      <p class="plan-select-hint">↓ Select in form below</p>
+    </div>
+
+    <div class="pricing-card featured" id="card-standard">
+      <div class="featured-badge">Most popular</div>
+      <div class="plan-name">Standard</div>
+      <div class="plan-price" id="standardPrice"><span>$</span>10</div>
+      <div class="plan-desc">2 parks · 8 weeks (2 months)</div>
+      <p style="font-size:12px; color:rgba(242,232,213,0.5); font-style:italic; margin-bottom:4px;">More options, more time</p>
+      <p style="font-size:12px; color:rgba(242,232,213,0.5); margin-bottom:8px; line-height:1.5;">2 months of monitoring across 2 parks — significantly more chances to catch a cancellation.</p>
+      <div class="plan-speed-rows">
+        <div class="plan-speed-row"><span>More than 4 weeks before arrival</span><span>every 15 min</span></div>
+        <div class="plan-speed-row"><span>2 to 4 weeks before arrival</span><span>every 10 min</span></div>
+        <div class="plan-speed-row fast"><span>Last 2 weeks before arrival</span><span>🚀 every 5 min</span></div>
+      </div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span>2 parks monitored simultaneously</li>
+        <li><span class="check">✓</span>Up to 2 site types monitored</li>
+        <li><span class="check">✓</span>Confirmation email</li>
+        <li><span class="check">✓</span>Instant alert with park link</li>
+        <li><span class="check">✓</span>Competition count shown</li>
+      </ul>
+      <p class="plan-select-hint">↓ Select in form below</p>
+    </div>
+
+    <div class="pricing-card" id="card-premium">
+      <div class="plan-name">Premium</div>
+      <div class="plan-price"><span>$</span>20</div>
+      <div class="plan-desc">3 parks · 16 weeks (4 months)</div>
+      <p style="font-size:12px; color:var(--bark); font-style:italic; margin-bottom:4px;">Maximum coverage, best chance</p>
+      <p style="font-size:12px; color:var(--bark); margin-bottom:8px; line-height:1.5;">4 months watching 3 parks — the longest window gives you the best odds of securing a spot.</p>
+      <div class="plan-speed-rows">
+        <div class="plan-speed-row"><span>More than 4 weeks before arrival</span><span>every 15 min</span></div>
+        <div class="plan-speed-row"><span>2 to 4 weeks before arrival</span><span>every 10 min</span></div>
+        <div class="plan-speed-row fast"><span>Last 2 weeks before arrival</span><span>🚀 every 5 min</span></div>
+      </div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span>3 parks monitored simultaneously</li>
+        <li><span class="check">✓</span>All site types monitored</li>
+        <li><span class="check">✓</span>Confirmation email</li>
+        <li><span class="check">✓</span>Instant alert with park link</li>
+        <li><span class="check">✓</span>Competition count shown</li>
+      </ul>
+      <p class="plan-select-hint">↓ Select in form below</p>
+    </div>
+
+  </div>
+</section>
+
+<section class="form-section" id="alert">
+  <p class="section-label">Get started</p>
+  <h2>Set up your alert</h2>
+  <p>Takes 2 minutes. Confirmation email sent immediately after.</p>
+  <div class="alert-form">
+    <div class="founding-banner">
+      🔥
+      <div><strong>🎁 Free early access</strong> — <span id="spotsRemaining" class="founding-loading">loading...</span> spots remaining</div>
+    </div>
+    <form id="alertForm">
+      <div class="form-row">
+        <label>Your email</label>
+        <input type="email" name="email" id="emailInput" placeholder="you@email.com" required>
+      </div>
+      <div id="parkSelectorsContainer"></div>
+      <div class="live-competition" id="competitionBox">
+        <div class="live-dot"></div>
+        <div id="competitionText"></div>
+      </div>
+      <div class="form-row-double">
+        <div class="form-row" style="margin-bottom:0">
+          <label>Arrival date</label>
+          <input type="date" name="arrival_date" id="arrivalDate" onchange="recommendPlan()" required>
+        </div>
+        <div class="form-row" style="margin-bottom:0">
+          <label>Nights</label>
+          <select name="nights" id="nightsSelect">
+            <option>1 night</option>
+            <option>2 nights</option>
+            <option>3 nights</option>
+            <option>4 nights</option>
+            <option>5 nights</option>
+            <option>6 nights</option>
+            <option>7 nights</option>
+            <option>8 nights</option>
+            <option>9 nights</option>
+            <option>10 nights</option>
+            <option>11 nights</option>
+            <option>12 nights</option>
+            <option>13 nights</option>
+            <option>14 nights</option>
+          </select>
+        </div>
+      </div>
+      <div id="planRecommendation" style="display:none; background:var(--mist); border-radius:12px; padding:14px 18px; margin-bottom:20px; font-size:13px; color:var(--forest); line-height:1.5;"></div>
+      <div class="form-row" style="margin-top:20px">
+        <label>Alert plan</label>
+        <select name="plan" id="planSelect">
+          <option value="basic" id="planOptBasic">Basic — $5 · 🎁 waived (1 park · 4 weeks)</option>
+          <option value="standard" id="planOptStandard" selected>Standard — $10 · 🎁 waived (2 parks · 8 weeks)</option>
+          <option value="premium">Premium — $20 (3 parks · 16 weeks)</option>
+        </select>
+      </div>
+      <div style="background:var(--mist); border-radius:12px; padding:14px 18px; margin-bottom:20px; font-size:13px; color:var(--forest); line-height:1.6;">💡 <strong>Tip:</strong> create your account on the park booking website now — so you can book in seconds when the alert arrives.</div>
+      <div class="form-row" id="promoRow" style="margin-bottom:12px;">
+        <label style="font-size:12px; color:var(--bark); cursor:pointer;" onclick="document.getElementById('promoField').style.display=document.getElementById('promoField').style.display==='none'?'block':'none'">Have a promo code? <span style="color:var(--moss);">Click here →</span></label>
+        <input type="text" name="promo_code" id="promoField" placeholder="Enter promo code" style="display:none; margin-top:8px; width:100%; padding:12px 16px; border:1.5px solid rgba(44,74,62,0.2); border-radius:12px; font-size:14px; background:white; box-sizing:border-box;" oninput="checkPromoCode(this.value)">
+        <div id="promoMsg" style="font-size:12px; margin-top:6px;"></div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="display:flex; align-items:flex-start; gap:12px; cursor:pointer; font-size:13px; color:var(--bark); font-weight:400; text-transform:none; letter-spacing:0; line-height:1.6;">
+          <input type="checkbox" id="termsCheckbox" onchange="updateSubmitBtn()" style="width:16px; height:16px; margin-top:2px; accent-color:var(--moss); cursor:pointer; flex-shrink:0;">
+          I have read and agree to the <a href="#disclaimer" style="color:var(--moss); font-weight:500;">important notices below</a>.
+        </label>
+      </div>
+      <button type="submit" class="form-submit" id="submitBtn" disabled style="opacity:0.5; cursor:not-allowed;">Set Up My Alert →</button>
+    </form>
+    <div class="success-msg" id="successMsg">
+      <div style="font-size:48px;margin-bottom:16px;">🏕</div>
+      <h3>You're all set!</h3>
+      <p>A confirmation email is on its way to <strong id="successEmail"></strong> — check your inbox. We'll notify you within minutes of a spot opening. Happy camping!</p>
+    </div>
+  </div>
+</section>
+
+<section class="disclaimer" id="disclaimer">
+  <div class="disclaimer-inner">
+    <h3>⚠️ Important — Please read before proceeding</h3>
+    <div class="disclaimer-grid">
+      <div class="disclaimer-item"><span class="disclaimer-icon">🔍</span><p><strong>Monitoring service only.</strong> CampSiteAlert checks availability on your behalf. We do not book campsites for you. When we alert you, you must complete the booking yourself directly on the park booking website.</p></div>
+      <div class="disclaimer-item"><span class="disclaimer-icon">❌</span><p><strong>No availability guarantee.</strong> CampSiteAlert monitors availability only — not a reservation service. If no campsite opens during your monitoring period, your alert expires automatically. No spot found = no refund.</p></div>
+      <div class="disclaimer-item"><span class="disclaimer-icon">⏰</span><p><strong>Checks are periodic, not instant.</strong> We check every 5–15 minutes depending on how close your arrival date is. A spot may open and be booked by someone else before your alert is sent.</p></div>
+      <div class="disclaimer-item"><span class="disclaimer-icon">🤝</span><p><strong>Independent service.</strong> CampSiteAlert is not affiliated with, endorsed by, or connected to California State Parks, ReserveCalifornia, or any county park system in any way.</p></div>
+
+      <div class="disclaimer-item"><span class="disclaimer-icon">⚡</span><p><strong>Limitation of liability.</strong> CampSiteAlert is not liable for any missed bookings, losses, or damages resulting from service interruptions, delays, or technical issues beyond our control.</p></div>
+      <div class="disclaimer-item"><span class="disclaimer-icon">🔧</span><p><strong>Service availability.</strong> CampSiteAlert reserves the right to modify or discontinue the service at any time without notice.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <strong>CampSiteAlert</strong>
+  Built by a camper, for campers. SoCal based. 🌊🏕🌲<br><br>
+  © 2026 CampSiteAlert · campsitealert.com · Not affiliated with California State Parks or any county park system<br><br>
+  <a href="#alert">Get Alerted</a> · <a href="#how">How it works</a> · <a href="#parks">Parks</a> · <a href="#pricing">Pricing</a>
+</footer>
+
+<script>
+  // Stars
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*70}%;--d:${2+Math.random()*4}s;--delay:${Math.random()*4}s;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;opacity:${0.3+Math.random()*0.7};`;
+    starsEl.appendChild(star);
+  }
+
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); });
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Live founding counter
+  const TOTAL_SPOTS = 15;
+  const SUPABASE_URL_COUNTER = 'https://wqbxylnrgdtcnxlbemdf.supabase.co';
+  const SUPABASE_KEY_COUNTER = 'sb_publishable_T9dDFWDk4lB4p7mjRpkrsg_VPlzbEMK';
+
+  function updateAllCounters(remaining) {
+    ['spotsRemaining', 'spotsRemainingPricing', 'spotsRemainingHero'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = remaining;
+        el.classList.remove('founding-loading');
+        if (remaining <= 5) el.style.color = '#D4622A';
+      }
+    });
+    if (remaining === 0) {
+      const pricingBanner = document.getElementById('spotsRemainingPricing');
+      if (pricingBanner) pricingBanner.parentElement.parentElement.style.display = 'none';
+    }
+    updatePlanLabels(remaining);
+  }
+
+  async function loadCounter() {
+    try {
+      const res = await fetch(`${SUPABASE_URL_COUNTER}/rest/v1/alerts?free_user=eq.true&promo_code=is.null&select=id`, {
+        headers: {
+          'apikey': SUPABASE_KEY_COUNTER,
+          'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}`,
+        }
+      });
+      const data = await res.json();
+      const used = Array.isArray(data) ? data.length : 0;
+      const remaining = Math.max(0, TOTAL_SPOTS - used);
+      updateAllCounters(remaining);
+      return remaining;
+    } catch(e) {
+      updateAllCounters(15);
+      return 15;
+    }
+  }
+
+  async function incrementCounter() {
+    // Counter now derived from Supabase directly — no action needed
+  }
+
+  loadCounter();
+
+  // Park options HTML
+  const parkOptionsHTML = `
+    <option value="">— Choose a park —</option>
+    <optgroup label="California State Parks (ReserveCalifornia)">
+      <option value="Leo Carrillo State Beach" data-watchers="12" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="665">Leo Carrillo State Beach</option>
+      <option value="Carpinteria State Beach" data-watchers="9" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="6">Carpinteria State Beach</option>
+      <option value="El Capitan State Beach" data-watchers="7" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="8">El Capitan State Beach</option>
+      <option value="Doheny State Beach" data-watchers="11" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="639">Doheny State Beach</option>
+      <option value="San Clemente State Beach" data-watchers="8" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="708">San Clemente State Beach</option>
+    </optgroup>
+    <optgroup label="Santa Barbara County Parks">
+      <option value="Jalama Beach" data-watchers="9" data-platform="Santa Barbara County Parks" data-system="santa_barbara" data-idno="2">Jalama Beach</option>
+      <option value="Cachuma Lake" data-watchers="4" data-platform="Santa Barbara County Parks" data-system="santa_barbara" data-idno="1">Cachuma Lake</option>
+    </optgroup>
+    <optgroup label="Santa Clara County Parks">
+      <option value="Coyote Lake" data-watchers="7" data-platform="Santa Clara County Parks" data-system="santa_clara" data-idno="3">Coyote Lake</option>
+      <option value="Joseph Grant Park" data-watchers="3" data-platform="Santa Clara County Parks" data-system="santa_clara" data-idno="6">Joseph Grant Park</option>
+      <option value="Mt Madonna Park" data-watchers="5" data-platform="Santa Clara County Parks" data-system="santa_clara" data-idno="8">Mt Madonna Park</option>
+      <option value="Sanborn" data-watchers="4" data-platform="Santa Clara County Parks" data-system="santa_clara" data-idno="9">Sanborn</option>
+      <option value="Uvas Canyon Park" data-watchers="6" data-platform="Santa Clara County Parks" data-system="santa_clara" data-idno="12">Uvas Canyon Park</option>
+    </optgroup>
+    <optgroup label="San Diego County Parks">
+      <option value="Agua Caliente" data-watchers="8" data-platform="San Diego County Parks" data-system="san_diego" data-idno="1">Agua Caliente</option>
+      <option value="Dos Picos" data-watchers="5" data-platform="San Diego County Parks" data-system="san_diego" data-idno="2">Dos Picos</option>
+      <option value="Guajome" data-watchers="6" data-platform="San Diego County Parks" data-system="san_diego" data-idno="3">Guajome</option>
+      <option value="Lake Morena" data-watchers="4" data-platform="San Diego County Parks" data-system="san_diego" data-idno="5">Lake Morena</option>
+      <option value="Potrero" data-watchers="3" data-platform="San Diego County Parks" data-system="san_diego" data-idno="6">Potrero</option>
+      <option value="Sweetwater" data-watchers="5" data-platform="San Diego County Parks" data-system="san_diego" data-idno="7">Sweetwater</option>
+      <option value="Tijuana River Valley" data-watchers="2" data-platform="San Diego County Parks" data-system="san_diego" data-idno="9494211">Tijuana River Valley</option>
+      <option value="Vallecito" data-watchers="3" data-platform="San Diego County Parks" data-system="san_diego" data-idno="8">Vallecito</option>
+      <option value="William Heise" data-watchers="6" data-platform="San Diego County Parks" data-system="san_diego" data-idno="9">William Heise</option>
+    </optgroup>
+  `;
+
+  const planParks = { basic: 1, standard: 2, premium: 3 };
+
+  function buildParkSelectors(plan) {
+    const count = planParks[plan] || 1;
+    const limit = planSiteTypeLimits[plan] || 1;
+    const limitLabel = planSiteTypeLabels[plan] || 'select 1';
+    const container = document.getElementById('parkSelectorsContainer');
+    container.innerHTML = '';
+
+    for (let i = 1; i <= count; i++) {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'background:var(--mist); border-radius:16px; padding:20px; margin-bottom:16px;';
+      wrap.innerHTML = `
+        <div class="form-row" style="margin-bottom:12px;">
+          <label>${count > 1 ? 'Park ' + i : 'Select park'} ${i > 1 ? '<span style="font-weight:300;color:var(--bark);font-size:11px;">— optional</span>' : ''}</label>
+          <select name="park_${i}" id="parkSelect_${i}" onchange="onParkChange(${i})" ${i === 1 ? 'required' : ''} style="background:white;">
+            ${parkOptionsHTML}
+          </select>
+        </div>
+        <div id="siteTypeBlock_${i}" style="display:none;">
+          <label style="display:block; font-size:12px; font-weight:500; letter-spacing:1px; text-transform:uppercase; color:var(--forest); margin-bottom:8px;">
+            Site type <span id="siteTypeLimit_${i}" style="font-weight:300; color:var(--bark); text-transform:none; letter-spacing:0; font-size:11px;">— ${limitLabel}</span>
+          </label>
+          <div style="display:flex; flex-direction:column; gap:8px; background:white; border:1.5px solid rgba(44,74,62,0.15); border-radius:12px; padding:14px 18px;" id="siteTypeCheckboxes_${i}"></div>
+          <div id="siteTypeUpgradeNote_${i}" style="display:none; font-size:12px; color:var(--sunset); margin-top:8px; font-weight:500;"></div>
+        </div>`;
+      container.appendChild(wrap);
+    }
+    updateCompetition();
+  }
+
+  function onParkChange(i) {
+    const select = document.getElementById('parkSelect_' + i);
+    const selected = select.options[select.selectedIndex];
+    const block = document.getElementById('siteTypeBlock_' + i);
+    const checkboxContainer = document.getElementById('siteTypeCheckboxes_' + i);
+
+    if (!selected || !selected.value) {
+      block.style.display = 'none';
+      return;
+    }
+
+    const park = selected.value;
+    const system = selected.dataset.system || '';
+    const plan = document.getElementById('planSelect').value;
+    const limit = planSiteTypeLimits[plan] || 1;
+    const types = getSiteTypesForPark(park, system);
+
+    block.style.display = 'block';
+    // Reset all checkboxes first
+    checkboxContainer.innerHTML = '';
+    checkboxContainer.innerHTML = types.map((t, idx) => `
+      <label style="display:flex; align-items:center; gap:10px; font-size:14px; font-weight:400; text-transform:none; letter-spacing:0; color:var(--forest); cursor:pointer;">
+        <input type="checkbox" name="site_type_${i}" value="${t.value}"  
+          onchange="updateSiteTypeLimitForPark(${i})" 
+          style="width:16px; height:16px; accent-color:var(--moss); cursor:pointer;">
+        ${t.label}
+      </label>`).join('');
+
+    // Update competition counter for first park
+    if (i === 1) updateCompetition();
+  }
+
+  function updateSiteTypeLimitForPark(i) {
+    const plan = document.getElementById('planSelect').value;
+    const limit = planSiteTypeLimits[plan] || 1;
+    const checkboxes = document.querySelectorAll(`#siteTypeCheckboxes_${i} input[type="checkbox"]`);
+    const checked = document.querySelectorAll(`#siteTypeCheckboxes_${i} input[type="checkbox"]:checked`);
+    const upgradeNote = document.getElementById('siteTypeUpgradeNote_' + i);
+    const limitLabel = document.getElementById('siteTypeLimit_' + i);
+
+    limitLabel.textContent = '— ' + (planSiteTypeLabels[plan] || 'select 1');
+
+    if (checked.length >= limit) {
+      checkboxes.forEach(cb => {
+        if (!cb.checked) {
+          cb.disabled = true;
+          cb.parentElement.style.opacity = '0.4';
+          cb.parentElement.style.cursor = 'not-allowed';
+        }
+      });
+      if (plan === 'basic') {
+        upgradeNote.style.display = 'block';
+        upgradeNote.textContent = '↑ Upgrade to Standard to select up to 2 site types';
+      } else if (plan === 'standard') {
+        upgradeNote.style.display = 'block';
+        upgradeNote.textContent = '↑ Upgrade to Premium to monitor all site types';
+      } else {
+        upgradeNote.style.display = 'none';
+      }
+    } else {
+      checkboxes.forEach(cb => {
+        cb.disabled = false;
+        cb.parentElement.style.opacity = '1';
+        cb.parentElement.style.cursor = 'pointer';
+      });
+      upgradeNote.style.display = 'none';
+    }
+  }
+
+  // Competition counter
+
+  function updateCompetition() {
+    const parkSelect = document.getElementById('parkSelect_1') || document.getElementById('parkSelect');
+    const box = document.getElementById('competitionBox');
+    const text = document.getElementById('competitionText');
+    const selected = parkSelect ? parkSelect.options[parkSelect.selectedIndex] : null;
+    if (!selected || !selected.dataset.watchers) { box.classList.remove('visible'); return; }
+    const watchers = parseInt(selected.dataset.watchers);
+    const park = selected.value;
+    const platform = selected.dataset.platform || 'the park website';
+    const system = selected.dataset.system || '';
+    box.classList.add('visible');
+    if (watchers >= 10) {
+      text.innerHTML = `<strong>${watchers} people</strong> are currently monitoring <strong>${park}</strong> for similar dates — high demand. Have your <strong>${platform}</strong> account ready to book fast.`;
+    } else if (watchers >= 5) {
+      text.innerHTML = `<strong>${watchers} people</strong> are currently monitoring <strong>${park}</strong> for similar dates — moderate competition. Have your <strong>${platform}</strong> account ready.`;
+    } else {
+      text.innerHTML = `<strong>${watchers} people</strong> are currently monitoring <strong>${park}</strong> for similar dates — lower competition than usual.`;
+    }
+  }
+
+  // Site types per system
+  const systemSiteTypes = {
+    rc_leo_carrillo: [
+      {value: '4303,4427,4328', label: 'Standard Campsite'},
+      {value: '4321', label: 'Hookup — Electric'},
+    ],
+    rc_carpinteria: [
+      {value: '4303,4427', label: 'Standard Campsite'},
+      {value: '4322', label: 'Hookup — Electric + Water'},
+      {value: '4324,4444', label: 'Hookup — Full (E/W/S)'},
+      {value: '4320', label: 'Hike / Bike Campsite'},
+    ],
+    rc_el_capitan: [
+      {value: '4303,4305', label: 'Standard Campsite'},
+      {value: '4320', label: 'Hike / Bike Campsite'},
+    ],
+    rc_doheny: [
+      {value: '4303,4427', label: 'Standard Campsite'},
+      {value: '4328', label: 'Tent Only Campsite'},
+    ],
+    rc_san_clemente: [
+      {value: '4303', label: 'Standard Campsite'},
+    ],
+    santa_barbara_jalama: [
+      {value: 'Basic Campsite', label: 'Basic Campsite'},
+      {value: 'Hookup - Partial', label: 'Hookup — Partial'},
+      {value: 'Waterfront - Campsite', label: 'Waterfront Campsite'},
+      {value: 'Cabin - Jalama', label: 'Cabin'},
+    ],
+    santa_barbara_cachuma: [
+      {value: 'Basic Campsite', label: 'Basic Campsite'},
+      {value: 'Hookup - Full', label: 'Hookup — Full'},
+      {value: 'Hookup - Partial', label: 'Hookup — Partial'},
+      {value: 'Waterfront - Campsite', label: 'Waterfront Campsite'},
+      {value: 'Yurt - Small', label: 'Yurt — Small'},
+      {value: 'Yurt -  Medium', label: 'Yurt — Medium'},
+      {value: 'Yurt - Large', label: 'Yurt — Large'},
+      {value: 'Cabin - Cachuma', label: 'Cabin'},
+    ],
+    santa_clara: [
+      {value: 'Camping - Tent', label: 'Tent Camping'},
+      {value: 'Camping - RV - Partial Hookup', label: 'RV — Partial Hookup'},
+      {value: 'Camping - Hike-In', label: 'Hike-In Camping'},
+      {value: 'Yurt - 16 Ft.', label: 'Yurt — 16 Ft'},
+      {value: 'Yurt - 20 Ft.', label: 'Yurt — 20 Ft'},
+      {value: 'Yurt - 24 Ft.', label: 'Yurt — 24 Ft'},
+    ],
+    san_diego: [
+      {value: 'Non-Hookup', label: 'Non-Hookup (tent/car)'},
+      {value: 'Tent Only', label: 'Tent Only'},
+      {value: 'Partial Hookup', label: 'Partial Hookup'},
+      {value: 'Full Hookup', label: 'Full Hookup'},
+      {value: 'Hike / Bike Campsite', label: 'Hike / Bike'},
+      {value: 'Yurt', label: 'Yurt'},
+      {value: 'Yurt - Large', label: 'Yurt — Large'},
+      {value: 'Cabin', label: 'Cabin'},
+      {value: 'Cabin - Large', label: 'Cabin — Large'},
+      {value: 'Caravan Area', label: 'Caravan Area'},
+    ]
+  };
+
+  function getSiteTypesForPark(parkValue, system) {
+    if (system === 'reserve_california') {
+      if (parkValue === 'Leo Carrillo State Beach') return systemSiteTypes.rc_leo_carrillo;
+      if (parkValue === 'Carpinteria State Beach') return systemSiteTypes.rc_carpinteria;
+      if (parkValue === 'El Capitan State Beach') return systemSiteTypes.rc_el_capitan;
+      if (parkValue === 'Doheny State Beach') return systemSiteTypes.rc_doheny;
+      if (parkValue === 'San Clemente State Beach') return systemSiteTypes.rc_san_clemente;
+      return [];
+    }
+    if (system === 'santa_barbara') {
+      if (parkValue === 'Jalama Beach') return systemSiteTypes.santa_barbara_jalama;
+      if (parkValue === 'Cachuma Lake') return systemSiteTypes.santa_barbara_cachuma;
+    }
+    if (system === 'santa_clara') return systemSiteTypes.santa_clara;
+    if (system === 'san_diego') return systemSiteTypes.san_diego;
+    return [];
+  }
+
+  function buildSiteTypeCheckboxes(parkValue, system) {
+    const types = getSiteTypesForPark(parkValue, system);
+    const container = document.getElementById('siteTypeCheckboxes');
+    const plan = document.getElementById('planSelect').value;
+    const limit = planSiteTypeLimits[plan] || 1;
+
+    if (types.length === 0) {
+      container.innerHTML = '<p style="font-size:13px; color:var(--bark); font-style:italic;">Select a park first to see available site types.</p>';
+      return;
+    }
+
+    container.innerHTML = types.map((t, i) => `
+      <label style="display:flex; align-items:center; gap:10px; font-size:14px; font-weight:400; text-transform:none; letter-spacing:0; color:var(--forest); cursor:pointer;">
+        <input type="checkbox" name="site_type" value="${t.value}" ${i === 0 ? 'checked' : ''} onchange="updateSiteTypeLimit()" style="width:16px; height:16px; accent-color:var(--moss); cursor:pointer;">
+        ${t.label}
+      </label>`).join('');
+    updateSiteTypeLimit();
+  }
+
+  // Site type checkbox limits per plan
+  const planSiteTypeLimits = { basic: 1, standard: 2, premium: 999 };
+  const planSiteTypeLabels = { basic: 'select 1 (Basic plan)', standard: 'select up to 2 (Standard plan)', premium: 'all types available (Premium plan)' };
+
+  // Highlight pricing card + rebuild park selectors
+  function highlightPlan(val) {
+    document.querySelectorAll('.pricing-card').forEach(c => c.classList.remove('active-plan'));
+    const card = document.getElementById('card-' + val);
+    if (card) card.classList.add('active-plan');
+    buildParkSelectors(val);
+  }
+
+  // Highlight only — updates park count WITHOUT clearing existing selections
+  function highlightPlanOnly(val) {
+    document.querySelectorAll('.pricing-card').forEach(c => c.classList.remove('active-plan'));
+    const card = document.getElementById('card-' + val);
+    if (card) card.classList.add('active-plan');
+    updatePlanLabels(parseInt(document.getElementById('spotsRemaining').textContent) || 0);
+    updateParkCount(val);
+    // Refresh site type limits for all visible park slots
+    const count = planParks[val] || 1;
+    for (let i = 1; i <= count; i++) {
+      updateSiteTypeLimitForPark(i);
+    }
+  }
+
+  // Show/hide park slots based on plan without clearing existing selections
+  function updateParkCount(plan) {
+    const count = planParks[plan] || 1;
+    const container = document.getElementById('parkSelectorsContainer');
+    const slots = container.children;
+    // Show/hide existing slots
+    for (let i = 0; i < slots.length; i++) {
+      slots[i].style.display = i < count ? 'block' : 'none';
+    }
+    // If we need more slots than exist, build them
+    if (slots.length < count) {
+      buildParkSelectors(plan);
+    }
+  }
+
+  // Plan recommendation based on arrival date
+  function recommendPlan() {
+    const dateInput = document.getElementById('arrivalDate');
+    const box = document.getElementById('planRecommendation');
+    const planSelect = document.getElementById('planSelect');
+    if (!dateInput.value) { box.style.display = 'none'; return; }
+
+    const today = new Date();
+    const arrival = new Date(dateInput.value);
+    const weeksAway = Math.round((arrival - today) / (1000 * 60 * 60 * 24 * 7));
+
+    if (weeksAway < 0) {
+      box.style.display = 'block';
+      box.innerHTML = `⚠️ This date is in the past — please select a future arrival date.`;
+      box.style.background = 'rgba(212,98,42,0.08)';
+      return;
+    }
+
+    box.style.display = 'block';
+    box.style.background = 'var(--mist)';
+
+    if (weeksAway <= 4) {
+      box.innerHTML = `📅 Your arrival is <strong>${weeksAway} week${weeksAway !== 1 ? 's' : ''} away</strong> — Basic (4 weeks) covers your full window.`;
+    } else if (weeksAway <= 8) {
+      box.innerHTML = `📅 Your arrival is <strong>${weeksAway} weeks away</strong> — Standard (8 weeks) is the right fit.`;
+    } else {
+      box.innerHTML = `📅 Your arrival is <strong>${weeksAway} weeks away</strong> — Premium (16 weeks) gives maximum coverage.`;
+    }
+  }
+  function showEmail(type) {
+    ['confirm','alert','expiry'].forEach(t => {
+      const el = document.getElementById('email-' + t);
+      if (el) el.style.display = t === type ? 'block' : 'none';
+      const btn = document.getElementById('btn-' + t);
+      if (btn) {
+        if (t === type) {
+          btn.style.background = 'var(--forest)'; btn.style.color = 'var(--sand)'; btn.style.borderColor = 'var(--forest)';
+        } else {
+          btn.style.background = 'transparent'; btn.style.color = 'var(--forest)'; btn.style.borderColor = 'rgba(44,74,62,0.3)';
+        }
+      }
+    });
+  }
+
+  // Form submit
+  const form = document.getElementById('alertForm');
+  
+  function updatePlanLabels(remaining) {
+    const isFree = remaining > 0;
+    const optBasic = document.getElementById('planOptBasic');
+    const optStandard = document.getElementById('planOptStandard');
+    const freeBanner = document.getElementById('freeBanner');
+    const paidBanner = document.getElementById('paidBanner');
+    const btn = document.querySelector('.form-submit');
+    
+    if (isFree) {
+      if (optBasic) optBasic.textContent = 'Basic — $5 · 🎁 waived (1 park · 4 weeks)';
+      if (optStandard) optStandard.textContent = 'Standard — $10 · 🎁 waived (2 parks · 8 weeks)';
+      if (freeBanner) freeBanner.style.display = 'block';
+      if (paidBanner) paidBanner.style.display = 'none';
+    } else {
+      if (optBasic) optBasic.textContent = 'Basic — $5 (1 park · 4 weeks)';
+      if (optStandard) optStandard.textContent = 'Standard — $10 (2 parks · 8 weeks)';
+      if (freeBanner) freeBanner.style.display = 'none';
+      if (paidBanner) paidBanner.style.display = 'block';
+    }
+    
+    const plan = document.getElementById('planSelect').value;
+    if (btn && !promoActive) {
+      if (plan === 'premium') {
+        btn.textContent = 'Pay $20 & Set Up My Alert →';
+      } else if (isFree) {
+        btn.textContent = 'Set Up My Alert →';
+      } else {
+        btn.textContent = plan === 'basic' ? 'Pay $5 & Set Up My Alert →' : 'Pay $10 & Set Up My Alert →';
+      }
+    }
+  }
+
+  document.getElementById('planSelect').addEventListener('change', function() {
+    const remaining = parseInt(document.getElementById('spotsRemaining').textContent) || 0;
+    updatePlanLabels(remaining);
+    highlightPlanOnly(this.value);
+  });
+
+  // ── Helpers ──────────────────────────────────────────────
+  function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+  }
+
+  function collectFormData() {
+    const email = document.getElementById('emailInput').value.trim();
+    const arrivalDate = document.getElementById('arrivalDate').value;
+    const nightsRaw = document.getElementById('nightsSelect').value;
+    const nights = parseInt(nightsRaw);
+    const plan = document.getElementById('planSelect').value;
+    const promoCode = document.getElementById('promoField').value.trim().toUpperCase() || null;
+
+    // Expiry: basic=4w, standard=8w, premium=16w
+    const weekMap = { basic: 4, standard: 8, premium: 16 };
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + (weekMap[plan] || 4) * 7);
+
+    // Collect parks (up to 3 slots)
+    const parks = [];
+    const parkCount = planParks[plan] || 1;
+    for (let i = 1; i <= parkCount; i++) {
+      const sel = document.getElementById('parkSelect_' + i);
+      if (!sel || !sel.value) continue;
+      const opt = sel.options[sel.selectedIndex];
+      const siteTypeCheckboxes = document.querySelectorAll(`#siteTypeCheckboxes_${i} input[type="checkbox"]:checked`);
+      const siteTypes = Array.from(siteTypeCheckboxes).map(cb => cb.value);
+      parks.push({
+        park_name: opt.value,
+        park_system: opt.dataset.system || '',
+        parent_idno: opt.dataset.idno || '',
+        site_types: siteTypes,
+      });
+    }
+
+    return { email, arrivalDate, nights, plan, parks, promoCode, expiresAt };
+  }
+
+  async function submitToSupabase(alertData) {
+    try {
+      const payload = { ...alertData, cancel_token: generateUUID(), active: true };
+      const res = await fetch(`${SUPABASE_URL_COUNTER}/rest/v1/alerts`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY_COUNTER,
+          'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        // Call Netlify function to send confirmation email
+        fetch('/.netlify/functions/send-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).catch(e => console.error('Email error:', e));
+      }
+      return res.ok;
+    } catch(e) {
+      console.error('Supabase submit error:', e);
+      return false;
+    }
+  }
+
+  async function submitAlerts(plan, freeUser, promoCode, expiresAt) {
+    const { email, arrivalDate, nights, parks } = collectFormData();
+    if (!email) return { ok: false, reason: 'No email' };
+    if (parks.length === 0) return { ok: false, reason: 'no_park' };
+
+    // Validate: park 1 must have at least one site type selected
+    if (parks[0].site_types.length === 0) return { ok: false, reason: 'no_site_type' };
+
+    let allOk = true;
+    for (const park of parks) {
+      const alertData = {
+        email,
+        park_name: park.park_name,
+        park_system: park.park_system,
+        parent_idno: park.parent_idno,
+        arrival_date: arrivalDate,
+        nights,
+        site_types: park.site_types,
+        plan,
+        expires_at: expiresAt.toISOString().split('T')[0],
+        free_user: freeUser,
+        promo_code: promoCode || null,
+      };
+      const ok = await submitToSupabase(alertData);
+      if (!ok) allOk = false;
+    }
+    return { ok: allOk };
+  }
+  // ─────────────────────────────────────────────────────────
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = form.querySelector('.form-submit');
+    const plan = document.getElementById('planSelect').value;
+    const remaining = parseInt(document.getElementById('spotsRemaining').textContent) || 0;
+    const isFree = remaining > 0 && plan !== 'premium';
+
+    btn.textContent = 'Setting up your alert...';
+    btn.disabled = true;
+
+    // Promo code — Premium free, direct to Supabase
+    if (promoActive) {
+      try {
+        const { expiresAt } = collectFormData();
+        const result = await submitAlerts('premium', true, document.getElementById('promoField').value.trim().toUpperCase(), expiresAt);
+        if (result.reason === 'no_park') { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
+        if (result.reason === 'no_site_type') { btn.textContent = 'Please select a site type'; btn.disabled = false; return; }
+        if (result.ok) {
+          document.getElementById('successEmail').textContent = document.getElementById('emailInput').value.trim();
+          form.style.display = 'none';
+          document.getElementById('successMsg').classList.add('visible');
+        } else { btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
+      } catch(err) { console.error(err); btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
+      return;
+    }
+
+    // Premium — goes to Lemon Squeezy (payment first)
+    if (plan === 'premium') {
+      window.open('https://YOUR_LEMONSQUEEZY_PREMIUM_LINK', '_blank');
+      btn.textContent = 'Pay $20 & Set Up My Alert →';
+      btn.disabled = false;
+      return;
+    }
+
+    // Paid Basic/Standard after free period ends — Lemon Squeezy
+    if (!isFree) {
+      const link = plan === 'basic' ? 'https://YOUR_LEMONSQUEEZY_BASIC_LINK' : 'https://YOUR_LEMONSQUEEZY_STANDARD_LINK';
+      window.open(link, '_blank');
+      btn.textContent = plan === 'basic' ? 'Pay $5 & Set Up My Alert →' : 'Pay $10 & Set Up My Alert →';
+      btn.disabled = false;
+      return;
+    }
+
+    // Free Basic/Standard — direct Supabase submit
+    try {
+      const { expiresAt } = collectFormData();
+      const result = await submitAlerts(plan, true, null, expiresAt);
+      if (result.reason === 'no_park') { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
+      if (result.reason === 'no_site_type') { btn.textContent = 'Please select a site type'; btn.disabled = false; return; }
+      if (result.ok) {
+        await loadCounter();
+        document.getElementById('successEmail').textContent = document.getElementById('emailInput').value.trim();
+        form.style.display = 'none';
+        document.getElementById('successMsg').classList.add('visible');
+      } else { btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
+    } catch(err) { console.error(err); btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
+  });
+
+  const PROMO_CODES = {
+    'CAMPING2026': 'premium',
+    'FRIENDS2026': 'premium',
+  };
+  let promoActive = false;
+
+  function checkPromoCode(code) {
+    const msg = document.getElementById('promoMsg');
+    const plan = document.getElementById('planSelect');
+    if (PROMO_CODES[code.toUpperCase()]) {
+      promoActive = true;
+      msg.style.color = '#4A7C59';
+      msg.textContent = '✅ Promo code applied — Premium access unlocked!';
+      plan.value = 'premium';
+      highlightPlanOnly('premium');
+      const btn = document.getElementById('submitBtn');
+      if (btn) { btn.textContent = 'Set Up My Alert →'; btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
+    } else if (code.length > 3) {
+      promoActive = false;
+      msg.style.color = '#D4622A';
+      msg.textContent = '❌ Invalid promo code';
+    } else {
+      promoActive = false;
+      msg.textContent = '';
+    }
+    updateSubmitBtn();
+  }
+
+  function updateSubmitBtn() {
+    const cb = document.getElementById('termsCheckbox');
+    const btn = document.getElementById('submitBtn');
+    const plan = document.getElementById('planSelect').value;
+    const remaining = parseInt(document.getElementById('spotsRemaining').textContent) || 0;
+    const isFree = remaining > 0 && plan !== 'premium';
+    if (cb && btn) {
+      btn.disabled = !cb.checked;
+      btn.style.opacity = cb.checked ? '1' : '0.5';
+      btn.style.cursor = cb.checked ? 'pointer' : 'not-allowed';
+      if (cb.checked) {
+        if (plan === 'premium') btn.textContent = 'Pay $20 & Set Up My Alert →';
+        else if (isFree) btn.textContent = 'Set Up My Alert →';
+        else btn.textContent = plan === 'basic' ? 'Pay $5 & Set Up My Alert →' : 'Pay $10 & Set Up My Alert →';
+      }
+    }
+  }
+
+  highlightPlan('standard');
+</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // Initialize map
+  const map = L.map('campsitealert-map', {
+    center: [36.5, -119.5],
+    zoom: 6,
+    scrollWheelZoom: false
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap © CARTO',
+    maxZoom: 19
+  }).addTo(map);
+
+  // Custom markers
+  function makeIcon(color) {
+    return L.divIcon({
+      className: '',
+      html: `<div style="width:14px;height:14px;background:${color};border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>`,
+      iconSize: [14, 14],
+      iconAnchor: [7, 7],
+      popupAnchor: [0, -10]
+    });
+  }
+
+  const sbIcon = makeIcon('#4A7C59');
+  const scIcon = makeIcon('#2C4A3E');
+  const sdIcon = makeIcon('#D4622A');
+
+  const parks = [
+    // ReserveCalifornia State Parks
+    { name: 'Leo Carrillo State Beach', lat: 34.0453, lng: -118.9344, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/665', county: 'California State Parks' },
+    { name: 'Carpinteria State Beach', lat: 34.3897, lng: -119.5181, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/6', county: 'California State Parks' },
+    { name: 'El Capitan State Beach', lat: 34.4583, lng: -120.0228, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/8', county: 'California State Parks' },
+    { name: 'Doheny State Beach', lat: 33.4614, lng: -117.6764, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/639', county: 'California State Parks' },
+    { name: 'San Clemente State Beach', lat: 33.4014, lng: -117.6100, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/708', county: 'California State Parks' },
+    // Santa Barbara
+    { name: 'Jalama Beach', lat: 34.5147, lng: -120.5009, color: sbIcon, url: 'https://santabarbara.camava.com/reservation/camping/index.asp', county: 'Santa Barbara County' },
+    { name: 'Cachuma Lake', lat: 34.5814, lng: -119.9700, color: sbIcon, url: 'https://santabarbara.camava.com/reservation/camping/index.asp', county: 'Santa Barbara County' },
+    // Santa Clara
+    { name: 'Coyote Lake', lat: 37.0988, lng: -121.5275, color: scIcon, url: 'https://gooutsideandplay.org/reservation/camping/index.asp', county: 'Santa Clara County' },
+    { name: 'Joseph Grant Park', lat: 37.2869, lng: -121.7436, color: scIcon, url: 'https://gooutsideandplay.org/reservation/camping/index.asp', county: 'Santa Clara County' },
+    { name: 'Mt Madonna Park', lat: 37.0011, lng: -121.7169, color: scIcon, url: 'https://gooutsideandplay.org/reservation/camping/index.asp', county: 'Santa Clara County' },
+    { name: 'Sanborn', lat: 37.2383, lng: -122.0827, color: scIcon, url: 'https://gooutsideandplay.org/reservation/camping/index.asp', county: 'Santa Clara County' },
+    { name: 'Uvas Canyon Park', lat: 37.0786, lng: -121.7836, color: scIcon, url: 'https://gooutsideandplay.org/reservation/camping/index.asp', county: 'Santa Clara County' },
+    // San Diego
+    { name: 'Agua Caliente', lat: 32.9397, lng: -116.3044, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
+    { name: 'Dos Picos', lat: 33.0233, lng: -116.9197, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
+    { name: 'Guajome', lat: 33.2483, lng: -117.2864, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
+    { name: 'Lake Morena', lat: 32.6886, lng: -116.5228, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
+    { name: 'Potrero', lat: 32.5983, lng: -116.5997, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
+    { name: 'Sweetwater', lat: 32.6969, lng: -117.0036, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
+    { name: 'Tijuana River Valley', lat: 32.5572, lng: -117.1006, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
+    { name: 'Vallecito', lat: 32.9794, lng: -116.3769, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
+    { name: 'William Heise', lat: 33.0786, lng: -116.5308, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
+  ];
+
+  parks.forEach(park => {
+    L.marker([park.lat, park.lng], { icon: park.color })
+      .addTo(map)
+      .bindPopup(`
+        <div style="font-family:'DM Sans',sans-serif; min-width:160px;">
+          <strong style="color:#2C4A3E; font-size:14px;">${park.name}</strong><br>
+          <span style="font-size:11px; color:#8B5E3C;">${park.county}</span><br><br>
+          <a href="${park.url}" target="_blank" style="background:#2C4A3E; color:white; padding:6px 12px; border-radius:100px; font-size:12px; text-decoration:none; display:inline-block;">View availability →</a>
+        </div>
+      `);
+  });
+</script>
+</body>
+</html>

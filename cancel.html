@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alert Cancelled — CampSiteAlert</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #F2E8D5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .card { background: white; border-radius: 24px; padding: 48px 40px; max-width: 480px; width: 100%; text-align: center; box-shadow: 0 8px 32px rgba(44,74,62,0.1); }
+    .icon { font-size: 48px; margin-bottom: 24px; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: #2C4A3E; margin-bottom: 12px; }
+    p { color: #8B5E3C; font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+    .btn { display: inline-block; background: #2C4A3E; color: white; padding: 14px 32px; border-radius: 100px; text-decoration: none; font-size: 15px; font-weight: 500; }
+    .error { color: #D4622A; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon" id="icon">⏳</div>
+    <h1 id="title">Cancelling your alert...</h1>
+    <p id="message">Please wait a moment.</p>
+    <a href="https://campsitealert.com" class="btn" id="homeBtn" style="display:none;">← Back to CampSiteAlert</a>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://wqbxylnrgdtcnxlbemdf.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_T9dDFWDk4lB4p7mjRpkrsg_VPlzbEMK';
+
+    async function cancelAlert() {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+
+      if (!token) {
+        document.getElementById('icon').textContent = '❌';
+        document.getElementById('title').textContent = 'Invalid link';
+        document.getElementById('message').textContent = 'This cancel link is invalid or has already been used.';
+        document.getElementById('homeBtn').style.display = 'inline-block';
+        return;
+      }
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/alerts?cancel_token=eq.${token}&active=eq.true`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ active: false })
+        });
+
+        if (res.ok) {
+          document.getElementById('icon').textContent = '✅';
+          document.getElementById('title').textContent = 'Alert cancelled!';
+          document.getElementById('message').textContent = 'Your campsite alert has been stopped. We hope you found a great spot! 🏕';
+        } else {
+          document.getElementById('icon').textContent = '❌';
+          document.getElementById('title').textContent = 'Something went wrong';
+          document.getElementById('message').textContent = 'Please try again or contact us at alerts@campsitealert.com';
+        }
+      } catch(err) {
+        document.getElementById('icon').textContent = '❌';
+        document.getElementById('title').textContent = 'Something went wrong';
+        document.getElementById('message').textContent = 'Please try again or contact us at alerts@campsitealert.com';
+      }
+
+      document.getElementById('homeBtn').style.display = 'inline-block';
+    }
+
+    cancelAlert();
+  </script>
+</body>
+</html>
