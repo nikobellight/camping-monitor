@@ -162,7 +162,7 @@ def check_county_park(park_system, parent_idno, arrival_date, nights):
         result = json.loads(r.text)
         sites = result.get('jsonPadicons', [])
         # Return available sites
-        return [s for s in sites if s.get('reason_code', 'Booked') not in UNAVAILABLE_REASONS]
+        return [s for s in sites if s.get('reason_code', '') == 'Available']
     except Exception as e:
         p(f"County park API error ({park_system}/{parent_idno}): {e}")
         return []
