@@ -44,13 +44,8 @@ def supabase_get(table, params={}):
         'apikey': SUPABASE_KEY,
         'Authorization': f'Bearer {SUPABASE_KEY}',
         'Content-Type': 'application/json',
-        'Prefer': 'return=representation',
     }
     r = requests.get(f'{SUPABASE_URL}/rest/v1/{table}', headers=headers, params=params)
-    p(f"Supabase GET status: {r.status_code}")
-    if r.status_code != 200:
-        p(f"Supabase GET error: {r.text[:200]}")
-        return []
     return r.json()
 
 def supabase_patch(table, match_params, data):
@@ -67,43 +62,30 @@ def supabase_patch(table, match_params, data):
 # ============================================================
 def get_active_alerts():
     today = date.today().isoformat()
+    now = datetime.now()
 
     # Filter by arrival date proximity based on MODE
-    result = supabase_get('alerts', {
+    alerts = supabase_get('alerts', {
         'active': 'eq.true',
         'expires_at': f'gte.{today}',
         'select': '*'
     })
 
-    p(f"Supabase response type: {type(result)}")
-    p(f"Supabase response: {str(result)[:200]}")
-
-    # Handle error response
-    if not isinstance(result, list):
-        p(f"ERROR: Supabase returned unexpected response: {result}")
-        return []
-
-    if len(result) == 0:
-        p("No active alerts in database.")
-        return []
-
     if MODE == '8am':
-        return [a for a in result if a.get('park_system') == 'reserve_california']
+        # Only ReserveCalifornia parks
+        return [a for a in alerts if a['park_system'] == 'reserve_california']
 
     filtered = []
-    for alert in result:
-        try:
-            arrival = date.fromisoformat(alert['arrival_date'])
-            days_until = (arrival - date.today()).days
+    for alert in alerts:
+        arrival = date.fromisoformat(alert['arrival_date'])
+        days_until = (arrival - date.today()).days
 
-            if MODE == '5min' and days_until <= 14:
-                filtered.append(alert)
-            elif MODE == '10min' and 14 < days_until <= 28:
-                filtered.append(alert)
-            elif MODE == '15min' and days_until > 28:
-                filtered.append(alert)
-        except Exception as e:
-            p(f"Error processing alert {alert.get('id')}: {e}")
+        if MODE == '5min' and days_until <= 14:
+            filtered.append(alert)
+        elif MODE == '10min' and 14 < days_until <= 28:
+            filtered.append(alert)
+        elif MODE == '15min' and days_until > 28:
+            filtered.append(alert)
 
     return filtered
 
@@ -263,37 +245,61 @@ def match_rc(available_units, customer_site_types):
 def send_alert_email(customer, park_name, park_system, available_sites, arrival_date, nights):
     if park_system == 'reserve_california':
         booking_url = RC_BOOKING_URL.format(place_id=customer['parent_idno'])
+        booking_platform = 'ReserveCalifornia'
         site_desc = ', '.join(set([s['type_name'] for s in available_sites[:3]]))
     else:
         booking_url = COUNTY_BOOKING_URLS[park_system]
+        platform_names = {
+            'santa_barbara': 'Santa Barbara County Parks',
+            'santa_clara': 'Santa Clara County Parks',
+            'san_diego': 'San Diego County Parks',
+        }
+        booking_platform = platform_names.get(park_system, 'the park website')
         site_desc = ', '.join(set([s.get('type_name', '') for s in available_sites[:3]]))
 
     cancel_url = f"{SITE_URL}/cancel?token={customer['cancel_token']}"
-    detected_at = datetime.now().strftime('%B %d, %Y — %I:%M%p')
+    detected_at = datetime.now().strftime('%B %d, %Y — %I:%M %p')
+    arrival_formatted = datetime.strptime(arrival_date, '%Y-%m-%d').strftime('%B %d, %Y')
 
-    html = f"""
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background: #2C4A3E; padding: 24px; border-radius: 12px 12px 0 0;">
-        <h1 style="color: #F2E8D5; margin: 0; font-size: 24px;">🏕 Spot Available!</h1>
-      </div>
-      <div style="background: #F9F6F0; padding: 32px; border-radius: 0 0 12px 12px;">
-        <p style="font-size: 16px; color: #2C4A3E;">A campsite just opened up at <strong>{park_name}</strong> for your dates!</p>
-        <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
-          <tr><td style="padding: 8px 0; color: #8B5E3C; font-weight: bold;">Park</td><td style="padding: 8px 0;">{park_name}</td></tr>
-          <tr><td style="padding: 8px 0; color: #8B5E3C; font-weight: bold;">Arrival</td><td style="padding: 8px 0;">{arrival_date}</td></tr>
-          <tr><td style="padding: 8px 0; color: #8B5E3C; font-weight: bold;">Nights</td><td style="padding: 8px 0;">{nights}</td></tr>
-          <tr><td style="padding: 8px 0; color: #8B5E3C; font-weight: bold;">Site type</td><td style="padding: 8px 0;">{site_desc}</td></tr>
-          <tr><td style="padding: 8px 0; color: #8B5E3C; font-weight: bold;">Detected at</td><td style="padding: 8px 0;">{detected_at}</td></tr>
-        </table>
-        <a href="{booking_url}" style="display: block; background: #D4622A; color: white; text-align: center; padding: 16px; border-radius: 8px; text-decoration: none; font-size: 16px; font-weight: bold; margin: 24px 0;">→ Book Now</a>
-        <p style="font-size: 13px; color: #8B5E3C;">We'll keep monitoring in case you miss this one.</p>
-        <a href="{cancel_url}" style="font-size: 13px; color: #8B5E3C;">✅ I booked it — stop my alerts</a>
-      </div>
+    html = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#F2E8D5;font-family:Arial,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;padding:24px 16px;">
+    <div style="background:#2C4A3E;border-radius:16px 16px 0 0;padding:28px 32px;">
+      <div style="font-size:13px;color:#7CC8A0;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">CampSiteAlert</div>
+      <div style="font-size:13px;color:rgba(242,232,213,0.5);">alerts@campsitealert.com</div>
     </div>
-    """
+    <div style="background:#FFF3EE;padding:12px 32px;border-left:4px solid #D4622A;">
+      <span style="font-size:13px;color:#2C4A3E;">Subject: <span style="color:#D4622A;font-weight:700;">🏕 Spot available!</span> — {park_name}, {arrival_formatted}</span>
+    </div>
+    <div style="background:#ffffff;padding:36px 32px;border-radius:0 0 16px 16px;box-shadow:0 4px 24px rgba(44,74,62,0.08);">
+      <h1 style="font-size:26px;color:#2C4A3E;margin:0 0 8px 0;">A site just opened up! 🎉</h1>
+      <p style="font-size:15px;color:#5C7A6E;margin:0 0 24px 0;">A <strong>{site_desc}</strong> just became available at <strong>{park_name}</strong> for your dates. Move fast — these spots go quickly!</p>
+      <div style="background:#F9F6F0;border-radius:12px;padding:24px;margin-bottom:24px;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr><td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;width:140px;border-bottom:1px solid #EDE8DF;">Park</td><td style="padding:10px 0;color:#2C4A3E;font-size:14px;font-weight:600;border-bottom:1px solid #EDE8DF;">{park_name}</td></tr>
+          <tr><td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;border-bottom:1px solid #EDE8DF;">Date available</td><td style="padding:10px 0;color:#2C4A3E;font-size:14px;border-bottom:1px solid #EDE8DF;">{arrival_formatted}</td></tr>
+          <tr><td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;border-bottom:1px solid #EDE8DF;">Nights</td><td style="padding:10px 0;color:#2C4A3E;font-size:14px;border-bottom:1px solid #EDE8DF;">{nights}</td></tr>
+          <tr><td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;border-bottom:1px solid #EDE8DF;">Site type</td><td style="padding:10px 0;color:#2C4A3E;font-size:14px;border-bottom:1px solid #EDE8DF;">{site_desc}</td></tr>
+          <tr><td style="padding:10px 0;color:#8B5E3C;font-size:13px;font-weight:600;">Detected at</td><td style="padding:10px 0;color:#2C4A3E;font-size:14px;">{detected_at}</td></tr>
+        </table>
+      </div>
+      <a href="{booking_url}" target="_blank" style="display:block;background:#D4622A;color:white;text-align:center;padding:18px 32px;border-radius:100px;text-decoration:none;font-size:16px;font-weight:600;margin-bottom:8px;">→ Book now on {booking_platform}</a>
+      <p style="font-size:11px;color:rgba(139,94,60,0.7);text-align:center;margin:0 0 24px 0;">Opens the park booking page — select your dates to complete your reservation.</p>
+      <div style="background:#F9F6F0;border-radius:12px;padding:20px 24px;margin-bottom:20px;text-align:center;">
+        <p style="margin:0 0 12px 0;font-size:14px;color:#5C7A6E;">Already booked your spot?</p>
+        <a href="{cancel_url}" style="display:inline-block;background:#ffffff;border:2px solid #2C4A3E;color:#2C4A3E;padding:10px 24px;border-radius:100px;text-decoration:none;font-size:14px;font-weight:600;">✅ I booked it — stop my alerts</a>
+      </div>
+      <p style="font-size:13px;color:rgba(139,94,60,0.7);text-align:center;margin:0;">We'll keep monitoring in case you miss this one.</p>
+    </div>
+    <div style="text-align:center;padding:20px;font-size:12px;color:#8B5E3C;">CampSiteAlert · Not affiliated with California State Parks or any county park system</div>
+  </div>
+</body>
+</html>"""
 
     try:
-        r = requests.post('https://api.resend.com/emails', 
+        r = requests.post('https://api.resend.com/emails',
             headers={
                 'Authorization': f'Bearer {RESEND_API_KEY}',
                 'Content-Type': 'application/json',
@@ -301,7 +307,7 @@ def send_alert_email(customer, park_name, park_system, available_sites, arrival_
             json={
                 'from': f'CampSiteAlert <{FROM_EMAIL}>',
                 'to': [customer['email']],
-                'subject': f'🏕 Spot available! — {park_name}, {arrival_date}',
+                'subject': f'🏕 Spot available! — {park_name}, {arrival_formatted}',
                 'html': html,
             }
         )
