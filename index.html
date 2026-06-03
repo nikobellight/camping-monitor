@@ -613,8 +613,9 @@
     </div>
     <div class="success-msg" id="pendingMsg" style="border-color: #c8a96e;">
       <div style="font-size:48px;margin-bottom:16px;">💳</div>
-      <h3>Complete your payment</h3>
-      <p>A payment window has opened. Once payment is confirmed, you'll receive a confirmation email at <strong id="pendingEmail"></strong>. You can close this page after paying.</p>
+      <h3>Payment pending<span id="pendingDots">...</span></h3>
+      <p>Complete your payment in the popup window. This page will update automatically once your payment is confirmed.</p>
+      <p style="margin-top:12px;font-size:13px;color:#8B5E3C;">Paying for: <strong id="pendingEmail"></strong></p>
     </div>
   </div>
 </section>
@@ -1291,6 +1292,32 @@
           body: JSON.stringify(alertData),
         }).catch(e => console.error('Pending insert error:', e));
       }
+
+      // Poll Supabase every 5s to detect payment completion, then show success
+      const pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(
+            `${SUPABASE_URL_COUNTER}/rest/v1/alerts?email=eq.${encodeURIComponent(email)}&plan=eq.${plan}&payment_status=eq.paid&active=eq.true&order=created_at.desc&limit=1`,
+            {
+              headers: {
+                'apikey': SUPABASE_KEY_COUNTER,
+                'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}`,
+              }
+            }
+          );
+          const rows = await res.json();
+          if (rows && rows.length > 0) {
+            clearInterval(pollInterval);
+            document.getElementById('pendingMsg').classList.remove('visible');
+            document.getElementById('successEmail').textContent = email;
+            document.getElementById('successMsg').classList.add('visible');
+          }
+        } catch(e) { console.error('Poll error:', e); }
+      }, 5000);
+
+      // Stop polling after 10 minutes
+      setTimeout(() => clearInterval(pollInterval), 10 * 60 * 1000);
+
       return;
     }
 
