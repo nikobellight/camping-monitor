@@ -1232,19 +1232,60 @@
       return;
     }
 
-    // Premium — goes to Lemon Squeezy (payment first)
-    if (plan === 'premium') {
-      window.open('https://campsitealert-app.lemonsqueezy.com/checkout/buy/29a92863-fc6b-4889-887a-2b8efd53b155', '_blank');
-      btn.textContent = 'Pay $20 & Set Up My Alert →';
-      btn.disabled = false;
-      return;
-    }
+    // Paid flow — insert as pending then redirect to Lemon Squeezy
+    if (plan === 'premium' || !isFree) {
+      const { email, arrivalDate, nights, parks, promoCode, expiresAt } = collectFormData();
+      if (!email) { btn.textContent = 'Please enter your email'; btn.disabled = false; return; }
+      if (parks.length === 0) { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
+      if (parks[0].site_types.length === 0) { btn.textContent = 'Please select a site type'; btn.disabled = false; return; }
 
-    // Paid Basic/Standard after free period ends — Lemon Squeezy
-    if (!isFree) {
-      const link = plan === 'basic' ? 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/c24ec1c6-7dda-4c37-91a0-215874653a17' : 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/42ce96de-62dc-4f71-9536-00c222a21030';
-      window.open(link, '_blank');
-      btn.textContent = plan === 'basic' ? 'Pay $5 & Set Up My Alert →' : 'Pay $10 & Set Up My Alert →';
+      btn.textContent = 'Saving your alert...';
+
+      let allOk = true;
+      for (const park of parks) {
+        const alertData = {
+          email,
+          park_name: park.park_name,
+          park_system: park.park_system,
+          parent_idno: park.parent_idno,
+          arrival_date: arrivalDate,
+          nights,
+          site_types: park.site_types,
+          plan,
+          expires_at: expiresAt.toISOString().split('T')[0],
+          free_user: false,
+          promo_code: null,
+          cancel_token: generateUUID(),
+          active: false,
+          payment_status: 'pending',
+        };
+        const res = await fetch(`${SUPABASE_URL_COUNTER}/rest/v1/alerts`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY_COUNTER,
+            'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal',
+          },
+          body: JSON.stringify(alertData),
+        });
+        if (!res.ok) allOk = false;
+      }
+
+      if (!allOk) {
+        btn.textContent = 'Something went wrong — try again';
+        btn.disabled = false;
+        return;
+      }
+
+      const lsLinks = {
+        basic: 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/c24ec1c6-7dda-4c37-91a0-215874653a17',
+        standard: 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/42ce96de-62dc-4f71-9536-00c222a21030',
+        premium: 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/29a92863-fc6b-4889-887a-2b8efd53b155',
+      };
+      const checkoutUrl = lsLinks[plan] + '?checkout[email]=' + encodeURIComponent(email);
+      window.open(checkoutUrl, '_blank');
+      btn.textContent = plan === 'premium' ? 'Pay $20 & Set Up My Alert →' : plan === 'basic' ? 'Pay $5 & Set Up My Alert →' : 'Pay $10 & Set Up My Alert →';
       btn.disabled = false;
       return;
     }
