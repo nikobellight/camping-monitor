@@ -1294,10 +1294,11 @@
       }
 
       // Poll Supabase every 5s to detect payment completion, then show success
+      const pollStart = new Date().toISOString();
       const pollInterval = setInterval(async () => {
         try {
           const res = await fetch(
-            `${SUPABASE_URL_COUNTER}/rest/v1/alerts?email=eq.${encodeURIComponent(email)}&plan=eq.${plan}&payment_status=eq.paid&active=eq.true&order=created_at.desc&limit=1`,
+            `${SUPABASE_URL_COUNTER}/rest/v1/alerts?email=eq.${encodeURIComponent(email)}&plan=eq.${plan}&payment_status=eq.paid&active=eq.true&created_at=gte.${pollStart}&order=created_at.desc&limit=1`,
             {
               headers: {
                 'apikey': SUPABASE_KEY_COUNTER,
