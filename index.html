@@ -611,6 +611,11 @@
       <h3>You're all set!</h3>
       <p>A confirmation email is on its way to <strong id="successEmail"></strong> — check your inbox. We'll notify you within minutes of a spot opening. Happy camping!</p>
     </div>
+    <div class="success-msg" id="pendingMsg" style="border-color: #c8a96e;">
+      <div style="font-size:48px;margin-bottom:16px;">💳</div>
+      <h3>Complete your payment</h3>
+      <p>A payment window has opened. Once payment is confirmed, you'll receive a confirmation email at <strong id="pendingEmail"></strong>. You can close this page after paying.</p>
+    </div>
   </div>
 </section>
 
@@ -1232,16 +1237,32 @@
       return;
     }
 
-    // Paid flow — insert as pending then redirect to Lemon Squeezy
+    // Paid flow — open LS immediately (browser popup blocker fix), insert pending in background
     if (plan === 'premium' || !isFree) {
       const { email, arrivalDate, nights, parks, promoCode, expiresAt } = collectFormData();
       if (!email) { btn.textContent = 'Please enter your email'; btn.disabled = false; return; }
       if (parks.length === 0) { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
       if (parks[0].site_types.length === 0) { btn.textContent = 'Please select a site type'; btn.disabled = false; return; }
 
-      btn.textContent = 'Saving your alert...';
+      const lsLinks = {
+        basic: 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/c24ec1c6-7dda-4c37-91a0-215874653a17',
+        standard: 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/42ce96de-62dc-4f71-9536-00c222a21030',
+        premium: 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/29a92863-fc6b-4889-887a-2b8efd53b155',
+      };
+      const checkoutUrl = lsLinks[plan] + '?checkout[email]=' + encodeURIComponent(email);
 
-      let allOk = true;
+      // Open checkout immediately (must be synchronous to avoid popup blocker)
+      const popupW = 520, popupH = 720;
+      const left = Math.round((screen.width - popupW) / 2);
+      const top = Math.round((screen.height - popupH) / 2);
+      window.open(checkoutUrl, 'lspayment', `width=${popupW},height=${popupH},left=${left},top=${top},scrollbars=yes,resizable=yes`);
+      btn.textContent = '⏳ Complete payment in the popup window...';
+      btn.disabled = true;
+      document.getElementById('pendingEmail').textContent = email;
+      form.style.display = 'none';
+      document.getElementById('pendingMsg').classList.add('visible');
+
+      // Insert pending rows in background (after popup opens)
       for (const park of parks) {
         const alertData = {
           email,
@@ -1259,7 +1280,7 @@
           active: false,
           payment_status: 'pending',
         };
-        const res = await fetch(`${SUPABASE_URL_COUNTER}/rest/v1/alerts`, {
+        fetch(`${SUPABASE_URL_COUNTER}/rest/v1/alerts`, {
           method: 'POST',
           headers: {
             'apikey': SUPABASE_KEY_COUNTER,
@@ -1268,25 +1289,8 @@
             'Prefer': 'return=minimal',
           },
           body: JSON.stringify(alertData),
-        });
-        if (!res.ok) allOk = false;
+        }).catch(e => console.error('Pending insert error:', e));
       }
-
-      if (!allOk) {
-        btn.textContent = 'Something went wrong — try again';
-        btn.disabled = false;
-        return;
-      }
-
-      const lsLinks = {
-        basic: 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/c24ec1c6-7dda-4c37-91a0-215874653a17',
-        standard: 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/42ce96de-62dc-4f71-9536-00c222a21030',
-        premium: 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/29a92863-fc6b-4889-887a-2b8efd53b155',
-      };
-      const checkoutUrl = lsLinks[plan] + '?checkout[email]=' + encodeURIComponent(email);
-      window.open(checkoutUrl, '_blank');
-      btn.textContent = plan === 'premium' ? 'Pay $20 & Set Up My Alert →' : plan === 'basic' ? 'Pay $5 & Set Up My Alert →' : 'Pay $10 & Set Up My Alert →';
-      btn.disabled = false;
       return;
     }
 
