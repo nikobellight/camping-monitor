@@ -3,8 +3,6 @@ on:
   workflow_dispatch:
   repository_dispatch:
     types: [trigger-8am]
-  schedule:
-    - cron: '0 15 * * *'  # 8am PT = 15:00 UTC
 
 jobs:
   check:
