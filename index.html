@@ -700,7 +700,7 @@
   });
 
   // Live founding counter
-  const TOTAL_SPOTS = 15;
+  const TOTAL_SPOTS = 20;
   const SUPABASE_URL_COUNTER = 'https://wqbxylnrgdtcnxlbemdf.supabase.co';
   const SUPABASE_KEY_COUNTER = 'sb_publishable_T9dDFWDk4lB4p7mjRpkrsg_VPlzbEMK';
 
@@ -734,8 +734,8 @@
       updateAllCounters(remaining);
       return remaining;
     } catch(e) {
-      updateAllCounters(15);
-      return 15;
+      updateAllCounters(20);
+      return 20;
     }
   }
 
@@ -1251,7 +1251,7 @@
     const btn = form.querySelector('.form-submit');
     const plan = document.getElementById('planSelect').value;
     const remaining = parseInt(document.getElementById('spotsRemaining').textContent) || 0;
-    const isFree = remaining > 0 && plan !== 'premium';
+    const isFree = remaining > 0;
 
     btn.textContent = 'Setting up your alert...';
     btn.disabled = true;
@@ -1273,7 +1273,7 @@
     }
 
     // Paid flow — open LS immediately (browser popup blocker fix), insert pending in background
-    if (plan === 'premium' || !isFree) {
+    if (!isFree) {
       const { email, arrivalDate, nights, parks, promoCode, expiresAt } = collectFormData();
       if (!email) { btn.textContent = 'Please enter your email'; btn.disabled = false; return; }
       if (parks.length === 0) { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
@@ -1404,7 +1404,7 @@
     const btn = document.getElementById('submitBtn');
     const plan = document.getElementById('planSelect').value;
     const remaining = parseInt(document.getElementById('spotsRemaining').textContent) || 0;
-    const isFree = remaining > 0 && plan !== 'premium';
+    const isFree = remaining > 0;
     if (cb && btn) {
       btn.disabled = !cb.checked;
       btn.style.opacity = cb.checked ? '1' : '0.5';
