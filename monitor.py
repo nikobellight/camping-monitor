@@ -20,7 +20,7 @@ MODE = os.environ.get('CHECK_MODE', '15min')  # 15min, 10min, 5min, 8am
 
 SITE_URL = 'https://campsitealert.com'
 FROM_EMAIL = 'alerts@campsitealert.com'
-ADMIN_EMAIL = 'nikobellight@gmail.com'
+ADMIN_EMAIL = 'campsitealert.app@gmail.com'
 
 USER_AGENTS = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -161,7 +161,6 @@ def check_county_park(park_system, parent_idno, arrival_date, nights):
                          headers=headers, data=data, timeout=15)
         result = json.loads(r.text)
         sites = result.get('jsonPadicons', [])
-        # Return available sites
         return [s for s in sites if s.get('reason_code', '') == 'Available']
     except Exception as e:
         p(f"County park API error ({park_system}/{parent_idno}): {e}")
@@ -226,7 +225,6 @@ def match_county(available_sites, customer_site_types):
             matched.append(site)
     return matched
 
-# RC unit type ID to display label mapping
 RC_TYPE_LABELS = {
     '4303': 'Standard Campsite',
     '4305': 'Standard Campsite',
@@ -240,7 +238,6 @@ RC_TYPE_LABELS = {
 }
 
 def match_rc(available_units, customer_site_types):
-    # customer_site_types for RC are comma-separated UnitTypeIds like '4303,4427,4328'
     matched = []
     allowed_ids = set()
     for st in customer_site_types:
@@ -249,7 +246,6 @@ def match_rc(available_units, customer_site_types):
 
     for unit in available_units:
         if unit['unit_type_id'] in allowed_ids:
-            # Use our display label instead of API type name
             display_label = RC_TYPE_LABELS.get(unit['unit_type_id'], unit['type_name'])
             matched.append({**unit, 'type_name': display_label})
     return matched
@@ -355,7 +351,6 @@ def main():
     p(f"Starting CampSiteAlert monitor — MODE: {MODE}")
     p(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
-    # Get active alerts filtered by mode
     alerts = get_active_alerts()
     p(f"Active alerts to check: {len(alerts)}")
 
@@ -363,7 +358,6 @@ def main():
         p("No alerts to check. Exiting.")
         return
 
-    # Group by unique park + date combo
     groups = group_alerts(alerts)
     p(f"Unique park/date combinations: {len(groups)}")
 
@@ -379,7 +373,6 @@ def main():
 
         p(f"\nChecking: {park_name} ({arrival_date}, {nights} nights) — {len(customers)} customer(s)")
 
-        # Make ONE API call for this park/date combo
         if park_system == 'reserve_california':
             available = check_rc_park(parent_idno, arrival_date, nights)
         else:
@@ -391,7 +384,6 @@ def main():
             time.sleep(random.uniform(2, 4))
             continue
 
-        # Check each customer's site type preferences
         for customer in customers:
             site_types = customer.get('site_types', [])
 
@@ -405,21 +397,19 @@ def main():
                 sent = send_alert_email(customer, park_name, park_system, matched, arrival_date, nights)
                 if sent:
                     alerts_sent += 1
-                    # Update alerted_at in Supabase
                     supabase_patch('alerts', {'id': f"eq.{customer['id']}"}, {
                         'alerted_at': datetime.now().isoformat()
                     })
                     p(f"  Alert sent to {customer['email']} ✅")
+                    send_admin_notification(f"🏕 Spot found! {customer['email']} alerted for {park_name} — {arrival_date}")
                 else:
                     p(f"  Failed to send alert to {customer['email']} ❌")
 
-        # Anti-detection delay between park checks
         time.sleep(random.uniform(2, 4))
 
     p(f"\n{'='*50}")
     p(f"Done! Alerts sent: {alerts_sent}")
 
-    # Admin notification at 8am run
     if MODE == '8am':
         send_admin_notification(f"8am RC check complete. {len(alerts)} alerts checked, {alerts_sent} alerts sent.")
 
