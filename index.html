@@ -271,7 +271,7 @@
   <div class="hero-content">
     <div class="badge">🎁 Free Early Access — <span id="spotsRemainingHero">...</span> spots left</div>
     <h1>Never miss a<br><em>California campsite</em><br>again.</h1>
-    <p class="hero-sub">Coastal state beaches & county parks — all in one alert service.<br>21 California parks. One simple email when a spot opens.</p>
+    <p class="hero-sub">Coastal state beaches & county parks — all in one alert service.<br>22 California parks. One simple email when a spot opens.</p>
     <div class="speed-stats">
       <div class="speed-stat"><strong>5 min</strong><span>fastest check</span></div>
       <div class="speed-stat"><strong>24/7</strong><span>monitoring</span></div>
@@ -443,7 +443,7 @@
 <section class="parks" id="parks">
   <p class="section-label">Coverage</p>
   <h2>Parks we cover</h2>
-  <p>21 California parks — coastal state beaches & county parks. Click any pin on the map or park name below to view availability.</p>
+  <p>22 California parks — coastal state beaches & county parks. Click any pin on the map or park name below to view availability.</p>
   <div class="parks-legend">
     <span><span class="legend-dot" style="background:#1B6CA8;"></span> CA State Parks</span>
     <span><span class="legend-dot" style="background:#4A7C59;"></span> Santa Barbara</span>
@@ -459,6 +459,7 @@
       <a href="https://www.reservecalifornia.com/park/8" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>El Capitan State Beach</a>
       <a href="https://www.reservecalifornia.com/park/639" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>Doheny State Beach</a>
       <a href="https://www.reservecalifornia.com/park/708" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>San Clemente State Beach</a>
+      <a href="https://www.reservecalifornia.com/park/670" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>Malibu Creek State Park</a>
     </div>
   </div>
   <div style="margin-bottom:32px;">
@@ -774,6 +775,7 @@
       <option value="El Capitan State Beach" data-watchers="7" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="8">El Capitan State Beach</option>
       <option value="Doheny State Beach" data-watchers="11" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="639">Doheny State Beach</option>
       <option value="San Clemente State Beach" data-watchers="8" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="708">San Clemente State Beach</option>
+      <option value="Malibu Creek State Park" data-watchers="14" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="670">Malibu Creek State Park</option>
     </optgroup>
     <optgroup label="Santa Barbara County Parks">
       <option value="Jalama Beach" data-watchers="9" data-platform="Santa Barbara County Parks" data-system="santa_barbara" data-idno="2">Jalama Beach</option>
@@ -944,6 +946,9 @@
     rc_san_clemente: [
       {value: '4303', label: 'Standard Campsite'},
     ],
+    rc_malibu_creek: [
+      {value: '4303', label: 'Standard Campsite'},
+    ],
     santa_barbara_jalama: [
       {value: 'Basic Campsite', label: 'Basic Campsite'},
       {value: 'Hookup - Partial', label: 'Hookup — Partial'},
@@ -989,6 +994,7 @@
       if (parkValue === 'El Capitan State Beach') return systemSiteTypes.rc_el_capitan;
       if (parkValue === 'Doheny State Beach') return systemSiteTypes.rc_doheny;
       if (parkValue === 'San Clemente State Beach') return systemSiteTypes.rc_san_clemente;
+      if (parkValue === 'Malibu Creek State Park') return systemSiteTypes.rc_malibu_creek;
       return [];
     }
     if (system === 'santa_barbara') {
@@ -1475,6 +1481,7 @@
     { name: 'El Capitan State Beach', lat: 34.4583, lng: -120.0228, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/8', county: 'California State Parks' },
     { name: 'Doheny State Beach', lat: 33.4614, lng: -117.6764, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/639', county: 'California State Parks' },
     { name: 'San Clemente State Beach', lat: 33.4014, lng: -117.6100, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/708', county: 'California State Parks' },
+    { name: 'Malibu Creek State Park', lat: 34.10077, lng: -118.71134, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/670', county: 'California State Parks' },
     // Santa Barbara
     { name: 'Jalama Beach', lat: 34.5147, lng: -120.5009, color: sbIcon, url: 'https://santabarbara.camava.com/reservation/camping/index.asp', county: 'Santa Barbara County' },
     { name: 'Cachuma Lake', lat: 34.5814, lng: -119.9700, color: sbIcon, url: 'https://santabarbara.camava.com/reservation/camping/index.asp', county: 'Santa Barbara County' },
