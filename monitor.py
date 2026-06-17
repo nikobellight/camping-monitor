@@ -410,8 +410,8 @@ def main():
     p(f"\n{'='*50}")
     p(f"Done! Alerts sent: {alerts_sent}")
 
-    if MODE == '8am':
-        send_admin_notification(f"8am RC check complete. {len(alerts)} alerts checked, {alerts_sent} alerts sent.")
+    if MODE == '8am' and alerts_sent > 0:
+        send_admin_notification(f"🏕 8am RC spot found! {alerts_sent} alerts sent out of {len(alerts)} checked.")
 
 if __name__ == '__main__':
     main()
