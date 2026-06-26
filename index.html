@@ -1384,7 +1384,20 @@
 
     // Free Basic/Standard — direct Supabase submit
     try {
-      const { expiresAt } = collectFormData();
+      const { email, expiresAt } = collectFormData();
+
+      // Check if this email already has a free alert
+      const existingRes = await fetch(
+        `${SUPABASE_URL_COUNTER}/rest/v1/alerts?email=eq.${encodeURIComponent(email)}&free_user=eq.true&promo_code=is.null&active=eq.true&limit=1`,
+        { headers: { 'apikey': SUPABASE_KEY_COUNTER, 'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}` } }
+      );
+      const existing = await existingRes.json();
+      if (existing && existing.length > 0) {
+        btn.textContent = 'This email already has a free alert — upgrade to a paid plan for more';
+        btn.disabled = false;
+        return;
+      }
+
       const result = await submitAlerts(plan, true, null, expiresAt);
       if (result.reason === 'no_park') { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
       if (result.reason === 'no_site_type') { btn.textContent = 'Please select a site type'; btn.disabled = false; return; }
