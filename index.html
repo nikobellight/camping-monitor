@@ -3,1530 +3,1648 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CampSiteAlert — California Campsite Availability Alerts</title>
-<meta name="description" content="Get instant email alerts when a California campsite opens up. CampSiteAlert monitors ReserveCalifornia, Santa Barbara, Santa Clara, and San Diego parks every 5-15 minutes so you never miss a cancellation.">
-<meta name="keywords" content="campsite alert, California campsite availability, ReserveCalifornia alert, campsite cancellation alert, campground availability tracker, California state park camping">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://campsitealert.com">
-
-<!-- Open Graph -->
-<meta property="og:title" content="CampSiteAlert — California Campsite Availability Alerts">
-<meta property="og:description" content="Get instant email alerts when a California campsite opens up. Monitors parks every 5-15 minutes. Never miss a cancellation again.">
-<meta property="og:url" content="https://campsitealert.com">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="CampSiteAlert">
-
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CampSiteAlert — California Campsite Availability Alerts">
-<meta name="twitter:description" content="Get instant email alerts when a California campsite opens up. Monitors parks every 5-15 minutes.">
-
-<!-- Structured Data -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "CampSiteAlert",
-  "url": "https://campsitealert.com",
-  "description": "CampSiteAlert monitors California campsite availability every 5-15 minutes and sends instant email alerts when a spot opens up.",
-  "applicationCategory": "UtilitiesApplication",
-  "operatingSystem": "Web",
-  "offers": [
-    {"@type": "Offer", "name": "Basic", "price": "5.00", "priceCurrency": "USD"},
-    {"@type": "Offer", "name": "Standard", "price": "10.00", "priceCurrency": "USD"},
-    {"@type": "Offer", "name": "Premium", "price": "20.00", "priceCurrency": "USD"}
-  ]
-}
-</script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232C4A3E'/><text y='.9em' font-size='80' x='10'>🏕</text></svg>">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>DUPLICATE'26 — World Cup sticker trading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root {
-    --sand: #F2E8D5;
-    --forest: #2C4A3E;
-    --moss: #4A7C59;
-    --sunset: #D4622A;
-    --cream: #FAF6EF;
-    --bark: #8B5E3C;
-    --mist: #E8F0EC;
+  :root{
+    --paper:#FFFFFF;
+    --paper-soft:#FAFAF9;
+    --ink:#232323;
+    --mist:#6B7280;
+    --mist-soft:#9AA1AC;
+    --line:#E7E5E0;
+    --line-strong:#D8D5CE;
+    --yellow:#FFF200;
+    --yellow-deep:#E8DD00;
+    --red:#E2231A;
+    --red-deep:#B81810;
+    --red-soft:#FDE9E8;
+    --blue:#1C75BC;
+    --blue-deep:#145A91;
+    --blue-soft:#E9F2FA;
+    --green:#2FAE66;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--forest); overflow-x: hidden; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper-soft);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.display{font-family:'Poppins',sans-serif;font-weight:800;margin:0;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:var(--blue);}
+  button{font-family:inherit;cursor:pointer;}
+  input,textarea{font-family:inherit;}
+  img.flag-ico{border-radius:3px;display:inline-block;vertical-align:middle;box-shadow:0 0 0 1px rgba(0,0,0,0.08);}
 
-  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; transition: background 0.3s, padding 0.3s; }
-  nav.scrolled { background: rgba(44,74,62,0.97); padding: 14px 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.2); }
-  .nav-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--sand); text-decoration: none; }
-  .nav-logo span { color: #7CC8A0; }
-  .nav-links { display: flex; gap: 32px; align-items: center; }
-  .nav-links a { color: rgba(242,232,213,0.7); text-decoration: none; font-size: 14px; transition: color 0.2s; }
-  .nav-links a:hover { color: var(--sand); }
-  .nav-cta { background: var(--sunset) !important; color: white !important; padding: 10px 24px; border-radius: 100px; font-weight: 500 !important; }
+  /* ---------- header ---------- */
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+  .topbar{
+    background:var(--paper);border-bottom:3px solid var(--red);
+    display:flex;align-items:center;justify-content:space-between;padding:14px 24px;gap:14px;flex-wrap:wrap;
+    position:sticky;top:0;z-index:50;
+  }
+  .wordmark{display:flex;align-items:center;gap:10px;}
+  .wordmark h1{font-size:21px;color:var(--ink);}
+  .tag{background:var(--yellow);color:var(--ink);font-family:'Poppins',sans-serif;font-weight:900;font-size:12px;padding:4px 9px;border-radius:4px;transform:rotate(-4deg);display:inline-block;box-shadow:0 2px 0 rgba(0,0,0,0.08);}
+  nav.tabs{display:flex;gap:4px;flex-wrap:wrap;}
+  nav.tabs button{background:transparent;border:none;border-bottom:3px solid transparent;color:var(--mist);padding:8px 12px 7px;font-size:13.5px;font-weight:600;}
+  nav.tabs button:hover{color:var(--ink);}
+  nav.tabs button.active{color:var(--red);border-color:var(--red);}
+  .who{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--mist);}
+  .who .pct{color:var(--blue);font-family:'JetBrains Mono',monospace;font-weight:700;}
+  .who button{background:none;border:1px solid var(--line-strong);color:var(--mist);padding:6px 12px;border-radius:6px;font-size:12px;}
+  .who button:hover{color:var(--ink);border-color:var(--mist);}
 
-  .hero { min-height: 100vh; background: var(--forest); position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px 24px; overflow: hidden; }
-  .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 20% 50%, rgba(74,124,89,0.3) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(27,79,114,0.25) 0%, transparent 50%); }
-  .stars { position: absolute; inset: 0; overflow: hidden; }
-  .star { position: absolute; background: rgba(255,255,255,0.6); border-radius: 50%; animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s); }
-  @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
-  .mountains { position: absolute; bottom: 0; left: 0; right: 0; height: 45%; }
-  .mountains svg { width: 100%; height: 100%; }
-  .hero-content { position: relative; z-index: 10; max-width: 780px; }
-  .badge { display: inline-block; background: rgba(212,98,42,0.9); color: white; font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; padding: 6px 16px; border-radius: 100px; margin-bottom: 28px; animation: fadeUp 0.6s ease both; }
-  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px, 7vw, 88px); font-weight: 900; color: var(--sand); line-height: 1.0; margin-bottom: 12px; animation: fadeUp 0.7s ease both 0.1s; }
-  .hero h1 em { font-style: italic; color: #7CC8A0; }
-  .hero-sub { font-size: clamp(16px, 2.5vw, 22px); color: rgba(242,232,213,0.75); font-weight: 300; margin-bottom: 48px; line-height: 1.6; animation: fadeUp 0.7s ease both 0.2s; }
-  .speed-stats { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; animation: fadeUp 0.7s ease both 0.25s; }
-  .speed-stat strong { display: block; font-family: 'Playfair Display', serif; font-size: 28px; color: #7CC8A0; font-weight: 700; }
-  .speed-stat span { font-size: 12px; color: rgba(242,232,213,0.55); letter-spacing: 1px; text-transform: uppercase; }
-  .hero-cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; animation: fadeUp 0.7s ease both 0.3s; }
-  .btn-primary { background: var(--sunset); color: white; border: none; padding: 18px 40px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500; border-radius: 100px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 8px 32px rgba(212,98,42,0.4); text-decoration: none; display: inline-block; }
-  .btn-primary:hover { transform: translateY(-2px); }
-  .btn-secondary { background: transparent; color: var(--sand); border: 1.5px solid rgba(242,232,213,0.4); padding: 18px 40px; font-family: 'DM Sans', sans-serif; font-size: 16px; border-radius: 100px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
-  .btn-secondary:hover { border-color: var(--sand); background: rgba(242,232,213,0.08); }
-  .scroll-hint { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); color: rgba(242,232,213,0.4); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; animation: bounce 2s ease-in-out infinite; z-index: 10; }
-  @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  main{flex:1;max-width:1080px;margin:0 auto;padding:28px 20px 60px;width:100%;}
+  .center-screen{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:20px;}
 
-  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: var(--sunset); margin-bottom: 20px; }
+  /* ---------- auth card ---------- */
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:32px;max-width:420px;width:100%;
+    box-shadow:0 1px 3px rgba(20,23,28,0.06),0 10px 30px rgba(20,23,28,0.06);text-align:center;}
+  .card h2{font-size:23px;margin:4px 0 6px;color:var(--ink);}
+  .card p.sub{color:var(--mist);font-size:14px;margin:0 0 22px;line-height:1.55;text-align:left;}
+  label{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:0.05em;color:var(--mist);margin-bottom:6px;font-weight:700;text-align:left;}
+  .field{margin-bottom:16px;text-align:left;}
+  input[type=text],input[type=email],textarea{width:100%;background:var(--paper);border:1.5px solid var(--line-strong);border-radius:8px;padding:11px 12px;color:var(--ink);font-size:14px;}
+  input[type=text]:focus,input[type=email]:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft);}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--red);color:#fff;border:none;border-radius:8px;padding:12px 18px;font-weight:700;font-size:14px;transition:filter .15s ease;}
+  .btn:hover{filter:brightness(1.08);}
+  .btn.full{width:100%;}
+  .btn:disabled{opacity:0.5;cursor:default;}
+  .msg{font-size:13px;margin-top:14px;padding:10px 12px;border-radius:8px;line-height:1.45;text-align:left;}
+  .msg.ok{background:#E9F8EF;color:#1E8A4C;border:1px solid #BFE9CF;}
+  .msg.err{background:var(--red-soft);color:var(--red);border:1px solid #F6C7C3;}
 
-  .problem { background: var(--sand); padding: 100px 24px; text-align: center; }
-  .problem h2 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 56px); font-weight: 700; color: var(--forest); max-width: 700px; margin: 0 auto 24px; line-height: 1.15; }
-  .problem p { font-size: 18px; color: var(--bark); max-width: 560px; margin: 0 auto; line-height: 1.7; font-weight: 300; }
-  .pain-points { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-top: 64px; max-width: 900px; margin-left: auto; margin-right: auto; }
-  .pain-card { background: white; border-radius: 20px; padding: 32px 28px; flex: 1; min-width: 220px; max-width: 260px; text-align: left; box-shadow: 0 4px 24px rgba(44,74,62,0.08); }
-  .pain-icon { font-size: 32px; margin-bottom: 16px; }
-  .pain-card h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--forest); margin-bottom: 10px; }
-  .pain-card p { font-size: 14px; color: var(--bark); line-height: 1.6; font-weight: 300; }
+  /* ---------- badge graphic (original, inspired by the cover, not a copy) ---------- */
+  .badge26{width:110px;height:110px;margin:0 auto 16px;}
+  .badge26.lg{width:150px;height:150px;}
 
-  .how { background: var(--forest); padding: 100px 24px; text-align: center; }
-  .how h2 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 52px); font-weight: 700; color: var(--sand); margin-bottom: 16px; }
-  .how > p { color: rgba(242,232,213,0.65); font-size: 18px; font-weight: 300; margin-bottom: 72px; }
-  .steps { display: flex; gap: 0; justify-content: center; flex-wrap: wrap; max-width: 960px; margin: 0 auto; }
-  .step { flex: 1; min-width: 180px; max-width: 220px; padding: 32px 20px; position: relative; text-align: center; }
-  .step-num { width: 56px; height: 56px; background: var(--moss); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: white; margin: 0 auto 20px; }
-  .step h3 { font-family: 'Playfair Display', serif; font-size: 19px; color: var(--sand); margin-bottom: 10px; font-weight: 700; }
-  .step p { font-size: 13px; color: rgba(242,232,213,0.6); line-height: 1.6; font-weight: 300; }
-  .step-arrow { position: absolute; right: -12px; top: 44%; transform: translateY(-50%); color: var(--moss); font-size: 24px; }
+  /* ---------- panels ---------- */
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:20px;}
+  .panel h2{font-size:20px;margin-bottom:4px;}
+  .panel p.lead{color:var(--mist);font-size:13.5px;margin:0 0 18px;line-height:1.5;}
+  .stat-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
+  .stat{background:var(--paper-soft);border:1px solid var(--line);border-radius:10px;padding:14px 18px;min-width:110px;flex:1;}
+  .stat .num{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:var(--blue);}
+  .stat .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:0.05em;color:var(--mist);margin-top:2px;}
 
-  /* SPEED EXPLAINER */
-  .speed-explainer { background: rgba(255,255,255,0.05); border: 1px solid rgba(242,232,213,0.1); border-radius: 16px; padding: 28px 32px; max-width: 700px; margin: 60px auto 0; text-align: left; }
-  .speed-explainer h4 { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--sand); margin-bottom: 16px; font-weight: 700; }
-  .speed-explainer p { font-size: 13px; color: rgba(242,232,213,0.6); margin-bottom: 16px; font-weight: 300; line-height: 1.6; }
-  .speed-timeline { display: flex; flex-direction: column; gap: 10px; }
-  .speed-row { display: flex; align-items: center; gap: 16px; }
-  .speed-bar-wrap { flex: 1; background: rgba(255,255,255,0.08); border-radius: 100px; height: 8px; overflow: hidden; }
-  .speed-bar { height: 100%; border-radius: 100px; background: var(--moss); }
-  .speed-label { font-size: 12px; color: rgba(242,232,213,0.5); width: 120px; flex-shrink: 0; }
-  .speed-value { font-size: 12px; color: #7CC8A0; font-weight: 500; width: 80px; flex-shrink: 0; text-align: right; }
+  /* ---------- import ---------- */
+  textarea.import-box{min-height:220px;resize:vertical;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.6;background:var(--paper-soft);}
+  .example{font-size:12px;color:var(--mist-soft);margin-top:8px;line-height:1.5;}
 
-  .email-preview-section { background: var(--sand); padding: 100px 24px; text-align: center; }
-  .email-preview-section h2 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 46px); font-weight: 700; color: var(--forest); margin-bottom: 12px; }
-  .email-preview-section > p { color: var(--bark); font-size: 17px; font-weight: 300; margin-bottom: 40px; }
-  .email-toggle { display: flex; gap: 12px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
-  .email-toggle button { padding: 10px 24px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-  .email-mockup { background: white; border-radius: 20px; max-width: 520px; margin: 0 auto; box-shadow: 0 12px 48px rgba(44,74,62,0.14); overflow: hidden; text-align: left; }
-  .email-header { background: var(--forest); padding: 24px 32px; }
-  .email-logo { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--sand); font-weight: 700; }
-  .email-logo span { color: #7CC8A0; }
-  .email-subject { background: var(--mist); padding: 14px 32px; font-size: 13px; color: var(--forest); font-weight: 500; border-bottom: 1px solid rgba(44,74,62,0.08); }
-  .email-subject strong { color: var(--sunset); }
-  .email-body { padding: 32px; }
-  .email-body h3 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--forest); margin-bottom: 8px; font-weight: 700; }
-  .email-body p { font-size: 14px; color: var(--bark); line-height: 1.7; margin-bottom: 20px; font-weight: 300; }
-  .email-details { background: var(--mist); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-  .email-detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(44,74,62,0.08); font-size: 13px; }
-  .email-detail-row:last-child { border-bottom: none; }
-  .email-detail-row span:first-child { color: var(--bark); }
-  .email-detail-row span:last-child { color: var(--forest); font-weight: 500; }
-  .competition-box { background: rgba(212,98,42,0.06); border: 1.5px solid rgba(212,98,42,0.25); border-radius: 12px; padding: 18px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; }
-  .competition-icon { font-size: 28px; flex-shrink: 0; }
-  .competition-text { font-size: 13px; color: var(--forest); line-height: 1.5; }
-  .competition-text strong { color: var(--sunset); }
-  .email-btn { display: block; color: white; text-align: center; padding: 14px; border-radius: 100px; font-size: 14px; font-weight: 500; text-decoration: none; margin-bottom: 8px; }
-  .email-footer-note { font-size: 11px; color: rgba(139,94,60,0.6); text-align: center; line-height: 1.5; }
-  .stop-alerts-box { background: var(--mist); border-radius: 12px; padding: 20px; margin-bottom: 16px; text-align: center; }
-  .stop-alerts-box p { font-size: 13px; color: var(--forest); margin-bottom: 12px; font-weight: 400; }
-  .stop-alerts-btn { display: inline-block; background: white; border: 1.5px solid rgba(44,74,62,0.2); color: var(--forest); padding: 10px 24px; border-radius: 100px; font-size: 13px; font-weight: 500; text-decoration: none; }
+  /* ---------- album grid ---------- */
+  .filter-row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+  .filter-row input{flex:1;min-width:160px;}
+  .team-group{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  .team-head{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:var(--paper-soft);cursor:pointer;user-select:none;}
+  .team-head .left{display:flex;align-items:center;gap:10px;font-weight:700;font-size:13.5px;}
+  .badge-pill{font-size:10px;font-weight:800;letter-spacing:0.04em;padding:3px 8px;border-radius:20px;}
+  .badge-pill.special{background:var(--blue-soft);color:var(--blue);}
+  .badge-pill.promo{background:var(--red-soft);color:var(--red);}
+  .team-head .bar-wrap{width:80px;height:6px;background:var(--line);border-radius:3px;overflow:hidden;}
+  .team-head .bar{height:100%;}
+  .team-head .pct{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mist);min-width:38px;text-align:right;}
+  .team-body{display:none;padding:14px 16px;background:var(--paper);}
+  .team-body.open{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:8px;}
+  .cell{aspect-ratio:2/3;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:-0.02em;font-weight:700;cursor:pointer;border:1.5px solid var(--line-strong);position:relative;transition:transform .08s ease;}
+  .cell[data-picker-toggle]:hover{transform:translateY(-2px);}
+  .cell.s-have{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,0.06);}
+  .cell.s-missing{background:var(--paper-soft);color:var(--mist-soft);border-style:dashed;}
+  .cell.s-duplicate{background:linear-gradient(135deg,#FFF9B0,var(--yellow) 70%);color:#5C5400;border-color:var(--yellow-deep);}
+  .cell .badge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:9px;font-weight:800;border-radius:8px;padding:1px 5px;}
+  .legend{display:flex;gap:18px;font-size:12px;color:var(--mist);margin-bottom:16px;flex-wrap:wrap;}
+  .legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;}
 
-  .parks { background: var(--mist); padding: 100px 24px; text-align: center; }
-  .parks h2 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 52px); font-weight: 700; color: var(--forest); margin-bottom: 16px; }
-  .parks > p { color: var(--bark); font-size: 18px; font-weight: 300; margin-bottom: 32px; }
-  .parks-legend { display: flex; gap: 24px; justify-content: center; font-size: 12px; color: var(--bark); margin-bottom: 40px; flex-wrap: wrap; }
-  .parks-legend span { display: flex; align-items: center; gap: 6px; }
-  .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-  .parks-grid { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; max-width: 800px; margin: 0 auto 32px; }
-  .park-tag { background: white; border: 1.5px solid rgba(44,74,62,0.15); color: var(--forest); padding: 10px 20px; border-radius: 100px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: all 0.2s; text-decoration: none; }
-  .park-tag:hover { background: var(--forest); color: var(--sand); border-color: var(--forest); }
-  .park-tag.coming-soon { opacity: 0.5; cursor: default; pointer-events: none; border-style: dashed; }
-  .park-dot { width: 8px; height: 8px; background: var(--moss); border-radius: 50%; flex-shrink: 0; }
-  .park-dot.soon { background: var(--bark); }
+  /* ---------- trade board ---------- */
+  .member-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;cursor:pointer;background:var(--paper);}
+  .member-row:hover{border-color:var(--blue);}
+  .member-row .name{font-weight:700;font-size:15px;}
+  .match-counts{display:flex;gap:16px;font-family:'JetBrains Mono',monospace;font-size:13px;}
+  .match-counts .get{color:var(--blue);}
+  .match-counts .give{color:var(--red);}
+  .detail{padding:16px;background:var(--paper-soft);border-radius:10px;margin:-2px 0 10px;border:1px solid var(--line);}
+  .detail .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .detail h4{font-size:11.5px;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 10px;color:var(--mist);}
+  .sticker-chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .sticker{background:var(--paper);font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;padding:7px 10px;border-radius:4px;border:1.5px solid var(--line-strong);}
+  .sticker.give{background:var(--paper);color:var(--ink);border:1.5px solid var(--ink);}
+  .sticker.get{background:var(--paper);color:var(--ink);border:1.5px solid var(--ink);}
+  .parallel-picker{display:flex;align-items:center;gap:7px;margin-top:7px;padding:6px;background:var(--paper-soft);border:1px solid var(--line);border-radius:8px;}
+  .duplicate-card-open{grid-column:1/-1;display:inline-flex;flex-direction:column;align-items:flex-start;width:fit-content;position:relative;z-index:5;}
+  .parallel-dot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid var(--line-strong);display:inline-block;flex-shrink:0;}
+  .parallel-rect{width:38px;height:32px;border-radius:6px;cursor:pointer;border:2px solid var(--line-strong);flex-shrink:0;padding:0;font:inherit;appearance:none;-webkit-appearance:none;outline:none;}
+  .parallel-rect:hover{border-color:var(--ink);transform:translateY(-1px);}
+  .parallel-rect.active{border-color:var(--ink);border-width:3px;}
+  .parallel-rect.tag-normal{background:#fff;}
+  .parallel-rect.tag-blue{background:var(--blue);}
+  .parallel-rect.tag-red{background:var(--red);}
+  .parallel-rect.tag-purple{background:#8E44AD;}
+  .parallel-rect.tag-green{background:var(--green);}
+  .parallel-rect.tag-black{background:#1A1A1A;}
+  .parallel-dot.active{border-color:var(--ink);box-shadow:0 0 0 2px var(--paper),0 0 0 3.5px var(--ink);}
+  .parallel-dot.tag-normal{background:#fff;}
+  .parallel-dot.tag-blue{background:var(--blue);}
+  .parallel-dot.tag-red{background:var(--red);}
+  .parallel-dot.tag-purple{background:#8E44AD;}
+  .parallel-dot.tag-green{background:var(--green);}
+  .parallel-dot.tag-black{background:#1A1A1A;}
+  .parallel-label{font-size:10.5px;color:var(--mist);text-transform:capitalize;}
+  .trade-card-block{display:inline-flex;flex-direction:column;align-items:flex-start;margin:0 10px 12px 0;}
+  .trade-header-cols{display:grid;grid-template-columns:140px 1fr 1fr;gap:10px;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--mist);padding:0 4px;margin-bottom:6px;}
+  .trade-team-row{display:grid;grid-template-columns:140px 1fr 1fr;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);align-items:start;}
+  .trade-team-row:last-child{border-bottom:none;}
+  .trade-team-label{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px;}
+  .empty-note{color:var(--mist-soft);font-size:13px;font-style:italic;}
+  .contact-line{margin-top:14px;font-size:13px;color:var(--mist);}
 
-  /* PRICING */
-  .pricing { background: var(--cream); padding: 100px 24px; text-align: center; }
-  .pricing h2 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 52px); font-weight: 700; color: var(--forest); margin-bottom: 16px; }
-  .pricing > p { color: var(--bark); font-size: 18px; font-weight: 300; margin-bottom: 16px; }
-  .pricing-note { font-size: 13px; color: var(--bark); margin-bottom: 64px; background: var(--mist); display: inline-block; padding: 10px 20px; border-radius: 100px; }
-  .pricing-cards { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; max-width: 1020px; margin: 0 auto; }
-  .pricing-card { background: white; border-radius: 24px; padding: 40px 32px; flex: 1; min-width: 260px; max-width: 310px; text-align: left; border: 1.5px solid rgba(44,74,62,0.1); position: relative; transition: transform 0.2s, box-shadow 0.2s; }
-  .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(44,74,62,0.12); }
-  .pricing-card.featured { background: var(--forest); border-color: var(--forest); transform: scale(1.04); }
-  .pricing-card.featured:hover { transform: scale(1.04) translateY(-4px); }
-  .pricing-card.active-plan { border-color: var(--sunset); box-shadow: 0 0 0 2px rgba(212,98,42,0.3); }
-  .featured-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--sunset); color: white; font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; padding: 5px 16px; border-radius: 100px; white-space: nowrap; }
-  .plan-name { font-size: 12px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--moss); margin-bottom: 16px; }
-  .featured .plan-name { color: rgba(242,232,213,0.6); }
-  .plan-price { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900; color: var(--forest); line-height: 1; margin-bottom: 4px; }
-  .featured .plan-price { color: var(--sand); }
-  .plan-price span { font-size: 20px; font-weight: 400; font-family: 'DM Sans', sans-serif; }
-  .plan-desc { font-size: 13px; color: var(--bark); margin-bottom: 20px; font-weight: 300; }
-  .featured .plan-desc { color: rgba(242,232,213,0.55); }
+  /* ---------- search ---------- */
+  .search-result-row{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;}
+  .search-result-row .count{font-family:'JetBrains Mono',monospace;color:var(--blue);font-size:13px;}
 
-  /* SPEED ESCALATION in card */
-  .plan-speed-title { font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--moss); margin-bottom: 10px; }
-  .featured .plan-speed-title { color: rgba(124,200,160,0.8); }
-  .plan-speed-rows { margin-bottom: 20px; }
-  .plan-speed-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 8px; margin-bottom: 4px; background: rgba(44,74,62,0.04); font-size: 12px; }
-  .featured .plan-speed-row { background: rgba(255,255,255,0.07); }
-  .plan-speed-row span:first-child { color: var(--bark); }
-  .featured .plan-speed-row span:first-child { color: rgba(242,232,213,0.5); }
-  .plan-speed-row span:last-child { color: var(--forest); font-weight: 500; }
-  .featured .plan-speed-row span:last-child { color: #7CC8A0; }
-  .plan-speed-row.fast { background: rgba(74,124,89,0.08); }
-  .featured .plan-speed-row.fast { background: rgba(124,200,160,0.15); }
+  /* ---------- members ---------- */
+  .members-table{width:100%;border-collapse:collapse;font-size:14px;}
+  .members-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--mist);padding:8px 10px;border-bottom:1.5px solid var(--line-strong);}
+  .members-table td{padding:10px;border-bottom:1px solid var(--line);}
 
-  .plan-features { list-style: none; margin-bottom: 24px; border-top: 1px solid rgba(44,74,62,0.08); padding-top: 16px; }
-  .featured .plan-features { border-top-color: rgba(242,232,213,0.1); }
-  .plan-features li { font-size: 14px; color: var(--forest); padding: 7px 0; border-bottom: 1px solid rgba(44,74,62,0.06); display: flex; align-items: center; gap: 10px; }
-  .featured .plan-features li { color: rgba(242,232,213,0.8); border-bottom-color: rgba(242,232,213,0.1); }
-  .check { width: 18px; height: 18px; background: var(--mist); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; color: var(--moss); font-weight: 700; }
-  .featured .check { background: rgba(74,124,89,0.3); color: #7CC8A0; }
-  .plan-select-hint { font-size: 12px; color: var(--bark); text-align: center; font-style: italic; }
-  .featured .plan-select-hint { color: rgba(242,232,213,0.45); }
+  .loading{display:flex;align-items:center;justify-content:center;padding:60px 0;color:var(--mist);font-size:14px;}
+  .footer-note{text-align:center;color:var(--mist-soft);font-size:12px;padding:20px;}
+  .help-box{background:var(--blue-soft);border:1.5px solid var(--blue);border-radius:10px;padding:16px 18px;margin-bottom:20px;}
+  .help-box h3{font-size:15px;color:var(--blue-deep);margin:0 0 10px;font-family:'Poppins',sans-serif;font-weight:800;}
+  .help-box ol,.help-box ul{margin:0;padding-left:20px;color:var(--ink);font-size:14px;line-height:2;}
+  .help-box li strong{color:var(--blue-deep);}
+  .help-box .help-toggle{background:none;border:none;color:var(--blue-deep);font-weight:700;font-size:13px;cursor:pointer;padding:0;text-decoration:underline;}
+  .help-body{margin-top:10px;}
 
-  .form-section { background: var(--sand); padding: 100px 24px; text-align: center; }
-  .form-section h2 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 52px); font-weight: 700; color: var(--forest); margin-bottom: 12px; }
-  .form-section > p { color: var(--bark); font-size: 18px; font-weight: 300; margin-bottom: 48px; }
-  .alert-form { background: white; border-radius: 28px; padding: 48px 40px; max-width: 580px; margin: 0 auto; box-shadow: 0 8px 48px rgba(44,74,62,0.1); text-align: left; }
-  .form-row { margin-bottom: 20px; }
-  .form-row label { display: block; font-size: 12px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--forest); margin-bottom: 8px; }
-  .form-row input, .form-row select { width: 100%; padding: 14px 18px; border: 1.5px solid rgba(44,74,62,0.15); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--forest); background: var(--cream); outline: none; transition: border-color 0.2s; appearance: none; }
-  .form-row input:focus, .form-row select:focus { border-color: var(--moss); background: white; }
-  .form-row-double { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-  .founding-banner { background: var(--forest); color: var(--sand); border-radius: 12px; padding: 16px 20px; font-size: 13px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
-  .founding-banner strong { color: #7CC8A0; }
-  .founding-loading { opacity: 0.5; font-size: 12px; }
-  .site-type-note { font-size: 12px; color: var(--moss); margin-top: 8px; font-weight: 500; }
-  .live-competition { background: rgba(212,98,42,0.06); border: 1.5px solid rgba(212,98,42,0.2); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: var(--forest); display: none; align-items: center; gap: 10px; line-height: 1.5; }
-  .live-competition.visible { display: flex; }
-  .live-dot { width: 8px; height: 8px; background: var(--sunset); border-radius: 50%; flex-shrink: 0; animation: pulse 1.5s ease-in-out infinite; }
-  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
-  .form-submit { width: 100%; padding: 18px; background: var(--sunset); color: white; border: none; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 24px rgba(212,98,42,0.35); margin-top: 8px; }
-  .form-submit:hover { transform: translateY(-2px); }
-  .form-note { text-align: center; font-size: 12px; color: var(--bark); margin-top: 16px; font-weight: 300; }
-  .success-msg { display: none; background: var(--mist); border: 1.5px solid var(--moss); border-radius: 16px; padding: 32px; text-align: center; }
-  .success-msg.visible { display: block; }
-  .success-msg h3 { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--forest); margin-bottom: 10px; }
-  .success-msg p { font-size: 14px; color: var(--bark); font-weight: 300; line-height: 1.6; }
-
-  .disclaimer { background: var(--forest); padding: 60px 24px; }
-  .disclaimer-inner { max-width: 760px; margin: 0 auto; }
-  .disclaimer h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--sand); margin-bottom: 20px; font-weight: 700; }
-  .disclaimer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 600px) { .disclaimer-grid { grid-template-columns: 1fr; } .form-row-double { grid-template-columns: 1fr; } .nav-links { display: none; } .pricing-card { max-width: 100%; } }
-  .disclaimer-item { display: flex; gap: 12px; align-items: flex-start; }
-  .disclaimer-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
-  .disclaimer-item p { font-size: 13px; color: rgba(242,232,213,0.6); line-height: 1.6; font-weight: 300; }
-  .disclaimer-item p strong { color: rgba(242,232,213,0.85); font-weight: 500; }
-
-  footer { background: #1a2e27; padding: 40px 24px; text-align: center; color: rgba(242,232,213,0.4); font-size: 13px; font-weight: 300; }
-  footer strong { color: var(--sand); font-family: 'Playfair Display', serif; font-size: 20px; display: block; margin-bottom: 12px; font-weight: 700; }
-  footer a { color: rgba(242,232,213,0.4); text-decoration: none; }
-  footer a:hover { color: var(--sand); }
+  @media (max-width:768px){
+    .detail .cols{grid-template-columns:1fr;}
+    .topbar{flex-direction:column;align-items:flex-start;}
+    .member-row{flex-wrap:wrap;gap:8px;}
+    .member-row > div:first-child{flex:1;min-width:0;}
+    .member-row > div:last-child{flex-shrink:0;}
+    .sticker-chips{gap:6px;}
+    .sticker{font-size:11px;padding:6px 8px;}
+    nav.tabs{gap:2px;}
+    nav.tabs button{font-size:12px;padding:6px 8px 5px;}
+    .trade-header-cols{grid-template-columns:80px 1fr 1fr;}
+    .trade-team-label{font-size:11px;}
+    .trade-board-grid{grid-template-columns:1fr !important;}
+  }
+  .indicator-symbol{font-size:14px;line-height:1;}
 </style>
 </head>
 <body>
+<div id="app"><div class="loading">Loading…</div></div>
 
-<nav id="nav">
-  <a href="/" class="nav-logo">CampSite<span>Alert</span></a>
-  <div class="nav-links">
-    <a href="#how">How it works</a>
-    <a href="#parks">Parks</a>
-    <a href="#pricing">Pricing</a>
-    <a href="#alert" class="nav-cta">Get Alerted</a>
-  </div>
-</nav>
+<script>
+/* ============================================================ CONFIG ============================================================ */
+const SUPABASE_URL = "https://lflkhyxkmysvcmfinhku.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmbGtoeXhrbXlzdmNtZmluaGt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzMyMDYsImV4cCI6MjA5NzQwOTIwNn0.6w2Gs3Y4ffrD2_rdxRi7B1MsxjGf-8yuFC4mAkvMxGE";
+const APP_NAME = "DUPLICATE";
+const IS_CONFIGURED = !SUPABASE_URL.includes("YOUR_SUPABASE_URL");
+const sb = IS_CONFIGURED ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="stars" id="stars"></div>
-  <div class="mountains">
-    <svg viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0,320 L0,200 L120,120 L240,180 L360,80 L480,160 L600,60 L720,140 L840,40 L960,130 L1080,70 L1200,150 L1320,90 L1440,160 L1440,320 Z" fill="rgba(27,79,114,0.25)"/>
-      <path d="M0,320 L0,240 L180,160 L300,220 L420,140 L540,200 L660,120 L780,190 L900,110 L1020,180 L1140,130 L1260,200 L1380,150 L1440,180 L1440,320 Z" fill="rgba(44,74,62,0.4)"/>
-      <path d="M0,320 L0,280 L240,220 L360,260 L480,200 L600,250 L720,190 L840,240 L960,200 L1080,250 L1200,210 L1320,260 L1440,230 L1440,320 Z" fill="rgba(44,74,62,0.6)"/>
-      <path d="M680,280 L720,220 L760,280 Z" fill="rgba(212,98,42,0.9)"/>
-      <path d="M715,280 L715,250" stroke="rgba(242,232,213,0.6)" stroke-width="1.5"/>
-    </svg>
-  </div>
-  <div class="hero-content">
-    <div class="badge">🎁 Free Early Access — <span id="spotsRemainingHero">...</span> spots left</div>
-    <h1>Never miss a<br><em>California campsite</em><br>again.</h1>
-    <p class="hero-sub">Coastal state beaches & county parks — all in one alert service.<br>22 California parks. One simple email when a spot opens.</p>
-    <div class="speed-stats">
-      <div class="speed-stat"><strong>5 min</strong><span>fastest check</span></div>
-      <div class="speed-stat"><strong>24/7</strong><span>monitoring</span></div>
-      <div class="speed-stat"><strong>2 min</strong><span>to set up</span></div>
-    </div>
-    <div class="hero-cta">
-      <a href="#alert" class="btn-primary">Get My Alert — from $5</a>
-      <a href="#how" class="btn-secondary">How it works ↓</a>
-    </div>
-  </div>
-  <div class="scroll-hint">↓ scroll</div>
-</section>
+const BADGE26_SVG = `<svg class="badge26" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="58" cy="58" r="44" fill="#E2231A" opacity="0.92"/>
+  <circle cx="92" cy="58" r="44" fill="#FFF200" opacity="0.92"/>
+  <circle cx="58" cy="92" r="44" fill="#1C75BC" opacity="0.92"/>
+  <circle cx="92" cy="92" r="44" fill="#2FAE66" opacity="0.92"/>
+  <circle cx="75" cy="75" r="40" fill="#FFFFFF"/>
+  <text x="75" y="88" text-anchor="middle" font-family="Poppins, sans-serif" font-weight="900" font-size="34" fill="#232323">26</text>
+</svg>`;
 
-<section class="problem">
-  <p class="section-label">The struggle is real</p>
-  <h2>Jalama Beach sold out in minutes. Again.</h2>
-  <p>California's best campsites — state beaches and county parks — vanish the moment they open. Refreshing the page all day isn't a strategy — it's a full-time job.</p>
-  <div class="pain-points">
-    <div class="pain-card"><div class="pain-icon">😩</div><h3>Sold out instantly</h3><p>Parks like Leo Carrillo, Jalama Beach & Doheny book up within minutes of opening — sometimes months in advance.</p></div>
-    <div class="pain-card"><div class="pain-icon">🔄</div><h3>Constant refreshing</h3><p>Cancellations happen daily — but you'd have to be glued to the website 24/7 to catch them.</p></div>
-    <div class="pain-card"><div class="pain-icon">😤</div><h3>Miss the moment</h3><p>A spot opens, someone else books it in seconds. You find out hours later. Too late.</p></div>
-  </div>
-</section>
+/* ============================================================ MASTER LIST (994) ============================================================ */
+const TEAMS = ['MEX','RSA','KOR','CZE','CAN','BIH','QAT','SUI','BRA','MAR','HAI','SCO','USA','PAR','AUS','TUR','GER','CUW','CIV','ECU','NED','JPN','SWE','TUN','BEL','EGY','IRN','NZL','ESP','CPV','KSA','URU','FRA','SEN','IRQ','NOR','ARG','ALG','AUT','JOR','POR','COD','UZB','COL','ENG','CRO','GHA','PAN'];
 
-<section class="how" id="how">
-  <p class="section-label" style="color:rgba(124,200,160,0.8)">4 steps, that's all</p>
-  <h2>How it works</h2>
-  <p>Set it up in 2 minutes. We handle everything else.</p>
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <h3>Pick your park</h3>
-      <p>Choose your campsite, dates, site type and monitoring plan.</p>
-      <span class="step-arrow">→</span>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <h3>Get confirmed</h3>
-      <p>Instant confirmation email with your details and how many others are monitoring the same spot.</p>
-      <span class="step-arrow">→</span>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <h3>We watch 24/7</h3>
-      <p>Our system checks automatically — and gets faster as your arrival date approaches.</p>
-      <span class="step-arrow">→</span>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <h3>Alert + Book</h3>
-      <p>Within minutes of a spot opening you get an email with a direct link. You book it yourself on the park website.</p>
-    </div>
-  </div>
+const TEAM_INFO = {
+  MEX:['Mexico','mx'], RSA:['South Africa','za'], KOR:['South Korea','kr'], CZE:['Czechia','cz'],
+  CAN:['Canada','ca'], BIH:['Bosnia & Herzegovina','ba'], QAT:['Qatar','qa'], SUI:['Switzerland','ch'],
+  BRA:['Brazil','br'], MAR:['Morocco','ma'], HAI:['Haiti','ht'], SCO:['Scotland','gb-sct'],
+  USA:['United States','us'], PAR:['Paraguay','py'], AUS:['Australia','au'], TUR:['Türkiye','tr'],
+  GER:['Germany','de'], CUW:['Curaçao','cw'], CIV:['Ivory Coast','ci'], ECU:['Ecuador','ec'],
+  NED:['Netherlands','nl'], JPN:['Japan','jp'], SWE:['Sweden','se'], TUN:['Tunisia','tn'],
+  BEL:['Belgium','be'], EGY:['Egypt','eg'], IRN:['Iran','ir'], NZL:['New Zealand','nz'],
+  ESP:['Spain','es'], CPV:['Cape Verde','cv'], KSA:['Saudi Arabia','sa'], URU:['Uruguay','uy'],
+  FRA:['France','fr'], SEN:['Senegal','sn'], IRQ:['Iraq','iq'], NOR:['Norway','no'],
+  ARG:['Argentina','ar'], ALG:['Algeria','dz'], AUT:['Austria','at'], JOR:['Jordan','jo'],
+  POR:['Portugal','pt'], COD:['DR Congo','cd'], UZB:['Uzbekistan','uz'], COL:['Colombia','co'],
+  ENG:['England','gb-eng'], CRO:['Croatia','hr'], GHA:['Ghana','gh'], PAN:['Panama','pa'],
+  FWC:['Special & FIFA Museum',null], CC:['Coca-Cola Promo',null]
+};
 
-  <div class="speed-explainer">
-    <h4>⚡ Smart speed escalation — on every plan</h4>
-    <p>Check frequency automatically increases as your arrival date gets closer — because that's when it matters most.</p>
-    <div class="speed-timeline">
-      <div class="speed-row">
-        <span class="speed-label">More than 4 weeks before arrival</span>
-        <div class="speed-bar-wrap"><div class="speed-bar" style="width:33%; background:var(--moss);"></div></div>
-        <span class="speed-value">every 15 min</span>
+function teamLabel(code){
+  const [name, flag] = TEAM_INFO[code];
+  if (flag) return `<img class="flag-ico" src="https://flagcdn.com/${flag}.svg" width="22" height="16" alt="">`;
+  return code==='FWC' ? `<span class="badge-pill special">SPECIAL</span>` : `<span class="badge-pill promo">PROMO</span>`;
+}
+
+function buildMasterList(){
+  const list = [];
+  for (const t of TEAMS){
+    for (let n=1;n<=20;n++){
+      list.push({code:`${t}${n}`, team:t, number:n, category: n<=2?'badge': n===13?'photo':'player'});
+    }
+  }
+  list.push({code:'FWC00', team:'FWC', number:0, category:'special'});
+  for (let n=1;n<=19;n++){
+    list.push({code:`FWC${n}`, team:'FWC', number:n, category: n<=8?'special':'museum'});
+  }
+  for (let n=1;n<=14;n++){
+    list.push({code:`CC${n}`, team:'CC', number:n, category:'promo'});
+  }
+  return list;
+}
+const MASTER = buildMasterList();
+const MASTER_BY_CODE = new Map(MASTER.map(s=>[s.code,s]));
+const GROUPS = ['FWC','CC',...TEAMS];
+
+/* ============================================================ PARSER ============================================================ */
+function parseExport(text, forceContext){
+  const lines = text.split('\n');
+  let context = forceContext || 'missing';
+  const missing = new Set();
+  const duplicates = {};
+  const unmatched = [];
+  for (let raw of lines){
+    const line = raw.trim();
+    if (!line) continue;
+    const lower = line.toLowerCase();
+    if (!forceContext && lower.includes('duplicate')) { context = 'duplicate'; continue; }
+    if (!forceContext && lower.includes('missing')) { context = 'missing'; continue; }
+    const m = line.match(/^([A-Za-z0-9]{2,4}):\s*(.+)$/);
+    if (!m) continue;
+    const prefix = m[1].toUpperCase();
+    const tokens = m[2].split(',').map(t => t.trim().replace(/\.$/, '')).filter(Boolean);
+    for (const tok of tokens){
+      let code = null, isDup = false, count = 1;
+      const dm = tok.match(/^(\d+)\((\d+)x\)$/i);
+      const pm = tok.match(/^(\d+)$/);
+      if (dm){
+        isDup = true; count = parseInt(dm[2],10);
+        code = (prefix==='FWC' && dm[1]==='00') ? 'FWC00' : `${prefix}${parseInt(dm[1],10)}`;
+      } else if (pm){
+        code = (prefix==='FWC' && pm[1]==='00') ? 'FWC00' : `${prefix}${parseInt(pm[1],10)}`;
+      } else { unmatched.push(`${prefix}:${tok}`); continue; }
+      if (!MASTER_BY_CODE.has(code)){ unmatched.push(`${code} (unknown)`); continue; }
+      if (isDup){ duplicates[code]=(duplicates[code]||0)+count; missing.delete(code); }
+      else if (!duplicates[code]) missing.add(code);
+    }
+  }
+  return { missing:[...missing], duplicates, unmatched };
+}
+
+
+function buildCollectionMap(missing, duplicates){
+  const map = new Map();
+  for (const s of MASTER){
+    if (duplicates[s.code]) map.set(s.code, {status:'duplicate', count:duplicates[s.code], parallel:'normal'});
+    else if (missing.includes(s.code)) map.set(s.code, {status:'missing', count:0, parallel:'normal'});
+    else map.set(s.code, {status:'have', count:0, parallel:'normal'});
+  }
+  return map;
+}
+
+/* ============================================================ STATE ============================================================ */
+let profile = null;
+let myCollection = new Map();
+let allMembers = [];
+let myReservations = new Map(); // code -> pseudo of who it's promised to
+let whoHasSpare = new Map(); // code -> [pseudo, ...] of other members with a duplicate
+let incomingOffers = new Map(); // code -> pseudo of who is already offering it to me
+
+async function loadMyReservations(){
+  const { data } = await sb.from('trade_proposals').select('*')
+    .or(`from_user.eq.${profile.id},to_user.eq.${profile.id}`)
+    .in('status',['pending','accepted']);
+  myReservations = new Map();
+  incomingOffers = new Map();
+  for (const t of (data||[])){
+    // Cards I promised to others
+    if (t.from_user === profile.id){
+      const pseudo = (allMembers.find(m=>m.id===t.to_user)||{}).pseudo || '?';
+      for (const raw of t.offer_codes){
+        const code = raw.split(':')[0];
+        myReservations.set(code, pseudo);
+      }
+    }
+    // Cards others are offering me
+    if (t.to_user === profile.id){
+      const pseudo = (allMembers.find(m=>m.id===t.from_user)||{}).pseudo || '?';
+      for (const raw of t.offer_codes){
+        const code = raw.split(':')[0];
+        incomingOffers.set(code, pseudo);
+      }
+    }
+  }
+  // Build whoHasSpare from allMembers
+  whoHasSpare = new Map();
+  for (const m of allMembers){
+    if (m.id === profile.id) continue;
+    for (const [code, v] of m.collection.entries()){
+      if (v.status === 'duplicate'){
+        if (!whoHasSpare.has(code)) whoHasSpare.set(code, []);
+        whoHasSpare.get(code).push(m.pseudo);
+      }
+    }
+  }
+}
+function reservationWarning(code){
+  const who = myReservations.get(code);
+  return who ? `<span style="color:orange;font-weight:900;font-size:9px;">⚠</span>` : '';
+}
+function incomingOfferWarning(code){
+  const who = incomingOffers.get(code);
+  return who ? `<span style="color:var(--blue);font-weight:900;font-size:11px;" title="Already offered to you by ${who}">📬</span>` : '';
+}
+function reservationTitle(code, extraInfo=''){
+  const who = myReservations.get(code);
+  const incoming = incomingOffers.get(code);
+  const parts = [];
+  if (extraInfo) parts.push(extraInfo);
+  if (who) parts.push(`⚠ Promised to: ${who}`);
+  if (incoming) parts.push(`📬 Already offered to you by: ${incoming}`);
+  return parts.join(' | ') || code;
+}
+let currentTab = 'import';
+let openTeams = new Set();
+const root = document.getElementById('app');
+
+async function init(){
+  if (!IS_CONFIGURED){ renderNotConfigured(); return; }
+  const savedId = localStorage.getItem('my_profile_id');
+  if (savedId){
+    const { data } = await sb.from('profiles').select('*').eq('id', savedId).maybeSingle();
+    if (data){ profile = data; await loadMyCollection(); renderShell(); return; }
+    localStorage.removeItem('my_profile_id'); // saved id no longer exists, start fresh
+  }
+  renderAuth();
+}
+
+function renderNotConfigured(){
+  root.innerHTML = `<div class="center-screen"><div class="card">
+    ${BADGE26_SVG}
+    <h2>Setup needed</h2>
+    <p class="sub">Supabase keys aren't set in this file yet.</p>
+  </div></div>`;
+}
+
+/* ============================================================ DATA ============================================================ */
+async function loadMyCollection(){
+  const { data } = await sb.from('collections').select('sticker_code,status,duplicate_count,parallel').eq('user_id', profile.id);
+  myCollection = new Map();
+  (data||[]).forEach(r=>myCollection.set(r.sticker_code, {status:r.status, count:r.duplicate_count, parallel:r.parallel||'normal'}));
+}
+async function fetchAllRows(table, columns){
+  let all = [];
+  let from = 0;
+  const pageSize = 1000;
+  while (true){
+    const { data, error } = await sb.from(table).select(columns).range(from, from + pageSize - 1);
+    if (error) throw error;
+    all = all.concat(data || []);
+    if (!data || data.length < pageSize) break;
+    from += pageSize;
+  }
+  return all;
+}
+async function loadAllMembers(){
+  const profiles = await fetchAllRows('profiles', 'id,pseudo');
+  const rows = await fetchAllRows('collections', 'user_id,sticker_code,status,duplicate_count,parallel');
+  const byUser = new Map();
+  (profiles||[]).forEach(p=>byUser.set(p.id, {...p, collection:new Map()}));
+  (rows||[]).forEach(r=>{
+    const u = byUser.get(r.user_id);
+    if (u) u.collection.set(r.sticker_code, {status:r.status, count:r.duplicate_count, parallel:r.parallel||'normal'});
+  });
+  allMembers = [...byUser.values()];
+  await loadMyReservations();
+}
+async function saveCollection(missing, duplicates, mode='both'){
+  let map;
+  if (mode==='both'){
+    map = buildCollectionMap(missing, duplicates);
+    // Preserve parallel colors for stickers that are still duplicates
+    for (const [code, v] of map.entries()){
+      if (v.status==='duplicate'){
+        const existing = myCollection.get(code);
+        if (existing && existing.parallel && existing.parallel!=='normal'){
+          v.parallel = existing.parallel;
+        }
+      }
+    }
+  } else if (mode==='missing-only'){
+    map = new Map();
+    for (const s of MASTER){
+      const existing = myCollection.get(s.code) || {status:'have', count:0, parallel:'normal'};
+      if (existing.status==='duplicate') map.set(s.code, existing);
+      else if (missing.includes(s.code)) map.set(s.code, {status:'missing', count:0, parallel:'normal'});
+      else map.set(s.code, {status:'have', count:0, parallel:'normal'});
+    }
+  } else { // duplicates-only
+    map = new Map();
+    for (const s of MASTER){
+      const existing = myCollection.get(s.code) || {status:'have', count:0, parallel:'normal'};
+      if (duplicates[s.code]) map.set(s.code, {status:'duplicate', count:duplicates[s.code], parallel: existing.status==='duplicate' ? existing.parallel : 'normal'});
+      else if (existing.status==='missing') map.set(s.code, existing);
+      else map.set(s.code, {status:'have', count:0, parallel:'normal'});
+    }
+  }
+  await sb.from('collections').delete().eq('user_id', profile.id);
+  const rows = [];
+  for (const [code, v] of map.entries()) rows.push({ user_id:profile.id, sticker_code:code, status:v.status, duplicate_count:v.count, parallel:v.parallel||'normal' });
+  for (let i=0;i<rows.length;i+=500){
+    const { error } = await sb.from('collections').insert(rows.slice(i,i+500));
+    if (error) throw error;
+  }
+  myCollection = map;
+}
+
+/* ============================================================ AUTH HELPERS (simple hashed password, no email) ============================================================ */
+async function hashPassword(password, salt){
+  const data = new TextEncoder().encode(password + ':' + salt);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function randomSalt(){
+  return Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+let authMode = 'login';
+function renderAuth(){
+  const isJoin = authMode === 'join';
+  root.innerHTML = `
+    <div class="topbar"><div class="wordmark"><h1>${APP_NAME}</h1><span class="tag">'26</span></div><div></div><div></div></div>
+    <div class="center-screen"><div class="card">
+      ${BADGE26_SVG}
+      <h2>${isJoin?'Welcome':'Log in'}</h2>
+      <p class="sub">${isJoin?`A free, private trading board for the World Cup 2026 sticker album. Paste what's missing from your <strong>Sticker Album 2026</strong> app export, see who can help complete it.`:`Welcome back to ${APP_NAME}'26 — the World Cup 2026 sticker trading board. Enter your pseudo and password.`}</p>
+      <div class="field"><label>Pseudo</label><input type="text" id="authPseudo" placeholder="e.g. Nico"></div>
+      <div class="field"><label>Password</label><input type="password" id="authPassword" placeholder="••••••••"></div>
+      <button class="btn full" id="authBtn">${isJoin?`Join ${APP_NAME}'26`:'Log in'}</button>
+      <div id="authMsg"></div>
+      <p class="sub" style="margin:16px 0 0;text-align:center;">
+        ${isJoin?`Already have an account? <a href="#" id="toggleAuth">Log in</a>`:`New here? <a href="#" id="toggleAuth">Create an account</a>`}
+      </p>
+    </div></div>`;
+  document.getElementById('authBtn').onclick = isJoin ? handleJoin : handleLogin;
+  document.getElementById('toggleAuth').onclick = (e)=>{ e.preventDefault(); authMode = isJoin ? 'login' : 'join'; renderAuth(); };
+}
+async function handleJoin(){
+  const pseudo = document.getElementById('authPseudo').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const msg = document.getElementById('authMsg');
+  if (!pseudo || !password){ msg.innerHTML = `<div class="msg err">Please fill in both fields.</div>`; return; }
+  if (password.length < 4){ msg.innerHTML = `<div class="msg err">Password should be at least 4 characters.</div>`; return; }
+  const btn = document.getElementById('authBtn'); btn.disabled = true; btn.textContent = 'Joining…';
+  const salt = randomSalt();
+  const password_hash = await hashPassword(password, salt);
+  const id = crypto.randomUUID();
+  const { error } = await sb.from('profiles').insert({ id, pseudo, password_hash, salt });
+  if (error){
+    btn.disabled = false; btn.textContent = `Join ${APP_NAME}'26`;
+    msg.innerHTML = `<div class="msg err">${error.message.toLowerCase().includes('duplicate')?'That pseudo is taken, try another.':error.message}</div>`;
+    return;
+  }
+  localStorage.setItem('my_profile_id', id);
+  profile = { id, pseudo };
+  myCollection = new Map();
+  renderShell();
+}
+async function handleLogin(){
+  const pseudo = document.getElementById('authPseudo').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const msg = document.getElementById('authMsg');
+  if (!pseudo || !password){ msg.innerHTML = `<div class="msg err">Please fill in both fields.</div>`; return; }
+  const btn = document.getElementById('authBtn'); btn.disabled = true; btn.textContent = 'Logging in…';
+  const { data } = await sb.from('profiles').select('*').eq('pseudo', pseudo).maybeSingle();
+  btn.disabled = false; btn.textContent = 'Log in';
+  if (!data){ msg.innerHTML = `<div class="msg err">No account with that pseudo.</div>`; return; }
+  const hash = await hashPassword(password, data.salt);
+  if (hash !== data.password_hash){ msg.innerHTML = `<div class="msg err">Wrong password.</div>`; return; }
+  localStorage.setItem('my_profile_id', data.id);
+  profile = data;
+  await loadMyCollection();
+  renderShell();
+}
+
+/* ============================================================ SHELL ============================================================ */
+function completionPct(){
+  if (myCollection.size===0) return 0;
+  let have=0; for (const v of myCollection.values()) if (v.status!=='missing') have++;
+  return Math.round(100*have/MASTER.length);
+}
+function renderShell(){
+  const pct = completionPct();
+  const hasData = myCollection.size>0;
+  root.innerHTML = `
+    <div class="topbar">
+      <div class="wordmark"><h1>${APP_NAME}</h1><span class="tag">'26</span></div>
+      <nav class="tabs">
+        <button data-tab="import">Import</button>
+        <button data-tab="album" ${!hasData?'disabled style="opacity:.4;cursor:default"':''}>My Album</button>
+        <button data-tab="trade" ${!hasData?'disabled style="opacity:.4;cursor:default"':''}>Trade Board</button>
+        <button data-tab="holo" ${!hasData?'disabled style="opacity:.4;cursor:default"':''}>✨ Holo Trades</button>
+        <button data-tab="trades" ${!hasData?'disabled style="opacity:.4;cursor:default"':''}>My Trades <span id="tradesBadge" style="display:none;background:var(--red);color:#fff;border-radius:10px;font-size:10px;font-weight:800;padding:1px 6px;margin-left:4px;vertical-align:1px;"></span></button>
+        <button data-tab="wanted" ${!hasData?'disabled style="opacity:.4;cursor:default"':''}>Most Wanted</button>
+        <button data-tab="members">Members</button>
+        <button data-tab="search" ${!hasData?'disabled style="opacity:.4;cursor:default"':''}>Find a sticker</button>
+      </nav>
+      <div class="who">
+        ${hasData?`<span>Complete: <span class="pct">${pct}%</span></span>`:''}
+        <span>${profile.pseudo}</span>
+        <button id="switchBtn">Switch profile</button>
       </div>
-      <div class="speed-row">
-        <span class="speed-label">2 to 4 weeks before arrival</span>
-        <div class="speed-bar-wrap"><div class="speed-bar" style="width:66%; background:#5a9e6a;"></div></div>
-        <span class="speed-value">every 10 min</span>
-      </div>
-      <div class="speed-row">
-        <span class="speed-label">Last 2 weeks before arrival</span>
-        <div class="speed-bar-wrap"><div class="speed-bar" style="width:100%; background:#7CC8A0;"></div></div>
-        <span class="speed-value">every 5 min</span>
-      </div>
     </div>
-  </div>
-</section>
+    <main id="main"></main>
+    <div class="footer-note">Not affiliated with Panini or FIFA. Built for the office, just for fun. · <a href="https://www.laststicker.com/cards/preview/panini_world_cup_2026/" target="_blank" rel="noopener">See sticker images on LastSticker.com ↗</a></div>`;
+  document.getElementById('switchBtn').onclick = ()=>{ localStorage.removeItem('my_profile_id'); profile=null; renderAuth(); };
+  // Load pending count quietly in the background
+  sb.from('trade_proposals').select('id').eq('to_user', profile.id).eq('status','pending').then(({data})=>{
+    const count = (data||[]).length;
+    const badge = document.getElementById('tradesBadge');
+    if (badge && count>0){ badge.textContent=count; badge.style.display='inline'; }
+  });
+  document.querySelectorAll('nav.tabs button').forEach(b=>{ b.onclick = ()=>{ if (b.disabled) return; currentTab = b.dataset.tab; renderTab(); }; });
+  if (!hasData) currentTab = 'import';
+  renderTab();
+}
+function renderTab(){
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===currentTab));
+  const main = document.getElementById('main');
+  if (currentTab==='import') return renderImport(main);
+  if (currentTab==='album') return renderAlbum(main);
+  if (currentTab==='trade') return renderTradeBoard(main);
+  if (currentTab==='holo') return renderHoloTab(main);
+  if (currentTab==='trades') return renderMyTrades(main);
+  if (currentTab==='wanted') return renderWanted(main);
+  if (currentTab==='search') return renderSearch(main);
+  if (currentTab==='members') return renderMembers(main);
+}
 
-<section class="email-preview-section" id="email">
-  <p class="section-label">What you receive</p>
-  <h2>Two emails. That's it.</h2>
-  <p>A confirmation when you set up — and an alert the moment your campsite opens.</p>
-
-  <div class="email-toggle">
-    <button onclick="showEmail('confirm')" id="btn-confirm" style="background:var(--forest); color:var(--sand); border:1.5px solid var(--forest);">1 — Confirmation</button>
-    <button onclick="showEmail('alert')" id="btn-alert" style="background:transparent; color:var(--forest); border:1.5px solid rgba(44,74,62,0.3);">2 — Alert</button>
-  </div>
-
-  <!-- Email 1: Confirmation -->
-  <div id="email-confirm" class="email-mockup">
-    <div class="email-header">
-      <div class="email-logo">CampSite<span>Alert</span></div>
-      <div style="font-size:11px; color:rgba(242,232,213,0.5); margin-top:2px;">alerts@campsitealert.com</div>
+/* ============================================================ IMPORT ============================================================ */
+function renderImport(main){
+  main.innerHTML = `
+    <div class="help-box">
+      <h3>📲 How to import</h3>
+      <ol>
+        <li><strong>Option 1 — Sticker Album 2026 app (MoovTech):</strong> share your missing list → paste in the first box, share your duplicate list → paste in the second box. You can paste one or both — whichever box you fill in gets updated, the other stays untouched.</li>
+        <li>Hit <strong>Parse</strong> to preview, then <strong>Save</strong>.</li>
+      </ol>
     </div>
-    <div class="email-subject">Subject: <strong>✅ Your alert is active</strong> — Jalama Beach, July 4th</div>
-    <div class="email-body">
-      <h3>You're all set! 🏕</h3>
-      <p>We're now monitoring Jalama Beach on your behalf. Here's a summary of your alert:</p>
-      <div class="email-details">
-        <div class="email-detail-row"><span>Park 1</span><span>Jalama Beach</span></div>
-        <div class="email-detail-row"><span>Park 2</span><span>Cachuma Lake</span></div>
-        <div class="email-detail-row"><span>Arrival date</span><span>July 4, 2026</span></div>
-        <div class="email-detail-row"><span>Nights</span><span>2 nights</span></div>
-        <div class="email-detail-row"><span>Site types</span><span>Basic Campsite · Hookup - Partial</span></div>
-        <div class="email-detail-row"><span>Plan</span><span>Standard — 2 parks · 8 weeks (2 months) · up to 2 site types</span></div>
-        <div class="email-detail-row"><span>Monitoring started</span><span>May 29, 2026</span></div>
-        <div class="email-detail-row" style="background:rgba(74,124,89,0.06); border-radius:8px; padding:8px 10px; margin-top:4px;">
-          <span style="color:var(--moss); font-weight:500;">✓ Monitoring until</span>
-          <span style="color:var(--moss); font-weight:600;">July 3, 2026 (day before arrival)</span>
+    <div class="panel">
+      <h2>Import from Sticker Album 2026</h2>
+      <p class="lead">Paste one or both lists from the MoovTech app — whichever boxes you fill in get updated, the ones you leave blank stay untouched.</p>
+      <label>Missing stickers list</label>
+      <textarea class="import-box" id="importMissing" placeholder="Paste your MISSING stickers export here…" style="min-height:140px;"></textarea>
+      <div style="height:14px;"></div>
+      <label>Duplicate stickers list</label>
+      <textarea class="import-box" id="importDuplicates" placeholder="Paste your DUPLICATE stickers export here…" style="min-height:100px;"></textarea>
+      <div style="height:10px;"></div>
+      <div style="margin-top:14px;"><button class="btn" id="parseBtn">Parse</button></div>
+      <div class="preview" id="previewArea"></div>
+    </div>`;
+  document.getElementById('parseBtn').onclick = ()=>{
+    try{
+    const missingText = document.getElementById('importMissing').value.trim();
+    const dupText = document.getElementById('importDuplicates').value.trim();
+    const hasMissing = missingText.length > 0;
+    const hasDup = dupText.length > 0;
+    if (!hasMissing && !hasDup){
+      document.getElementById('previewArea').innerHTML = `<div class="msg err">Paste at least one list before parsing.</div>`;
+      return;
+    }
+    let result = { missing:[], duplicates:{}, unmatched:[], mode:'both' };
+    let mode = 'both';
+    // MoovTech boxes
+    if (hasMissing || hasDup){
+      mode = hasMissing && hasDup ? 'both' : hasMissing ? 'missing-only' : 'duplicates-only';
+      const r = parseExport(missingText + '\n' + dupText);
+      result.missing = [...new Set([...result.missing, ...r.missing])];
+      Object.assign(result.duplicates, r.duplicates);
+      result.unmatched = r.unmatched || [];
+      result.mode = mode;
+    }
+    const existingDupTypes = [...myCollection.values()].filter(v=>v.status==='duplicate').length;
+    const existingMissingCount = [...myCollection.values()].filter(v=>v.status==='missing').length;
+    const dupTypes = Object.keys(result.duplicates).length;
+    const dupTotal = Object.values(result.duplicates).reduce((a,b)=>a+b,0);
+    let statsHtml = '', warningHtml = '';
+    if (mode==='both'){
+      const have = MASTER.length - result.missing.length;
+      const previouslyMissing = [...myCollection.entries()].filter(([,v])=>v.status==='missing').map(([code])=>code);
+      const noLongerMissing = previouslyMissing.filter(code => !result.missing.includes(code) && !result.duplicates[code]);
+      statsHtml = `<div class="stat-row">
+        <div class="stat"><div class="num">${have}</div><div class="lbl">Owned</div></div>
+        <div class="stat"><div class="num">${result.missing.length}</div><div class="lbl">Missing</div></div>
+        <div class="stat"><div class="num">${dupTypes}</div><div class="lbl">Duplicate types</div></div>
+        <div class="stat"><div class="num">${dupTotal}</div><div class="lbl">Duplicate copies</div></div>
+      </div>`;
+      if (noLongerMissing.length) warningHtml = `<div class="msg info">Heads up: ${noLongerMissing.length} sticker${noLongerMissing.length>1?'s':''} previously missing (e.g. ${noLongerMissing.slice(0,6).join(', ')}${noLongerMissing.length>6?'…':''}) aren't in this paste — saving will mark ${noLongerMissing.length>1?'them':'it'} as owned.</div>`;
+    } else if (mode==='missing-only'){
+      const previouslyMissing = [...myCollection.entries()].filter(([,v])=>v.status==='missing').map(([code])=>code);
+      const noLongerMissing = previouslyMissing.filter(code => !result.missing.includes(code));
+      statsHtml = `<div class="stat-row">
+        <div class="stat"><div class="num">${result.missing.length}</div><div class="lbl">Missing</div></div>
+        <div class="stat"><div class="num">${existingDupTypes}</div><div class="lbl">Duplicates unchanged</div></div>
+      </div>`;
+      if (noLongerMissing.length) warningHtml = `<div class="msg info">Heads up: ${noLongerMissing.length} sticker${noLongerMissing.length>1?'s':''} previously missing aren't in this paste — saving will mark ${noLongerMissing.length>1?'them':'it'} as owned. Duplicates stay untouched.</div>`;
+    } else {
+      statsHtml = `<div class="stat-row">
+        <div class="stat"><div class="num">${dupTypes}</div><div class="lbl">Duplicate types</div></div>
+        <div class="stat"><div class="num">${dupTotal}</div><div class="lbl">Duplicate copies</div></div>
+        <div class="stat"><div class="num">${existingMissingCount}</div><div class="lbl">Missing unchanged</div></div>
+      </div>`;
+    }
+    document.getElementById('previewArea').innerHTML = `
+      ${statsHtml}
+      ${result.unmatched.length?`<div class="msg err">Could not read ${result.unmatched.length} entr${result.unmatched.length>1?'ies':'y'}: ${result.unmatched.slice(0,10).join(', ')}${result.unmatched.length>10?'…':''}</div>`:''}
+      ${warningHtml}
+      <button class="btn full" id="confirmImportBtn" style="margin-top:14px;">Save this to my album</button>`;
+    document.getElementById('confirmImportBtn').onclick = async ()=>{
+      const b = document.getElementById('confirmImportBtn'); b.disabled=true; b.textContent='Saving…';
+      try{ await saveCollection(result.missing, result.duplicates, mode); currentTab='album'; renderShell(); }
+      catch(e){ b.disabled=false; b.textContent='Save this to my album'; alert('Save failed: '+e.message); }
+    };
+    }catch(err){ document.getElementById('previewArea').innerHTML = `<div class="msg err">Parse error: ${err.message}</div>`; }
+  };
+}
+
+/* ============================================================ MY ALBUM ============================================================ */
+let statusFilter = 'all';
+let openParallelPicker = null;
+async function renderAlbum(main){
+  if (!allMembers.length) await loadAllMembers();
+  let have=0,missing=0,dup=0,dupCopies=0;
+  for (const v of myCollection.values()){
+    if (v.status==='have') have++; else if (v.status==='missing') missing++; else { dup++; dupCopies+=v.count; }
+  }
+  main.innerHTML = `
+    <div class="help-box">
+      <h3>📖 How My Album works</h3>
+      <ul>
+        <li><strong>All / Missing only</strong> — white = owned, faded = missing, yellow = duplicate. A <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);border:1.5px solid #888;vertical-align:middle;"></span> red dot on a missing card means someone in the group has a spare — hover to see who</li>
+        <li><strong>My duplicates</strong> — click any card to tag its parallel color (blue, red, purple, green, black). Use <strong>🔵 All blue</strong> to tag all at once</li>
+        <li>Your album only changes via <strong>Import</strong> — nothing here edits your collection</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h2>My Album</h2>
+      <p class="lead">Your album is updated via Import — paste one or both lists from the MoovTech app. Use "My duplicates" to tag parallel colors.</p>
+      <div class="stat-row">
+        <div class="stat"><div class="num">${completionPct()}%</div><div class="lbl">Complete</div></div>
+        <div class="stat"><div class="num">${have+dup}</div><div class="lbl">Owned</div></div>
+        <div class="stat"><div class="num">${missing}</div><div class="lbl">Missing</div></div>
+        <div class="stat"><div class="num">${dupCopies}</div><div class="lbl">Duplicate copies</div></div>
+      </div>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--paper);border:1px solid var(--line-strong)"></span>Have</span>
+        <span><span class="sw" style="background:var(--paper-soft);border:1.5px dashed var(--mist-soft)"></span>Missing</span>
+        <span><span class="sw" style="background:var(--yellow)"></span>Duplicate</span>
+      </div>
+      <div class="msg info" style="display:flex;align-items:center;gap:8px;">🎨 <strong>Got a special parallel (blue/red/purple/green/black)?</strong>&nbsp;Tap "My duplicates" below to tag its color.</div>
+      <div class="filter-row">
+        <input type="text" id="teamFilter" placeholder="Jump to a team or code (e.g. France, FRA, FRA17)…">
+        <button class="btn ghost" data-status="all" style="padding:8px 14px;">All</button>
+        <button class="btn ghost" data-status="duplicate" style="padding:8px 14px;">My duplicates</button>
+        <button class="btn ghost" data-status="missing" style="padding:8px 14px;">Missing only</button>
+        ${statusFilter==='duplicate'?`<button class="btn ghost" id="markAllBlueBtn" style="padding:8px 14px;background:var(--blue);color:#fff;border-color:var(--blue);">🔵 All blue</button>`:''}
+      </div>
+      <div id="groupsHolder"></div>
+    </div>`;
+  renderGroups();
+  if (statusFilter==='duplicate'){
+    const blueBtn = document.getElementById('markAllBlueBtn');
+    if (blueBtn) blueBtn.onclick = async ()=>{
+      blueBtn.disabled = true; blueBtn.textContent = 'Applying…';
+      const dupes = [...myCollection.entries()].filter(([,v])=>v.status==='duplicate');
+      for (const [code] of dupes) await setStickerParallel(code, 'blue');
+      renderAlbum(document.getElementById('main'));
+    };
+  }
+  document.getElementById('teamFilter').oninput = (e)=>renderGroups(e.target.value.trim().toLowerCase());
+  document.querySelectorAll('[data-status]').forEach(b=>{
+    b.style.background = b.dataset.status===statusFilter ? 'var(--ink)' : 'transparent';
+    b.style.color = b.dataset.status===statusFilter ? '#fff' : 'var(--ink)';
+    b.onclick = ()=>{ statusFilter = b.dataset.status; openParallelPicker = null; renderAlbum(main); };
+  });
+  // Render the number rows at the bottom
+  renderNumberRows([1, 13]);
+}
+function renderNumberRows(numbers){
+  const main = document.getElementById('main');
+  if (!main) return;
+  let existing = document.getElementById('numberRowsPanel');
+  if (existing) existing.remove();
+  const panel = document.createElement('div');
+  panel.id = 'numberRowsPanel';
+  panel.className = 'panel';
+  panel.style.marginTop = '0';
+
+  // Build who-has-it map from allMembers
+  const whoHasDupe = new Map(); // code -> [pseudo, ...]
+  for (const m of allMembers){
+    if (m.id === profile.id) continue;
+    for (const [code, v] of m.collection.entries()){
+      if (v.status === 'duplicate'){
+        if (!whoHasDupe.has(code)) whoHasDupe.set(code, []);
+        whoHasDupe.get(code).push(m.pseudo);
+      }
+    }
+  }
+
+  panel.innerHTML = `
+    <h2 style="font-size:16px;margin-bottom:4px;">Quick reference — by number</h2>
+    <p class="lead" style="margin-bottom:10px;">All teams' card #1 and #13 at a glance. Hover any card to see the full situation.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;font-size:12px;align-items:center;">
+      <span><span style="display:inline-block;width:28px;height:18px;background:white;border:1.5px solid #1A1A1A;border-radius:4px;vertical-align:middle;"></span> Owned</span>
+      <span><span style="display:inline-block;width:28px;height:18px;background:var(--yellow);border:1.5px solid #1A1A1A;border-radius:4px;vertical-align:middle;"></span> Your spare (normal)</span>
+      <span><span style="display:inline-block;width:28px;height:18px;background:#1C75BC;border:1.5px solid #1A1A1A;border-radius:4px;vertical-align:middle;"></span> Your spare (parallel color)</span>
+      <span><span style="display:inline-block;width:28px;height:18px;background:white;border:1.5px solid #1A1A1A;border-radius:4px;opacity:0.35;vertical-align:middle;"></span> Missing</span>
+      <span><span style="color:orange;font-weight:900;font-size:15px;">⚠</span> Already in a proposal</span>
+      <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);border:1.5px solid #888;vertical-align:middle;"></span> Someone has a spare (hover to see who)</span>
+    </div>
+    ${numbers.map(n=>{
+      const cards = MASTER.filter(s=>s.number===n && s.team!=='FWC' && s.team!=='CC');
+      return `
+      <div style="margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--mist);margin-bottom:8px;">All #${n}s</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          ${cards.map(s=>{
+            const v = myCollection.get(s.code)||{status:'have',parallel:'normal'};
+            const hasPar = v.status==='duplicate' && v.parallel && v.parallel!=='normal';
+            const bg = v.status==='duplicate'
+              ? (hasPar ? PARALLEL_CHIP_STYLE[v.parallel]?.bg||'var(--yellow)' : 'var(--yellow)')
+              : '';
+            const cardStyle = bg ? `background:${bg};` : v.status==='missing'?'opacity:0.35;':'';
+            const holders = whoHasDupe.get(s.code)||[];
+            const promised = myReservations.get(s.code);
+            const tooltipParts = [];
+            if (v.status==='duplicate') tooltipParts.push(`You have a spare${hasPar?' ('+v.parallel+' parallel)':''}`);
+            if (holders.length) tooltipParts.push(`Has spare: ${holders.join(', ')}`);
+            if (promised) tooltipParts.push(`⚠ You promised this to: ${promised}`);
+            const tooltip = tooltipParts.length ? tooltipParts.join(' | ') : s.code;
+            const warn = promised ? `<span style="color:orange;font-weight:900;font-size:9px;">⚠</span>` : '';
+            const redDot = v.status==='missing' && holders.length ? `<span style="position:absolute;top:-4px;right:-4px;width:9px;height:9px;border-radius:50%;background:var(--red);border:1.5px solid #fff;"></span>` : '';
+            return `<span class="sticker" style="border:1.5px solid var(--ink);font-size:10px;${cardStyle}cursor:default;position:relative;" title="${tooltip}">${warn}${redDot}${s.code}</span>`;
+          }).join('')}
         </div>
-        <div class="email-detail-row"><span>Current check speed</span><span>Every 15 min → escalates automatically</span></div>
-      </div>
-      <div class="competition-box">
-        <div class="competition-icon">👀</div>
-        <div class="competition-text"><strong>14 people</strong> are currently monitoring Jalama Beach for similar dates — have your <strong>Santa Barbara County Parks</strong> account ready to book fast.</div>
-      </div>
-      <div class="stop-alerts-box">
-        <p>Already found a spot another way?</p>
-        <a href="#" class="stop-alerts-btn">✅ I booked it — stop my alerts</a>
-      </div>
-      <div style="border-top:1px solid rgba(44,74,62,0.08); padding-top:18px; margin-top:8px; display:flex; flex-direction:column; gap:12px;">
-        <div style="display:flex; align-items:flex-start; gap:10px;">
-          <span style="font-size:16px; flex-shrink:0;">⚡</span>
-          <div>
-            <div style="font-size:13px; color:var(--forest); font-weight:400;">Check speed escalates automatically as your arrival date approaches</div>
-            <a href="#how" style="font-size:12px; color:var(--moss); text-decoration:none; font-weight:500;">see how it works ↑</a>
+      </div>`;
+    }).join('')}`;
+  main.appendChild(panel);
+}
+function renderGroups(filter=''){
+  const holder = document.getElementById('groupsHolder');
+  let html = '';
+  for (const g of GROUPS){
+    const [name] = TEAM_INFO[g];
+    if (filter){
+      const matches = g.toLowerCase().includes(filter) || name.toLowerCase().includes(filter) || MASTER.some(s=>s.team===g && s.code.toLowerCase().includes(filter));
+      if (!matches) continue;
+    }
+    const stickers = MASTER.filter(s=>s.team===g);
+    const total = stickers.length;
+    let owned=0; stickers.forEach(s=>{ const v=myCollection.get(s.code); if (v && v.status!=='missing') owned++; });
+    const pct = Math.round(100*owned/total);
+
+    let visibleStickers = stickers;
+    if (statusFilter !== 'all'){
+      visibleStickers = stickers.filter(s => (myCollection.get(s.code)||{status:'have'}).status === statusFilter);
+      if (visibleStickers.length === 0) continue;
+    }
+    const isOpen = openTeams.has(g) || (filter && filter.length>0) || statusFilter !== 'all';
+    html += `
+      <div class="team-group" data-group="${g}">
+        <div class="team-head" data-toggle="${g}">
+          <div class="left">${teamLabel(g)}<span>${name}</span></div>
+          <div style="display:flex;align-items:center;gap:10px;">${pct===100?`<span class="badge-pill" style="background:var(--green);color:#fff;">✓ COMPLETE</span>`:`<div class="bar-wrap"><div class="bar" style="width:${pct}%;background:hsl(${Math.round(pct*1.2)},75%,42%);"></div></div>`}<div class="pct">${owned}/${total} <span style="color:var(--mist);font-size:11px;">${pct}%</span></div></div>
+        </div>
+        <div class="team-body ${isOpen?'open':''}">
+          ${visibleStickers.map(s=>{
+            const v = myCollection.get(s.code) || {status:'have',count:0,parallel:'normal'};
+            if (statusFilter==='duplicate'){
+              const tagged = v.parallel && v.parallel!=='normal';
+              const cardStyle = tagged ? parallelChipStyle(v.parallel) : '';
+              const cardHtml = `<div class="cell ${tagged?'':'s-have'}" data-code="${s.code}" data-picker-toggle="${s.code}" style="${cardStyle}cursor:pointer;width:54px;">${v.count>1?`<span class="badge">${v.count}x</span>`:''}${s.code}</div>`;
+              const pickerHtml = openParallelPicker===s.code ? editablePicker(s.code, v.parallel||'normal') : '';
+              return `<div class="${openParallelPicker===s.code?'duplicate-card-open':''}">${cardHtml}${pickerHtml}</div>`;
+            }
+            const spare = whoHasSpare.get(s.code);
+            const spareDot = v.status==='missing' && spare ? `<span style="position:absolute;bottom:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:var(--red);border:1.5px solid #fff;cursor:help;" title="Has spare: ${spare.join(', ')}"></span>` : '';
+            return `<div class="cell s-${v.status}" data-code="${s.code}" style="cursor:default;" title="${spare&&v.status==='missing'?'Has spare: '+spare.join(', '):''}">` +
+              (v.status==='duplicate'&&v.count>1?`<span class="badge">${v.count}x</span>`:'') +
+              (v.parallel&&v.parallel!=='normal'?`<span class="parallel-dot tag-${v.parallel} active" style="position:absolute;bottom:-4px;left:-4px;width:10px;height:10px;cursor:default;"></span>`:'') +
+              spareDot + s.code + `</div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+  holder.innerHTML = html || `<p class="empty-note">${statusFilter!=='all'?'Nothing matches that filter.':`No team matches "${filter}".`}</p>`;
+  holder.querySelectorAll('.team-head').forEach(h=>{
+    h.onclick = ()=>{ const g = h.dataset.toggle; if (openTeams.has(g)) openTeams.delete(g); else openTeams.add(g); renderGroups(document.getElementById('teamFilter').value.trim().toLowerCase()); };
+  });
+  holder.querySelectorAll('[data-picker-toggle]').forEach(c=>{
+    c.onclick = (ev)=>{
+      ev.stopPropagation();
+      const code = c.dataset.pickerToggle;
+      openParallelPicker = openParallelPicker===code ? null : code;
+      renderGroups(document.getElementById('teamFilter').value.trim().toLowerCase());
+    };
+  });
+  holder.querySelectorAll('[data-tag-code]').forEach(d=>{
+    d.onclick = async (ev)=>{
+      ev.stopPropagation();
+      await setStickerParallel(d.dataset.tagCode, d.dataset.tagValue);
+      openParallelPicker = null;
+      renderGroups(document.getElementById('teamFilter').value.trim().toLowerCase());
+    };
+  });
+}
+
+/* ============================================================ TRADE BOARD ============================================================ */
+let selectedTradeMember = null;
+let tradeSelection = { give: new Set(), get: new Set() };
+const PARALLEL_TAGS = ['normal','blue','red','purple','green','black'];
+function parseTradeCode(raw){
+  const [code, parallel] = raw.split(':');
+  return { code, parallel: parallel || 'normal' };
+}
+const PARALLEL_CHIP_STYLE = {
+  blue:  {bg:'#1C75BC', text:'#fff'},
+  red:   {bg:'#E2231A', text:'#fff'},
+  purple:{bg:'#8E44AD', text:'#fff'},
+  green: {bg:'#2FAE66', text:'#fff'},
+  black: {bg:'#1A1A1A', text:'#fff'}
+};
+function parallelChipStyle(parallel){
+  const s = PARALLEL_CHIP_STYLE[parallel];
+  if (!s) return '';
+  return `background:${s.bg};color:${s.text};`;
+}
+function editablePicker(code, current){
+  return `<div class="parallel-picker">${PARALLEL_TAGS.map(p=>{
+    const isActive = current===p;
+    const checkColor = p==='normal' ? '#1A1A1A' : '#fff';
+    return `<button type="button" class="parallel-rect tag-${p} ${isActive?'active':''}" data-tag-code="${code}" data-tag-value="${p}" title="${p}">${isActive?`<span style="color:${checkColor};font-weight:900;font-size:15px;">✓</span>`:''}</button>`;
+  }).join('')}</div>`;
+}
+function tradeChip(raw, side){
+  const { code, parallel } = parseTradeCode(raw);
+  return `<span class="sticker ${side}" style="${parallelChipStyle(parallel)}">${code}</span>`;
+}
+async function renderTradeBoard(main){
+  main.innerHTML = `<div class="panel"><h2>Trade Board</h2><div class="loading">Loading members…</div></div>`;
+  await loadAllMembers();
+  selectedTradeMember = null;
+  const others = allMembers.filter(m=>m.id!==profile.id);
+  const matches = others.map(m=>{
+    const youGet=[], youGive=[];
+    for (const s of MASTER){
+      const mine = myCollection.get(s.code) || {status:'have'};
+      const theirs = m.collection.get(s.code) || {status:'have'};
+      if (mine.status==='missing' && theirs.status==='duplicate') youGet.push(s.code);
+      if (theirs.status==='missing' && mine.status==='duplicate') youGive.push(s.code);
+    }
+    return { member:m, youGet, youGive, total: youGet.length+youGive.length };
+  }).filter(x=>x.member.collection.size>0).sort((a,b)=>b.total-a.total);
+
+  document.getElementById('main').innerHTML = `
+    <div class="help-box">
+      <h3>🔄 How the Trade Board works</h3>
+      <ol>
+        <li>Click a name on the left — the builder opens on the right</li>
+        <li><span style="color:var(--red);font-weight:900;font-size:15px;">↓</span> they need it &nbsp;·&nbsp; <span style="color:var(--yellow-deep);font-weight:900;font-size:15px;">★</span> you need it &nbsp;·&nbsp; <span style="color:orange;font-weight:900;font-size:15px;">⚠</span> already in another deal</li>
+        <li>Click cards to select, then <strong>Send trade proposal</strong></li>
+      </ol>
+    </div>
+    <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:start;">
+      <div>
+        <div class="panel" style="padding:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <strong style="font-size:14px;">Members</strong>
+            <button class="btn ghost" id="refreshTB" style="padding:3px 8px;font-size:11px;">↻</button>
+          </div>
+          <div id="memberList">
+            ${matches.length===0?'<p class="empty-note">No one has imported yet.</p>':
+            matches.map(x=>`
+              <div class="member-row" data-id="${x.member.id}" style="padding:10px;border-radius:8px;cursor:pointer;margin-bottom:4px;border:1px solid var(--line);flex-direction:column;align-items:flex-start;gap:4px;">
+                <div class="name" style="font-size:14px;">${x.member.pseudo}</div>
+                <div class="match-counts" style="font-size:11px;">
+                  <span class="get">↓ ${x.youGet.length} possible</span>&nbsp;<span class="give">↑ ${x.youGive.length} possible</span>
+                </div>
+              </div>`).join('')}
           </div>
         </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span style="font-size:16px; flex-shrink:0;">🛑</span>
-          <div style="font-size:13px; color:var(--forest); font-weight:400;">Alerts stop when you click "I booked it" or on your arrival date</div>
-        </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span style="font-size:16px; flex-shrink:0;">🔄</span>
-          <div style="font-size:13px; color:var(--forest); font-weight:400;">If plan expires before arrival with no spot found, we'll notify you with an option to renew</div>
-        </div>
+      </div>
+      <div id="builderPanel" class="panel" style="min-height:200px;">
+        <p class="empty-note" style="text-align:center;padding:40px 0;">← Select a person to start trading</p>
       </div>
     </div>
-  </div>
+    <div class="panel" id="tradeBoardHistory" style="margin-top:0;">
+      <div class="loading" style="padding:20px 0;">Loading proposals…</div>
+    </div>`;
 
-  <!-- Email 2: Alert -->
-  <div id="email-alert" class="email-mockup" style="display:none;">
-    <div class="email-header">
-      <div class="email-logo">CampSite<span>Alert</span></div>
-      <div style="font-size:11px; color:rgba(242,232,213,0.5); margin-top:2px;">alerts@campsitealert.com</div>
-    </div>
-    <div class="email-subject">Subject: <strong>🏕 Spot available!</strong> — Jalama Beach, July 4th</div>
-    <div class="email-body">
-      <h3>A site just opened up! 🎉</h3>
-      <p>A <strong>Basic Campsite</strong> just became available at <strong>Jalama Beach</strong> for your dates. Move fast — these spots go quickly!</p>
-      <div class="email-details">
-        <div class="email-detail-row"><span>Park</span><span>Jalama Beach</span></div>
-        <div class="email-detail-row"><span>Date available</span><span>July 4, 2026</span></div>
-        <div class="email-detail-row"><span>Site type</span><span>Basic Campsite</span></div>
-        <div class="email-detail-row"><span>Detected at</span><span>June 12, 2026 — 8:43am</span></div>
-      </div>
-      <a href="https://santabarbara.camava.com/reservation/camping/index.asp" target="_blank" class="email-btn" style="background:var(--sunset);">→ Book now on Santa Barbara County Parks</a>
-      <p style="font-size:11px; color:rgba(139,94,60,0.7); text-align:center; margin-top:-4px; margin-bottom:16px;">Opens the county park booking page — select your park and dates to complete your reservation.</p>
-      <div class="stop-alerts-box">
-        <p>Already booked your spot?</p>
-        <a href="#" class="stop-alerts-btn">✅ I booked it — stop my alerts</a>
-      </div>
-      <p class="email-footer-note">We'll keep monitoring in case you miss this one. Click "I booked it" to stop future alerts for this search.</p>
-    </div>
-  </div>
-
-
-</section>
-
-<section class="parks" id="parks">
-  <p class="section-label">Coverage</p>
-  <h2>Parks we cover</h2>
-  <p>22 California parks — coastal state beaches & county parks. Click any pin on the map or park name below to view availability.</p>
-  <div class="parks-legend">
-    <span><span class="legend-dot" style="background:#1B6CA8;"></span> CA State Parks</span>
-    <span><span class="legend-dot" style="background:#4A7C59;"></span> Santa Barbara</span>
-    <span><span class="legend-dot" style="background:#2C4A3E;"></span> Santa Clara</span>
-    <span><span class="legend-dot" style="background:#D4622A;"></span> San Diego</span>
-  </div>
-  <div id="campsitealert-map" style="width:100%; max-width:860px; height:420px; border-radius:20px; margin:0 auto 40px; box-shadow:0 8px 32px rgba(44,74,62,0.15); overflow:hidden;"></div>
-  <div style="margin-bottom:32px;">
-    <p style="font-size:12px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:var(--moss); margin-bottom:16px;">California State Parks (ReserveCalifornia)</p>
-    <div class="parks-grid">
-      <a href="https://www.reservecalifornia.com/park/665" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>Leo Carrillo State Beach</a>
-      <a href="https://www.reservecalifornia.com/park/6" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>Carpinteria State Beach</a>
-      <a href="https://www.reservecalifornia.com/park/8" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>El Capitan State Beach</a>
-      <a href="https://www.reservecalifornia.com/park/639" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>Doheny State Beach</a>
-      <a href="https://www.reservecalifornia.com/park/708" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>San Clemente State Beach</a>
-      <a href="https://www.reservecalifornia.com/park/670" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B6CA8;"></span>Malibu Creek State Park</a>
-    </div>
-  </div>
-  <div style="margin-bottom:32px;">
-    <p style="font-size:12px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:var(--moss); margin-bottom:16px;">Santa Barbara County Parks</p>
-    <div class="parks-grid">
-      <a href="https://santabarbara.camava.com/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#4A7C59;"></span>Jalama Beach</a>
-      <a href="https://santabarbara.camava.com/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#4A7C59;"></span>Cachuma Lake</a>
-    </div>
-  </div>
-  <div style="margin-bottom:32px;">
-    <p style="font-size:12px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:var(--moss); margin-bottom:16px;">Santa Clara County Parks</p>
-    <div class="parks-grid">
-      <a href="https://gooutsideandplay.org/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#2C4A3E;"></span>Coyote Lake</a>
-      <a href="https://gooutsideandplay.org/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#2C4A3E;"></span>Joseph Grant Park</a>
-      <a href="https://gooutsideandplay.org/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#2C4A3E;"></span>Mt Madonna Park</a>
-      <a href="https://gooutsideandplay.org/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#2C4A3E;"></span>Sanborn</a>
-      <a href="https://gooutsideandplay.org/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#2C4A3E;"></span>Uvas Canyon Park</a>
-    </div>
-  </div>
-  <div style="margin-bottom:32px;">
-    <p style="font-size:12px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:var(--moss); margin-bottom:16px;">San Diego County Parks</p>
-    <div class="parks-grid">
-      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Agua Caliente</a>
-      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Dos Picos</a>
-      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Guajome</a>
-      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Lake Morena</a>
-      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Potrero</a>
-      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Sweetwater</a>
-      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Tijuana River Valley</a>
-      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>Vallecito</a>
-      <a href="https://parksres.sandiegocounty.gov/reservation/camping/index.asp" target="_blank" class="park-tag"><span class="park-dot" style="background:#D4622A;"></span>William Heise</a>
-    </div>
-  </div>
-  <p style="font-size:13px; color:var(--bark); font-weight:300;">Don't see your park? <a href="#alert" style="color:var(--moss); text-decoration:none; font-weight:500;">Request it →</a></p>
-</section>
-
-<section class="pricing" id="pricing">
-  <p class="section-label">Pricing</p>
-  <div style="background:linear-gradient(135deg, var(--forest), var(--moss)); border-radius:20px; padding:32px 40px; max-width:600px; margin:0 auto 48px; text-align:center;">
-    <div style="font-size:28px; margin-bottom:8px;">🎁</div>
-    <h3 style="font-family:'Playfair Display',serif; font-size:24px; color:var(--sand); margin-bottom:8px; font-weight:700;">First 15 users get Basic & Standard for free</h3>
-    <p style="color:#7CC8A0; font-size:14px; font-weight:500; margin:0;"><span id="spotsRemainingPricing">...</span> spots remaining</p>
-  </div>
-  <h2>Simple. No subscriptions.</h2>
-  <p>Pay once. Choose your monitoring window and number of parks.</p>
-  <div class="pricing-note">⚡ All plans include smart speed escalation — checks get faster as your arrival date approaches</div>
-  <div class="pricing-cards" id="pricingCards">
-
-    <div class="pricing-card" id="card-basic">
-      <div class="plan-name">Basic</div>
-      <div class="plan-price" id="basicPrice"><span>$</span>5</div>
-      <div class="plan-desc">1 park · 4 weeks (1 month)</div>
-      <p style="font-size:12px; color:var(--bark); font-style:italic; margin-bottom:4px;">One park, one chance</p>
-      <p style="font-size:12px; color:var(--bark); margin-bottom:16px; line-height:1.5;">Best if your arrival date is within the next month.</p>
-      <div class="plan-speed-rows">
-        <div class="plan-speed-row"><span>2 to 4 weeks before arrival</span><span>every 10 min</span></div>
-        <div class="plan-speed-row fast"><span>Last 2 weeks before arrival</span><span>🚀 every 5 min</span></div>
-      </div>
-      <ul class="plan-features">
-        <li><span class="check">✓</span>1 park monitored</li>
-        <li><span class="check">✓</span>1 site type monitored</li>
-        <li><span class="check">✓</span>Confirmation email</li>
-        <li><span class="check">✓</span>Instant alert with park link</li>
-        <li><span class="check">✓</span>Competition count shown</li>
-      </ul>
-      <p class="plan-select-hint">↓ Select in form below</p>
-    </div>
-
-    <div class="pricing-card featured" id="card-standard">
-      <div class="featured-badge">Most popular</div>
-      <div class="plan-name">Standard</div>
-      <div class="plan-price" id="standardPrice"><span>$</span>10</div>
-      <div class="plan-desc">2 parks · 8 weeks (2 months)</div>
-      <p style="font-size:12px; color:rgba(242,232,213,0.5); font-style:italic; margin-bottom:4px;">More options, more time</p>
-      <p style="font-size:12px; color:rgba(242,232,213,0.5); margin-bottom:8px; line-height:1.5;">2 months of monitoring across 2 parks — significantly more chances to catch a cancellation.</p>
-      <div class="plan-speed-rows">
-        <div class="plan-speed-row"><span>More than 4 weeks before arrival</span><span>every 15 min</span></div>
-        <div class="plan-speed-row"><span>2 to 4 weeks before arrival</span><span>every 10 min</span></div>
-        <div class="plan-speed-row fast"><span>Last 2 weeks before arrival</span><span>🚀 every 5 min</span></div>
-      </div>
-      <ul class="plan-features">
-        <li><span class="check">✓</span>2 parks monitored simultaneously</li>
-        <li><span class="check">✓</span>Up to 2 site types monitored</li>
-        <li><span class="check">✓</span>Confirmation email</li>
-        <li><span class="check">✓</span>Instant alert with park link</li>
-        <li><span class="check">✓</span>Competition count shown</li>
-      </ul>
-      <p class="plan-select-hint">↓ Select in form below</p>
-    </div>
-
-    <div class="pricing-card" id="card-premium">
-      <div class="plan-name">Premium</div>
-      <div class="plan-price"><span>$</span>20</div>
-      <div class="plan-desc">3 parks · 16 weeks (4 months)</div>
-      <p style="font-size:12px; color:var(--bark); font-style:italic; margin-bottom:4px;">Maximum coverage, best chance</p>
-      <p style="font-size:12px; color:var(--bark); margin-bottom:8px; line-height:1.5;">4 months watching 3 parks — the longest window gives you the best odds of securing a spot.</p>
-      <div class="plan-speed-rows">
-        <div class="plan-speed-row"><span>More than 4 weeks before arrival</span><span>every 15 min</span></div>
-        <div class="plan-speed-row"><span>2 to 4 weeks before arrival</span><span>every 10 min</span></div>
-        <div class="plan-speed-row fast"><span>Last 2 weeks before arrival</span><span>🚀 every 5 min</span></div>
-      </div>
-      <ul class="plan-features">
-        <li><span class="check">✓</span>3 parks monitored simultaneously</li>
-        <li><span class="check">✓</span>All site types monitored</li>
-        <li><span class="check">✓</span>Confirmation email</li>
-        <li><span class="check">✓</span>Instant alert with park link</li>
-        <li><span class="check">✓</span>Competition count shown</li>
-      </ul>
-      <p class="plan-select-hint">↓ Select in form below</p>
-    </div>
-
-  </div>
-</section>
-
-<section class="form-section" id="alert">
-  <p class="section-label">Get started</p>
-  <h2>Set up your alert</h2>
-  <p>Takes 2 minutes. Confirmation email sent immediately after.</p>
-  <div class="alert-form">
-    <div class="founding-banner">
-      🔥
-      <div><strong>🎁 Free early access</strong> — <span id="spotsRemaining" class="founding-loading">loading...</span> spots remaining</div>
-    </div>
-    <form id="alertForm">
-      <div class="form-row">
-        <label>Your email</label>
-        <input type="email" name="email" id="emailInput" placeholder="you@email.com" required>
-      </div>
-      <div id="parkSelectorsContainer"></div>
-      <div class="live-competition" id="competitionBox">
-        <div class="live-dot"></div>
-        <div id="competitionText"></div>
-      </div>
-      <div class="form-row-double">
-        <div class="form-row" style="margin-bottom:0">
-          <label>Arrival date</label>
-          <input type="date" name="arrival_date" id="arrivalDate" onchange="recommendPlan()" required>
-        </div>
-        <div class="form-row" style="margin-bottom:0">
-          <label>Nights</label>
-          <select name="nights" id="nightsSelect">
-            <option>1 night</option>
-            <option>2 nights</option>
-            <option>3 nights</option>
-            <option>4 nights</option>
-            <option>5 nights</option>
-            <option>6 nights</option>
-            <option>7 nights</option>
-            <option>8 nights</option>
-            <option>9 nights</option>
-            <option>10 nights</option>
-            <option>11 nights</option>
-            <option>12 nights</option>
-            <option>13 nights</option>
-            <option>14 nights</option>
-          </select>
-        </div>
-      </div>
-      <div id="planRecommendation" style="display:none; background:var(--mist); border-radius:12px; padding:14px 18px; margin-bottom:20px; font-size:13px; color:var(--forest); line-height:1.5;"></div>
-      <div class="form-row" style="margin-top:20px">
-        <label>Alert plan</label>
-        <select name="plan" id="planSelect">
-          <option value="basic" id="planOptBasic">Basic — $5 · 🎁 waived (1 park · 4 weeks)</option>
-          <option value="standard" id="planOptStandard" selected>Standard — $10 · 🎁 waived (2 parks · 8 weeks)</option>
-          <option value="premium">Premium — $20 · 🎁 waived (3 parks · 16 weeks)</option>
-        </select>
-      </div>
-      <div style="background:var(--mist); border-radius:12px; padding:14px 18px; margin-bottom:20px; font-size:13px; color:var(--forest); line-height:1.6;">💡 <strong>Tip:</strong> create your account on the park booking website now — so you can book in seconds when the alert arrives.</div>
-      <div class="form-row" id="promoRow" style="margin-bottom:12px;">
-        <label style="font-size:12px; color:var(--bark); cursor:pointer;" onclick="document.getElementById('promoField').style.display=document.getElementById('promoField').style.display==='none'?'block':'none'">Have a promo code? <span style="color:var(--moss);">Click here →</span></label>
-        <input type="text" name="promo_code" id="promoField" placeholder="Enter promo code" style="display:none; margin-top:8px; width:100%; padding:12px 16px; border:1.5px solid rgba(44,74,62,0.2); border-radius:12px; font-size:14px; background:white; box-sizing:border-box;" oninput="checkPromoCode(this.value)">
-        <div id="promoMsg" style="font-size:12px; margin-top:6px;"></div>
-      </div>
-      <div style="margin-bottom:16px;">
-        <label style="display:flex; align-items:flex-start; gap:12px; cursor:pointer; font-size:13px; color:var(--bark); font-weight:400; text-transform:none; letter-spacing:0; line-height:1.6;">
-          <input type="checkbox" id="termsCheckbox" onchange="updateSubmitBtn()" style="width:16px; height:16px; margin-top:2px; accent-color:var(--moss); cursor:pointer; flex-shrink:0;">
-          I have read and agree to the <a href="#disclaimer" style="color:var(--moss); font-weight:500;">important notices</a> and <a href="#legal" style="color:var(--moss); font-weight:500;">policies</a> below.
-        </label>
-      </div>
-      <button type="submit" class="form-submit" id="submitBtn" disabled style="opacity:0.5; cursor:not-allowed;">Set Up My Alert →</button>
-    </form>
-    <div class="success-msg" id="successMsg">
-      <div style="font-size:48px;margin-bottom:16px;">🏕</div>
-      <h3>You're all set!</h3>
-      <p>A confirmation email is on its way to <strong id="successEmail"></strong> — check your inbox. We'll notify you within minutes of a spot opening. Happy camping!</p>
-    </div>
-    <div class="success-msg" id="pendingMsg" style="border-color: #c8a96e;">
-      <div style="font-size:48px;margin-bottom:16px;">💳</div>
-      <h3>Payment pending<span id="pendingDots">...</span></h3>
-      <p>Complete your payment in the popup window. This page will update automatically once your payment is confirmed.</p>
-      <p style="margin-top:12px;font-size:13px;color:#8B5E3C;">Paying for: <strong id="pendingEmail"></strong></p>
-    </div>
-  </div>
-</section>
-
-<section class="disclaimer" id="disclaimer">
-  <div class="disclaimer-inner">
-    <h3>⚠️ Important — Please read before proceeding</h3>
-    <div class="disclaimer-grid">
-      <div class="disclaimer-item"><span class="disclaimer-icon">🔍</span><p><strong>Monitoring service only.</strong> CampSiteAlert checks availability on your behalf. We do not book campsites for you. When we alert you, you must complete the booking yourself directly on the park booking website.</p></div>
-      <div class="disclaimer-item"><span class="disclaimer-icon">❌</span><p><strong>No availability guarantee.</strong> CampSiteAlert monitors availability only — not a reservation service. If no campsite opens during your monitoring period, your alert expires automatically. No spot found = no refund.</p></div>
-      <div class="disclaimer-item"><span class="disclaimer-icon">⏰</span><p><strong>Checks are periodic, not instant.</strong> We check every 5–15 minutes depending on how close your arrival date is. A spot may open and be booked by someone else before your alert is sent.</p></div>
-      <div class="disclaimer-item"><span class="disclaimer-icon">🤝</span><p><strong>Independent service.</strong> CampSiteAlert is not affiliated with, endorsed by, or connected to California State Parks, ReserveCalifornia, or any county park system in any way.</p></div>
-
-      <div class="disclaimer-item"><span class="disclaimer-icon">⚡</span><p><strong>Limitation of liability.</strong> CampSiteAlert is not liable for any missed bookings, losses, or damages resulting from service interruptions, delays, or technical issues beyond our control.</p></div>
-      <div class="disclaimer-item"><span class="disclaimer-icon">🔧</span><p><strong>Service availability.</strong> CampSiteAlert reserves the right to modify or discontinue the service at any time without notice.</p></div>
-    </div>
-  </div>
-</section>
-
-<section id="legal" style="background:#f9f6f0;padding:40px 24px;border-top:1px solid #EDE8DF;">
-  <div style="max-width:680px;margin:0 auto;">
-    <p style="font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:20px;text-align:center;">Policies</p>
-    <div style="display:flex;gap:40px;flex-wrap:wrap;justify-content:center;">
-      <div style="flex:1;min-width:180px;">
-        <p style="font-size:12px;font-weight:600;color:#5C7A6E;margin-bottom:6px;">Privacy</p>
-        <p style="font-size:12px;color:#8B5E3C;line-height:1.6;">We collect only your email and alert preferences, used solely to send you campsite notifications. Your data is never sold or shared. Cancel anytime via the link in your confirmation email.</p>
-      </div>
-      <div style="flex:1;min-width:180px;">
-        <p style="font-size:12px;font-weight:600;color:#5C7A6E;margin-bottom:6px;">Refunds</p>
-        <p style="font-size:12px;color:#8B5E3C;line-height:1.6;">All purchases are non-refundable. You are paying for a monitoring service, not a guaranteed reservation. If no spot opens during your period, the alert expires with no refund.</p>
-      </div>
-      <div style="flex:1;min-width:180px;">
-        <p style="font-size:12px;font-weight:600;color:#5C7A6E;margin-bottom:6px;">Terms</p>
-        <p style="font-size:12px;color:#8B5E3C;line-height:1.6;">CampSiteAlert monitors availability only — it does not book on your behalf. We are not liable for missed bookings or service interruptions. We reserve the right to modify or discontinue the service at any time.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <strong>CampSiteAlert</strong>
-  Built by a camper, for campers. SoCal based. 🌊🏕🌲<br><br>
-  © 2026 CampSiteAlert · campsitealert.com · Not affiliated with California State Parks or any county park system<br><br>
-  <a href="#alert">Get Alerted</a> · <a href="#how">How it works</a> · <a href="#parks">Parks</a> · <a href="#pricing">Pricing</a> · <a href="#legal">Legal</a>
-</footer>
-
-<script>
-  // Stars
-  const starsEl = document.getElementById('stars');
-  for (let i = 0; i < 80; i++) {
-    const star = document.createElement('div');
-    star.className = 'star';
-    star.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*70}%;--d:${2+Math.random()*4}s;--delay:${Math.random()*4}s;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;opacity:${0.3+Math.random()*0.7};`;
-    starsEl.appendChild(star);
-  }
-
-  // Nav scroll
-  const nav = document.getElementById('nav');
-  window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); });
-
-  // Smooth scroll
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      e.preventDefault();
-      const target = document.querySelector(a.getAttribute('href'));
-      if (target) target.scrollIntoView({ behavior: 'smooth' });
-    });
+  document.getElementById('memberList').querySelectorAll('.member-row').forEach(row=>{
+    row.onclick = async ()=>{
+      document.querySelectorAll('#memberList .member-row').forEach(r=>r.style.background='');
+      row.style.background = 'var(--blue-soft)';
+      const x = matches.find(m=>m.member.id===row.dataset.id);
+      selectedTradeMember = x.member;
+      tradeSelection = { give: new Set(), get: new Set() };
+      sentDealsThisSession = [];
+      await renderTradeBuilder();
+      renderTradeBoardHistory(x.member);
+    };
   });
+  await renderTradeBoardHistory(null);
+  const refreshBtn = document.getElementById('refreshTB');
+  if (refreshBtn) refreshBtn.onclick = ()=>renderTradeBoard(document.getElementById('main'));
+}
+let sentDealsThisSession = [];
+async function renderHoloTab(main){
+  main.innerHTML = `
+    <div class="help-box">
+      <h3>✨ How Holo Trades works</h3>
+      <ul>
+        <li>Shows only <strong>FWC cards</strong> (the special FIFA World Cup cards) and <strong>all #1s</strong> across every team — the premium holo cards</li>
+        <li>Holo cards are typically traded <strong>holo for holo</strong> — one special card for another special card</li>
+        <li><strong>✨ Mutual swap</strong> highlighted in yellow — both of you have something the other needs</li>
+        <li>Click <strong>"Open in Trade Board →"</strong> to go directly to the builder with that person pre-selected</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h2>✨ Holo Trades</h2>
+      <p class="lead">FWC cards + all #1s — your holo matches across the group.</p>
+      <div id="holoList"><div class="loading">Loading…</div></div>
+    </div>`;
+  await loadAllMembers();
+  const others = allMembers.filter(m=>m.id!==profile.id && m.collection.size>0);
+  const holoCodes = new Set(MASTER.filter(s=>s.team==='FWC' || s.number===1).map(s=>s.code));
+  const rows = others.map(m=>{
+    const iGive = [...holoCodes].filter(code=>
+      (myCollection.get(code)||{}).status==='duplicate' &&
+      (m.collection.get(code)||{}).status==='missing'
+    );
+    const iGet = [...holoCodes].filter(code=>
+      (m.collection.get(code)||{}).status==='duplicate' &&
+      (myCollection.get(code)||{}).status==='missing'
+    );
+    return { member:m, iGive, iGet };
+  }).filter(r=>r.iGive.length>0 || r.iGet.length>0);
 
-  // Live founding counter
-  const TOTAL_SPOTS = 22;
-  const SUPABASE_URL_COUNTER = 'https://wqbxylnrgdtcnxlbemdf.supabase.co';
-  const SUPABASE_KEY_COUNTER = 'sb_publishable_T9dDFWDk4lB4p7mjRpkrsg_VPlzbEMK';
-
-  function updateAllCounters(remaining) {
-    ['spotsRemaining', 'spotsRemainingPricing', 'spotsRemainingHero'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.textContent = remaining;
-        el.classList.remove('founding-loading');
-        if (remaining <= 5) el.style.color = '#D4622A';
-      }
-    });
-    if (remaining === 0) {
-      const pricingBanner = document.getElementById('spotsRemainingPricing');
-      if (pricingBanner) pricingBanner.parentElement.parentElement.style.display = 'none';
-    }
-    updatePlanLabels(remaining);
+  const el = document.getElementById('holoList');
+  if (!rows.length){
+    el.innerHTML = '<p class="empty-note">No holo matches right now — more cards need to be imported to see potential swaps.</p>';
+    return;
   }
-
-  async function loadCounter() {
-    try {
-      const res = await fetch(`${SUPABASE_URL_COUNTER}/rest/v1/alerts?free_user=eq.true&promo_code=is.null&select=id`, {
-        headers: {
-          'apikey': SUPABASE_KEY_COUNTER,
-          'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}`,
-        }
-      });
-      const data = await res.json();
-      const used = Array.isArray(data) ? data.length : 0;
-      const remaining = Math.max(0, TOTAL_SPOTS - used);
-      updateAllCounters(remaining);
-      return remaining;
-    } catch(e) {
-      updateAllCounters(20);
-      return 20;
-    }
-  }
-
-  async function incrementCounter() {
-    // Counter now derived from Supabase directly — no action needed
-  }
-
-  loadCounter();
-
-  // Park options HTML
-  const parkOptionsHTML = `
-    <option value="">— Choose a park —</option>
-    <optgroup label="California State Parks (ReserveCalifornia)">
-      <option value="Leo Carrillo State Beach" data-watchers="12" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="665">Leo Carrillo State Beach</option>
-      <option value="Carpinteria State Beach" data-watchers="9" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="6">Carpinteria State Beach</option>
-      <option value="El Capitan State Beach" data-watchers="7" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="8">El Capitan State Beach</option>
-      <option value="Doheny State Beach" data-watchers="11" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="639">Doheny State Beach</option>
-      <option value="San Clemente State Beach" data-watchers="8" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="708">San Clemente State Beach</option>
-      <option value="Malibu Creek State Park" data-watchers="14" data-platform="ReserveCalifornia" data-system="reserve_california" data-idno="670">Malibu Creek State Park</option>
-    </optgroup>
-    <optgroup label="Santa Barbara County Parks">
-      <option value="Jalama Beach" data-watchers="9" data-platform="Santa Barbara County Parks" data-system="santa_barbara" data-idno="2">Jalama Beach</option>
-      <option value="Cachuma Lake" data-watchers="4" data-platform="Santa Barbara County Parks" data-system="santa_barbara" data-idno="1">Cachuma Lake</option>
-    </optgroup>
-    <optgroup label="Santa Clara County Parks">
-      <option value="Coyote Lake" data-watchers="7" data-platform="Santa Clara County Parks" data-system="santa_clara" data-idno="3">Coyote Lake</option>
-      <option value="Joseph Grant Park" data-watchers="3" data-platform="Santa Clara County Parks" data-system="santa_clara" data-idno="6">Joseph Grant Park</option>
-      <option value="Mt Madonna Park" data-watchers="5" data-platform="Santa Clara County Parks" data-system="santa_clara" data-idno="8">Mt Madonna Park</option>
-      <option value="Sanborn" data-watchers="4" data-platform="Santa Clara County Parks" data-system="santa_clara" data-idno="9">Sanborn</option>
-      <option value="Uvas Canyon Park" data-watchers="6" data-platform="Santa Clara County Parks" data-system="santa_clara" data-idno="12">Uvas Canyon Park</option>
-    </optgroup>
-    <optgroup label="San Diego County Parks">
-      <option value="Agua Caliente" data-watchers="8" data-platform="San Diego County Parks" data-system="san_diego" data-idno="1">Agua Caliente</option>
-      <option value="Dos Picos" data-watchers="5" data-platform="San Diego County Parks" data-system="san_diego" data-idno="2">Dos Picos</option>
-      <option value="Guajome" data-watchers="6" data-platform="San Diego County Parks" data-system="san_diego" data-idno="3">Guajome</option>
-      <option value="Lake Morena" data-watchers="4" data-platform="San Diego County Parks" data-system="san_diego" data-idno="5">Lake Morena</option>
-      <option value="Potrero" data-watchers="3" data-platform="San Diego County Parks" data-system="san_diego" data-idno="6">Potrero</option>
-      <option value="Sweetwater" data-watchers="5" data-platform="San Diego County Parks" data-system="san_diego" data-idno="7">Sweetwater</option>
-      <option value="Tijuana River Valley" data-watchers="2" data-platform="San Diego County Parks" data-system="san_diego" data-idno="9494211">Tijuana River Valley</option>
-      <option value="Vallecito" data-watchers="3" data-platform="San Diego County Parks" data-system="san_diego" data-idno="8">Vallecito</option>
-      <option value="William Heise" data-watchers="6" data-platform="San Diego County Parks" data-system="san_diego" data-idno="9">William Heise</option>
-    </optgroup>
-  `;
-
-  const planParks = { basic: 1, standard: 2, premium: 3 };
-
-  function buildParkSelectors(plan) {
-    const count = planParks[plan] || 1;
-    const limit = planSiteTypeLimits[plan] || 1;
-    const limitLabel = planSiteTypeLabels[plan] || 'select 1';
-    const container = document.getElementById('parkSelectorsContainer');
-    container.innerHTML = '';
-
-    for (let i = 1; i <= count; i++) {
-      const wrap = document.createElement('div');
-      wrap.style.cssText = 'background:var(--mist); border-radius:16px; padding:20px; margin-bottom:16px;';
-      wrap.innerHTML = `
-        <div class="form-row" style="margin-bottom:12px;">
-          <label>${count > 1 ? 'Park ' + i : 'Select park'} ${i > 1 ? '<span style="font-weight:300;color:var(--bark);font-size:11px;">— optional</span>' : ''}</label>
-          <select name="park_${i}" id="parkSelect_${i}" onchange="onParkChange(${i})" ${i === 1 ? 'required' : ''} style="background:white;">
-            ${parkOptionsHTML}
-          </select>
+  el.innerHTML = rows.map(r=>{
+    const mutual = r.iGive.length>0 && r.iGet.length>0;
+    return `
+    <div style="border:1.5px solid ${mutual?'var(--yellow-deep)':'var(--line)'};border-radius:10px;padding:14px;margin-bottom:10px;${mutual?'background:linear-gradient(135deg,#FFFBE6,#FFF9B0 80%);':''}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <strong>${r.member.pseudo}</strong>
+        ${mutual?'<span class="badge-pill promo" style="background:var(--yellow-deep);color:var(--ink);">✨ Mutual swap</span>':''}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--mist);margin-bottom:6px;">You give</div>
+          <div class="sticker-chips">${r.iGive.length?r.iGive.map(code=>{
+            const v = myCollection.get(code)||{};
+            return `<span class="sticker give" style="${parallelChipStyle(v.parallel)}" title="${reservationTitle(code)}">${reservationWarning(code)}${code}</span>`;
+          }).join(''):'<span class="empty-note">—</span>'}</div>
         </div>
-        <div id="siteTypeBlock_${i}" style="display:none;">
-          <label style="display:block; font-size:12px; font-weight:500; letter-spacing:1px; text-transform:uppercase; color:var(--forest); margin-bottom:8px;">
-            Site type <span id="siteTypeLimit_${i}" style="font-weight:300; color:var(--bark); text-transform:none; letter-spacing:0; font-size:11px;">— ${limitLabel}</span>
-          </label>
-          <div style="display:flex; flex-direction:column; gap:8px; background:white; border:1.5px solid rgba(44,74,62,0.15); border-radius:12px; padding:14px 18px;" id="siteTypeCheckboxes_${i}"></div>
-          <div id="siteTypeUpgradeNote_${i}" style="display:none; font-size:12px; color:var(--sunset); margin-top:8px; font-weight:500;"></div>
+        <div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--mist);margin-bottom:6px;">You get</div>
+          <div class="sticker-chips">${r.iGet.length?r.iGet.map(code=>{
+            const v = r.member.collection.get(code)||{};
+            return `<span class="sticker get" style="${parallelChipStyle(v.parallel)}" title="${reservationTitle(code)}">${incomingOfferWarning(code)}${code}</span>`;
+          }).join(''):'<span class="empty-note">—</span>'}</div>
+        </div>
+      </div>
+      ${mutual?`<button class="btn ghost" style="margin-top:10px;font-size:12px;" data-holo-member="${r.member.id}">Open in Trade Board →</button>`:''}
+    </div>`;
+  }).join('');
+
+  el.querySelectorAll('[data-holo-member]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const member = allMembers.find(m=>m.id===btn.dataset.holoMember);
+      if (!member) return;
+      selectedTradeMember = member;
+      tradeSelection = { give: new Set(), get: new Set() };
+      sentDealsThisSession = [];
+      currentTab = 'trade';
+      renderShell();
+      setTimeout(async ()=>{
+        const builderPanel = document.getElementById('builderPanel');
+        if (builderPanel){ await renderTradeBuilder(); builderPanel.scrollIntoView({behavior:'smooth', block:'start'}); }
+      }, 100);
+    };
+  });
+}
+
+async function renderTradeBoardHistory(member){
+  const histEl = document.getElementById('tradeBoardHistory');
+  if (!histEl) return;
+  histEl.innerHTML = `<div class="loading" style="padding:20px 0;">Loading…</div>`;
+  let query;
+  if (member){
+    query = sb.from('trade_proposals').select('*')
+      .or(`and(from_user.eq.${profile.id},to_user.eq.${member.id}),and(from_user.eq.${member.id},to_user.eq.${profile.id})`)
+      .order('created_at', {ascending:false});
+  } else {
+    query = sb.from('trade_proposals').select('*')
+      .or(`from_user.eq.${profile.id},to_user.eq.${profile.id}`)
+      .order('created_at', {ascending:false});
+  }
+  const { data } = await query;
+  const trades = data || [];
+  const pseudoOf = id => (allMembers.find(m=>m.id===id)||{}).pseudo || 'someone';
+  const statusColor = {pending:'var(--mist)',accepted:'var(--blue)',completed:'var(--green)',rejected:'var(--red)',cancelled:'var(--mist-soft)'};
+  const canDelete = t => t.status !== 'pending' && t.status !== 'accepted';
+  const title = member ? `Proposals with ${member.pseudo}` : 'All my proposals';
+  histEl.innerHTML = `
+    <h2>${title}</h2>
+    ${trades.length===0?`<p class="empty-note">${member?'No proposals yet with this person.':'No proposals yet.'}</p>`:trades.map(t=>{
+      const sent = t.from_user===profile.id;
+      const other = member ? member.pseudo : pseudoOf(sent?t.to_user:t.from_user);
+      const youGive = sent?t.offer_codes:t.request_codes;
+      const youGet = sent?t.request_codes:t.offer_codes;
+      const date = new Date(t.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      return `
+      <div class="member-row" style="cursor:default;align-items:flex-start;gap:14px;" id="hist-${t.id}">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span class="badge-pill ${sent?'promo':'special'}">${sent?'SENT':'RECEIVED'}</span>
+            ${!member?`<span style="font-weight:700;font-size:13px;">${sent?'To':'From'} ${other}</span>`:''}
+            <span style="font-size:12px;color:var(--mist);">${date}</span>
+            <span style="font-weight:700;font-size:12px;text-transform:capitalize;color:${statusColor[t.status]||'var(--mist)'};">${t.status}</span>
+          </div>
+          <div class="sticker-chips">${youGive.map(c=>tradeChip(c,'give')).join('')}</div>
+          <div style="font-size:11px;color:var(--mist);margin:5px 0 4px;">⇄</div>
+          <div class="sticker-chips">${youGet.map(c=>tradeChip(c,'get')).join('')}</div>
+        </div>
+        ${canDelete(t)?`<button class="btn ghost" data-delete-trade="${t.id}" style="padding:5px 10px;font-size:12px;color:var(--red);border-color:var(--red);background:var(--paper);flex-shrink:0;">Delete</button>`:''}
+      </div>`;
+    }).join('')}`;
+  histEl.querySelectorAll('[data-delete-trade]').forEach(btn=>{
+    btn.onclick = async ()=>{
+      btn.disabled = true; btn.textContent = '…';
+      const t = (await sb.from('trade_proposals').select('*').eq('id', btn.dataset.deleteTrade).maybeSingle()).data;
+      if (!t) return;
+      const col = t.from_user === profile.id ? 'hidden_from' : 'hidden_to';
+      await sb.from('trade_proposals').update({ [col]: true, updated_at:new Date().toISOString() }).eq('id', btn.dataset.deleteTrade);
+      const row = document.getElementById('hist-'+btn.dataset.deleteTrade);
+      if (row) row.remove();
+      if (!histEl.querySelector('.member-row')) histEl.innerHTML += `<p class="empty-note">No proposals yet.</p>`;
+    };
+  });
+}
+async function renderTradeBuilder(){
+  const panel = document.getElementById('builderPanel');
+  const member = selectedTradeMember;
+  const prevTG = document.getElementById('tradeGroups');
+  const prevScroll = prevTG ? prevTG.scrollTop : 0;
+  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+
+  const groupsWithDups = GROUPS.filter(g=>{
+    const teamCodes = MASTER.filter(s=>s.team===g).map(s=>s.code);
+    // Only show teams where there's at least one real match in either direction
+    const iGiveThemSomething = teamCodes.some(c=>
+      (myCollection.get(c)||{}).status==='duplicate' && (member.collection.get(c)||{}).status==='missing');
+    const theyGiveMeSomething = teamCodes.some(c=>
+      (member.collection.get(c)||{}).status==='duplicate' && (myCollection.get(c)||{}).status==='missing');
+    return iGiveThemSomething || theyGiveMeSomething;
+  });
+  const giveList = [...tradeSelection.give], getList = [...tradeSelection.get];
+  const star = `<span class="indicator-symbol" style="color:var(--yellow-deep);">★</span> `;
+  panel.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <h2 style="font-size:18px;">Trade with ${member.pseudo}</h2>
+    </div>
+    <div class="trade-header-cols"><div></div><div>You give</div><div>${member.pseudo} gives</div></div>
+    <p class="example" style="margin:-2px 0 8px;"><span class="indicator-symbol" style="color:var(--red);font-weight:900;">↓</span> = they need it &nbsp;·&nbsp; ${star}= you need it &nbsp;·&nbsp; <span class="indicator-symbol" style="color:orange;font-weight:900;">⚠</span> = already promised &nbsp;·&nbsp; 📬 = someone already offering you this</p>
+    ${sentDealsThisSession.length?`
+    <div style="background:var(--paper-soft);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:14px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--mist);margin-bottom:6px;">Deals sent this session (${sentDealsThisSession.length}) — each is separate</div>
+      ${sentDealsThisSession.map((d,i)=>`<div style="font-size:12.5px;margin-bottom:4px;"><strong>Deal ${i+1}:</strong> ${d.give.join(', ')||'nothing'} → ${d.get.join(', ')||'nothing'}</div>`).join('')}
+    </div>`:''}
+    <div id="tradeGroups" style="max-height:320px;overflow-y:auto;">
+      ${groupsWithDups.length===0?'<p class="empty-note">No mutual matches right now — neither of you has a duplicate the other needs.</p>':groupsWithDups.map(g=>{
+        const [name] = TEAM_INFO[g];
+        const teamCodes = MASTER.filter(s=>s.team===g);
+        const mineDups = teamCodes.filter(s=>
+          (myCollection.get(s.code)||{}).status==='duplicate' &&
+          (member.collection.get(s.code)||{}).status==='missing');
+        const theirsDups = teamCodes.filter(s=>
+          (member.collection.get(s.code)||{}).status==='duplicate' &&
+          (myCollection.get(s.code)||{}).status==='missing');
+        return `
+        <div class="trade-team-row">
+          <div class="trade-team-label">${teamLabel(g)}<span>${name}</span></div>
+          <div class="sticker-chips">${mineDups.length?mineDups.map(s=>{
+            const v = myCollection.get(s.code);
+            const sel = tradeSelection.give.has(s.code);
+            const theyNeed = (member.collection.get(s.code)||{}).status==='missing';
+            return `<span class="sticker give trade-chip" data-side="give" data-code="${s.code}" style="cursor:pointer;${parallelChipStyle(v.parallel)}${sel?'outline:2.5px solid var(--ink);':''}">${theyNeed?`<span class="indicator-symbol" style="color:var(--red);font-weight:900;">↓</span> `:''}${reservationWarning(s.code)}${s.code}${v.count>1?` (${v.count}x)`:''}</span>`;
+          }).join(''):'<span class="empty-note">—</span>'}</div>
+          <div class="sticker-chips">${theirsDups.length?theirsDups.map(s=>{
+            const v = member.collection.get(s.code);
+            const sel = tradeSelection.get.has(s.code);
+            const needed = (myCollection.get(s.code)||{}).status==='missing';
+            return `<span class="sticker get trade-chip" data-side="get" data-code="${s.code}" style="cursor:pointer;${parallelChipStyle(v.parallel)}${sel?'outline:2.5px solid var(--ink);':''}">${needed?star:''}${incomingOfferWarning(s.code)}${s.code}${v.count>1?` (${v.count}x)`:''}</span>`;
+          }).join(''):'<span class="empty-note">—</span>'}</div>
         </div>`;
-      container.appendChild(wrap);
+      }).join('')}
+    </div>
+    <div style="margin-top:16px;">
+      <h4>You give${giveList.length?` (${giveList.length})`:''}</h4>
+      <div class="sticker-chips">${giveList.length?giveList.map(c=>{
+        const v = myCollection.get(c)||{};
+        return `<span class="sticker give" style="${parallelChipStyle(v.parallel)}">${c}</span>`;
+      }).join(''):'<span class="empty-note">none selected</span>'}</div>
+      <h4 style="margin-top:10px;">You get${getList.length?` (${getList.length})`:''}</h4>
+      <div class="sticker-chips">${getList.length?getList.map(c=>{
+        const v = member.collection.get(c)||{};
+        return `<span class="sticker get" style="${parallelChipStyle(v.parallel)}">${c}</span>`;
+      }).join(''):'<span class="empty-note">none selected</span>'}</div>
+    </div>
+    <button class="btn full" id="sendProposalBtn" style="margin-top:12px;" ${(giveList.length===0 && getList.length===0)?'disabled':''}>Send trade proposal</button>
+    <p class="example" style="margin-top:8px;">Each "Send" creates one separate deal — pick everything for that one trade, send it, then start fresh for a different deal (with this person or anyone else).</p>
+    <div id="proposalMsg"></div>`;
+
+  panel.querySelectorAll('.trade-chip').forEach(c=>{
+    c.onclick = async ()=>{
+      const set = c.dataset.side==='give' ? tradeSelection.give : tradeSelection.get;
+      if (set.has(c.dataset.code)) set.delete(c.dataset.code); else set.add(c.dataset.code);
+      await renderTradeBuilder();
+    };
+  });
+  const tg = document.getElementById('tradeGroups');
+  if (tg) tg.scrollTop = prevScroll;
+  const sendBtn = document.getElementById('sendProposalBtn');
+  if (sendBtn) sendBtn.onclick = async ()=>{
+    sendBtn.disabled = true; sendBtn.textContent = 'Sending…';
+    try{
+      const offerCodes = giveList.map(c=>{ const v=myCollection.get(c)||{}; return v.parallel && v.parallel!=='normal' ? `${c}:${v.parallel}` : c; });
+      const requestCodes = getList.map(c=>{ const v=member.collection.get(c)||{}; return v.parallel && v.parallel!=='normal' ? `${c}:${v.parallel}` : c; });
+      await sendTradeProposal(member.id, offerCodes, requestCodes);
+      const sentPseudo = member.pseudo;
+      sentDealsThisSession.push({ give:[...giveList], get:[...getList] });
+      tradeSelection = { give: new Set(), get: new Set() };
+      await renderTradeBuilder();
+      document.getElementById('proposalMsg').innerHTML = `<div class="msg ok">Deal ${sentDealsThisSession.length} sent to ${sentPseudo} as its own separate proposal — see the log above, and "My Trades" for the full record.</div>`;
+      if (selectedTradeMember) renderTradeBoardHistory(selectedTradeMember);
+    }catch(e){
+      sendBtn.disabled = false; sendBtn.textContent = 'Send trade proposal';
+      document.getElementById('proposalMsg').innerHTML = `<div class="msg err">${e.message}</div>`;
     }
-    updateCompetition();
-  }
-
-  function onParkChange(i) {
-    const select = document.getElementById('parkSelect_' + i);
-    const selected = select.options[select.selectedIndex];
-    const block = document.getElementById('siteTypeBlock_' + i);
-    const checkboxContainer = document.getElementById('siteTypeCheckboxes_' + i);
-
-    if (!selected || !selected.value) {
-      block.style.display = 'none';
-      return;
-    }
-
-    const park = selected.value;
-    const system = selected.dataset.system || '';
-    const plan = document.getElementById('planSelect').value;
-    const limit = planSiteTypeLimits[plan] || 1;
-    const types = getSiteTypesForPark(park, system);
-
-    block.style.display = 'block';
-    // Reset all checkboxes first
-    checkboxContainer.innerHTML = '';
-    checkboxContainer.innerHTML = types.map((t, idx) => `
-      <label style="display:flex; align-items:center; gap:10px; font-size:14px; font-weight:400; text-transform:none; letter-spacing:0; color:var(--forest); cursor:pointer;">
-        <input type="checkbox" name="site_type_${i}" value="${t.value}"  
-          onchange="updateSiteTypeLimitForPark(${i})" 
-          style="width:16px; height:16px; accent-color:var(--moss); cursor:pointer;">
-        ${t.label}
-      </label>`).join('');
-
-    // Update competition counter for first park
-    if (i === 1) updateCompetition();
-  }
-
-  function updateSiteTypeLimitForPark(i) {
-    const plan = document.getElementById('planSelect').value;
-    const limit = planSiteTypeLimits[plan] || 1;
-    const checkboxes = document.querySelectorAll(`#siteTypeCheckboxes_${i} input[type="checkbox"]`);
-    const checked = document.querySelectorAll(`#siteTypeCheckboxes_${i} input[type="checkbox"]:checked`);
-    const upgradeNote = document.getElementById('siteTypeUpgradeNote_' + i);
-    const limitLabel = document.getElementById('siteTypeLimit_' + i);
-
-    limitLabel.textContent = '— ' + (planSiteTypeLabels[plan] || 'select 1');
-
-    if (checked.length >= limit) {
-      checkboxes.forEach(cb => {
-        if (!cb.checked) {
-          cb.disabled = true;
-          cb.parentElement.style.opacity = '0.4';
-          cb.parentElement.style.cursor = 'not-allowed';
-        }
-      });
-      if (plan === 'basic') {
-        upgradeNote.style.display = 'block';
-        upgradeNote.textContent = '↑ Upgrade to Standard to select up to 2 site types';
-      } else if (plan === 'standard') {
-        upgradeNote.style.display = 'block';
-        upgradeNote.textContent = '↑ Upgrade to Premium to monitor all site types';
-      } else {
-        upgradeNote.style.display = 'none';
-      }
-    } else {
-      checkboxes.forEach(cb => {
-        cb.disabled = false;
-        cb.parentElement.style.opacity = '1';
-        cb.parentElement.style.cursor = 'pointer';
-      });
-      upgradeNote.style.display = 'none';
-    }
-  }
-
-  // Competition counter
-
-  function updateCompetition() {
-    const parkSelect = document.getElementById('parkSelect_1') || document.getElementById('parkSelect');
-    const box = document.getElementById('competitionBox');
-    const text = document.getElementById('competitionText');
-    const selected = parkSelect ? parkSelect.options[parkSelect.selectedIndex] : null;
-    if (!selected || !selected.dataset.watchers) { box.classList.remove('visible'); return; }
-    const watchers = parseInt(selected.dataset.watchers);
-    const park = selected.value;
-    const platform = selected.dataset.platform || 'the park website';
-    const system = selected.dataset.system || '';
-    box.classList.add('visible');
-    if (watchers >= 10) {
-      text.innerHTML = `<strong>${watchers} people</strong> are currently monitoring <strong>${park}</strong> for similar dates — high demand. Have your <strong>${platform}</strong> account ready to book fast.`;
-    } else if (watchers >= 5) {
-      text.innerHTML = `<strong>${watchers} people</strong> are currently monitoring <strong>${park}</strong> for similar dates — moderate competition. Have your <strong>${platform}</strong> account ready.`;
-    } else {
-      text.innerHTML = `<strong>${watchers} people</strong> are currently monitoring <strong>${park}</strong> for similar dates — lower competition than usual.`;
-    }
-  }
-
-  // Site types per system
-  const systemSiteTypes = {
-    rc_leo_carrillo: [
-      {value: '4303,4427,4328', label: 'Standard Campsite'},
-      {value: '4321', label: 'Hookup — Electric'},
-    ],
-    rc_carpinteria: [
-      {value: '4303,4427', label: 'Standard Campsite'},
-      {value: '4322', label: 'Hookup — Electric + Water'},
-      {value: '4324,4444', label: 'Hookup — Full (E/W/S)'},
-      {value: '4320', label: 'Hike / Bike Campsite'},
-    ],
-    rc_el_capitan: [
-      {value: '4303,4305', label: 'Standard Campsite'},
-      {value: '4320', label: 'Hike / Bike Campsite'},
-    ],
-    rc_doheny: [
-      {value: '4303,4427', label: 'Standard Campsite'},
-      {value: '4328', label: 'Tent Only Campsite'},
-    ],
-    rc_san_clemente: [
-      {value: '4303', label: 'Standard Campsite'},
-    ],
-    rc_malibu_creek: [
-      {value: '4303', label: 'Standard Campsite'},
-    ],
-    santa_barbara_jalama: [
-      {value: 'Basic Campsite', label: 'Basic Campsite'},
-      {value: 'Hookup - Partial', label: 'Hookup — Partial'},
-      {value: 'Waterfront - Campsite', label: 'Waterfront Campsite'},
-      {value: 'Cabin - Jalama', label: 'Cabin'},
-    ],
-    santa_barbara_cachuma: [
-      {value: 'Basic Campsite', label: 'Basic Campsite'},
-      {value: 'Hookup - Full', label: 'Hookup — Full'},
-      {value: 'Hookup - Partial', label: 'Hookup — Partial'},
-      {value: 'Waterfront - Campsite', label: 'Waterfront Campsite'},
-      {value: 'Yurt - Small', label: 'Yurt — Small'},
-      {value: 'Yurt -  Medium', label: 'Yurt — Medium'},
-      {value: 'Yurt - Large', label: 'Yurt — Large'},
-      {value: 'Cabin - Cachuma', label: 'Cabin'},
-    ],
-    santa_clara: [
-      {value: 'Camping - Tent', label: 'Tent Camping'},
-      {value: 'Camping - RV - Partial Hookup', label: 'RV — Partial Hookup'},
-      {value: 'Camping - Hike-In', label: 'Hike-In Camping'},
-      {value: 'Yurt - 16 Ft.', label: 'Yurt — 16 Ft'},
-      {value: 'Yurt - 20 Ft.', label: 'Yurt — 20 Ft'},
-      {value: 'Yurt - 24 Ft.', label: 'Yurt — 24 Ft'},
-    ],
-    san_diego: [
-      {value: 'Non-Hookup', label: 'Non-Hookup (tent/car)'},
-      {value: 'Tent Only', label: 'Tent Only'},
-      {value: 'Partial Hookup', label: 'Partial Hookup'},
-      {value: 'Full Hookup', label: 'Full Hookup'},
-      {value: 'Hike / Bike Campsite', label: 'Hike / Bike'},
-      {value: 'Yurt', label: 'Yurt'},
-      {value: 'Yurt - Large', label: 'Yurt — Large'},
-      {value: 'Cabin', label: 'Cabin'},
-      {value: 'Cabin - Large', label: 'Cabin — Large'},
-      {value: 'Caravan Area', label: 'Caravan Area'},
-    ]
   };
+}
 
-  function getSiteTypesForPark(parkValue, system) {
-    if (system === 'reserve_california') {
-      if (parkValue === 'Leo Carrillo State Beach') return systemSiteTypes.rc_leo_carrillo;
-      if (parkValue === 'Carpinteria State Beach') return systemSiteTypes.rc_carpinteria;
-      if (parkValue === 'El Capitan State Beach') return systemSiteTypes.rc_el_capitan;
-      if (parkValue === 'Doheny State Beach') return systemSiteTypes.rc_doheny;
-      if (parkValue === 'San Clemente State Beach') return systemSiteTypes.rc_san_clemente;
-      if (parkValue === 'Malibu Creek State Park') return systemSiteTypes.rc_malibu_creek;
-      return [];
-    }
-    if (system === 'santa_barbara') {
-      if (parkValue === 'Jalama Beach') return systemSiteTypes.santa_barbara_jalama;
-      if (parkValue === 'Cachuma Lake') return systemSiteTypes.santa_barbara_cachuma;
-    }
-    if (system === 'santa_clara') return systemSiteTypes.santa_clara;
-    if (system === 'san_diego') return systemSiteTypes.san_diego;
-    return [];
-  }
-
-  function buildSiteTypeCheckboxes(parkValue, system) {
-    const types = getSiteTypesForPark(parkValue, system);
-    const container = document.getElementById('siteTypeCheckboxes');
-    const plan = document.getElementById('planSelect').value;
-    const limit = planSiteTypeLimits[plan] || 1;
-
-    if (types.length === 0) {
-      container.innerHTML = '<p style="font-size:13px; color:var(--bark); font-style:italic;">Select a park first to see available site types.</p>';
-      return;
-    }
-
-    container.innerHTML = types.map((t, i) => `
-      <label style="display:flex; align-items:center; gap:10px; font-size:14px; font-weight:400; text-transform:none; letter-spacing:0; color:var(--forest); cursor:pointer;">
-        <input type="checkbox" name="site_type" value="${t.value}" ${i === 0 ? 'checked' : ''} onchange="updateSiteTypeLimit()" style="width:16px; height:16px; accent-color:var(--moss); cursor:pointer;">
-        ${t.label}
-      </label>`).join('');
-    updateSiteTypeLimit();
-  }
-
-  // Site type checkbox limits per plan
-  const planSiteTypeLimits = { basic: 1, standard: 2, premium: 999 };
-  const planSiteTypeLabels = { basic: 'select 1 (Basic plan)', standard: 'select up to 2 (Standard plan)', premium: 'all types available (Premium plan)' };
-
-  // Highlight pricing card + rebuild park selectors
-  function highlightPlan(val) {
-    document.querySelectorAll('.pricing-card').forEach(c => c.classList.remove('active-plan'));
-    const card = document.getElementById('card-' + val);
-    if (card) card.classList.add('active-plan');
-    buildParkSelectors(val);
-  }
-
-  // Highlight only — updates park count WITHOUT clearing existing selections
-  function highlightPlanOnly(val) {
-    document.querySelectorAll('.pricing-card').forEach(c => c.classList.remove('active-plan'));
-    const card = document.getElementById('card-' + val);
-    if (card) card.classList.add('active-plan');
-    updatePlanLabels(parseInt(document.getElementById('spotsRemaining').textContent) || 0);
-    updateParkCount(val);
-    // Refresh site type limits for all visible park slots
-    const count = planParks[val] || 1;
-    for (let i = 1; i <= count; i++) {
-      updateSiteTypeLimitForPark(i);
-    }
-  }
-
-  // Show/hide park slots based on plan without clearing existing selections
-  function updateParkCount(plan) {
-    const count = planParks[plan] || 1;
-    const container = document.getElementById('parkSelectorsContainer');
-    const slots = container.children;
-    // Show/hide existing slots
-    for (let i = 0; i < slots.length; i++) {
-      slots[i].style.display = i < count ? 'block' : 'none';
-    }
-    // If we need more slots than exist, build them
-    if (slots.length < count) {
-      buildParkSelectors(plan);
-    }
-  }
-
-  // Plan recommendation based on arrival date
-  function recommendPlan() {
-    const dateInput = document.getElementById('arrivalDate');
-    const box = document.getElementById('planRecommendation');
-    const planSelect = document.getElementById('planSelect');
-    if (!dateInput.value) { box.style.display = 'none'; return; }
-
-    const today = new Date();
-    const arrival = new Date(dateInput.value);
-    const weeksAway = Math.round((arrival - today) / (1000 * 60 * 60 * 24 * 7));
-
-    if (weeksAway < 0) {
-      box.style.display = 'block';
-      box.innerHTML = `⚠️ This date is in the past — please select a future arrival date.`;
-      box.style.background = 'rgba(212,98,42,0.08)';
-      return;
-    }
-
-    box.style.display = 'block';
-    box.style.background = 'var(--mist)';
-
-    if (weeksAway <= 4) {
-      box.innerHTML = `📅 Your arrival is <strong>${weeksAway} week${weeksAway !== 1 ? 's' : ''} away</strong> — Basic (4 weeks) covers your full window.`;
-    } else if (weeksAway <= 8) {
-      box.innerHTML = `📅 Your arrival is <strong>${weeksAway} weeks away</strong> — Standard (8 weeks) is the right fit.`;
-    } else {
-      box.innerHTML = `📅 Your arrival is <strong>${weeksAway} weeks away</strong> — Premium (16 weeks) gives maximum coverage.`;
-    }
-  }
-  function showEmail(type) {
-    ['confirm','alert','expiry'].forEach(t => {
-      const el = document.getElementById('email-' + t);
-      if (el) el.style.display = t === type ? 'block' : 'none';
-      const btn = document.getElementById('btn-' + t);
-      if (btn) {
-        if (t === type) {
-          btn.style.background = 'var(--forest)'; btn.style.color = 'var(--sand)'; btn.style.borderColor = 'var(--forest)';
-        } else {
-          btn.style.background = 'transparent'; btn.style.color = 'var(--forest)'; btn.style.borderColor = 'rgba(44,74,62,0.3)';
-        }
-      }
-    });
-  }
-
-  // Form submit
-  const form = document.getElementById('alertForm');
-  
-  function updatePlanLabels(remaining) {
-    const isFree = remaining > 0;
-    const optBasic = document.getElementById('planOptBasic');
-    const optStandard = document.getElementById('planOptStandard');
-    const freeBanner = document.getElementById('freeBanner');
-    const paidBanner = document.getElementById('paidBanner');
-    const btn = document.querySelector('.form-submit');
-    
-    if (isFree) {
-      if (optBasic) optBasic.textContent = 'Basic — $5 · 🎁 waived (1 park · 4 weeks)';
-      if (optStandard) optStandard.textContent = 'Standard — $10 · 🎁 waived (2 parks · 8 weeks)';
-      if (freeBanner) freeBanner.style.display = 'block';
-      if (paidBanner) paidBanner.style.display = 'none';
-    } else {
-      if (optBasic) optBasic.textContent = 'Basic — $5 (1 park · 4 weeks)';
-      if (optStandard) optStandard.textContent = 'Standard — $10 (2 parks · 8 weeks)';
-      if (freeBanner) freeBanner.style.display = 'none';
-      if (paidBanner) paidBanner.style.display = 'block';
-    }
-    
-    const plan = document.getElementById('planSelect').value;
-    if (btn && !promoActive) {
-      if (plan === 'premium') {
-        btn.textContent = 'Pay $20 & Set Up My Alert →';
-      } else if (isFree) {
-        btn.textContent = 'Set Up My Alert →';
-      } else {
-        btn.textContent = plan === 'basic' ? 'Pay $5 & Set Up My Alert →' : 'Pay $10 & Set Up My Alert →';
-      }
-    }
-  }
-
-  document.getElementById('planSelect').addEventListener('change', function() {
-    const remaining = parseInt(document.getElementById('spotsRemaining').textContent) || 0;
-    updatePlanLabels(remaining);
-    highlightPlanOnly(this.value);
+/* ============================================================ TRADE PROPOSALS (data + transfer logic) ============================================================ */
+let myTrades = [];
+async function setStickerParallel(code, parallel){
+  await sb.from('collections').update({ parallel, updated_at:new Date().toISOString() }).eq('user_id', profile.id).eq('sticker_code', code);
+  const v = myCollection.get(code) || {status:'duplicate', count:1, parallel:'normal'};
+  v.parallel = parallel;
+  myCollection.set(code, v);
+}
+async function sendTradeProposal(toUserId, offerCodes, requestCodes){
+  const id = crypto.randomUUID();
+  const { error } = await sb.from('trade_proposals').insert({
+    id, from_user: profile.id, to_user: toUserId, offer_codes: offerCodes, request_codes: requestCodes, status: 'pending'
   });
-
-  // ── Helpers ──────────────────────────────────────────────
-  function generateUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-      const r = Math.random() * 16 | 0;
-      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-  }
-
-  function collectFormData() {
-    const email = document.getElementById('emailInput').value.trim();
-    const arrivalDate = document.getElementById('arrivalDate').value;
-    const nightsRaw = document.getElementById('nightsSelect').value;
-    const nights = parseInt(nightsRaw);
-    const plan = document.getElementById('planSelect').value;
-    const promoCode = document.getElementById('promoField').value.trim().toUpperCase() || null;
-
-    // Expiry: basic=4w, standard=8w, premium=16w — capped at arrival date - 1 day
-    const weekMap = { basic: 4, standard: 8, premium: 16 };
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + (weekMap[plan] || 4) * 7);
-    if (arrivalDate) {
-      const dayBeforeArrival = new Date(arrivalDate);
-      dayBeforeArrival.setDate(dayBeforeArrival.getDate() - 1);
-      if (dayBeforeArrival < expiresAt) {
-        expiresAt.setTime(dayBeforeArrival.getTime());
-      }
-    }
-
-    // Collect parks (up to 3 slots)
-    const parks = [];
-    const parkCount = planParks[plan] || 1;
-    for (let i = 1; i <= parkCount; i++) {
-      const sel = document.getElementById('parkSelect_' + i);
-      if (!sel || !sel.value) continue;
-      const opt = sel.options[sel.selectedIndex];
-      const siteTypeCheckboxes = document.querySelectorAll(`#siteTypeCheckboxes_${i} input[type="checkbox"]:checked`);
-      const parkSystem = opt.dataset.system || '';
-      const siteTypes = Array.from(siteTypeCheckboxes).map(cb => parkSystem === 'reserve_california' ? cb.value : (cb.parentElement ? cb.parentElement.textContent.trim() : cb.value));
-      parks.push({
-        park_name: opt.value,
-        park_system: opt.dataset.system || '',
-        parent_idno: opt.dataset.idno || '',
-        site_types: siteTypes,
-      });
-    }
-
-    return { email, arrivalDate, nights, plan, parks, promoCode, expiresAt };
-  }
-
-  async function submitToSupabase(alertData) {
-    try {
-      const payload = { ...alertData, cancel_token: generateUUID(), active: true };
-      const res = await fetch(`${SUPABASE_URL_COUNTER}/rest/v1/alerts`, {
-        method: 'POST',
-        headers: {
-          'apikey': SUPABASE_KEY_COUNTER,
-          'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal',
-        },
-        body: JSON.stringify(payload),
-      });
-      return res.ok;
-    } catch(e) {
-      console.error('Supabase submit error:', e);
-      return false;
-    }
-  }
-
-  async function submitAlerts(plan, freeUser, promoCode, expiresAt) {
-    const { email, arrivalDate, nights, parks } = collectFormData();
-    if (!email) return { ok: false, reason: 'No email' };
-    if (parks.length === 0) return { ok: false, reason: 'no_park' };
-    if (parks[0].site_types.length === 0) return { ok: false, reason: 'no_site_type' };
-
-    let allOk = true;
-    const firstPayload = null;
-    let emailPayload = null;
-    for (const park of parks) {
-      const alertData = {
-        email,
-        park_name: park.park_name,
-        park_system: park.park_system,
-        parent_idno: park.parent_idno,
-        arrival_date: arrivalDate,
-        nights,
-        site_types: park.site_types,
-        plan,
-        expires_at: expiresAt.toISOString().split('T')[0],
-        free_user: freeUser,
-        promo_code: promoCode || null,
-        cancel_token: generateUUID(),
-        active: true,
-      };
-      const res = await fetch(`${SUPABASE_URL_COUNTER}/rest/v1/alerts`, {
-        method: 'POST',
-        headers: {
-          'apikey': SUPABASE_KEY_COUNTER,
-          'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal',
-        },
-        body: JSON.stringify(alertData),
-      });
-      if (!res.ok) allOk = false;
-      if (!emailPayload) emailPayload = alertData;
-    }
-
-    // Send ONE confirmation email covering all parks
-    if (allOk && emailPayload) {
-      const allParkNames = parks.map(p => p.park_name).join(', ');
-      fetch('https://send-confirmation.nikobellight.workers.dev', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...emailPayload, park_name: allParkNames, all_parks: parks }),
-      }).catch(e => console.error('Email error:', e));
-    }
-    return { ok: allOk };
-  }
-  // ─────────────────────────────────────────────────────────
-
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const btn = form.querySelector('.form-submit');
-    const plan = document.getElementById('planSelect').value;
-    const remaining = parseInt(document.getElementById('spotsRemaining').textContent) || 0;
-    const isFree = remaining > 0;
-
-    btn.textContent = 'Setting up your alert...';
-    btn.disabled = true;
-
-    // Promo code — Premium free, direct to Supabase
-    if (promoActive) {
-      try {
-        const { expiresAt } = collectFormData();
-        const result = await submitAlerts('premium', true, document.getElementById('promoField').value.trim().toUpperCase(), expiresAt);
-        if (result.reason === 'no_park') { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
-        if (result.reason === 'no_site_type') { btn.textContent = 'Please select a site type'; btn.disabled = false; return; }
-        if (result.ok) {
-          document.getElementById('successEmail').textContent = document.getElementById('emailInput').value.trim();
-          form.style.display = 'none';
-          document.getElementById('successMsg').classList.add('visible');
-        } else { btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
-      } catch(err) { console.error(err); btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
-      return;
-    }
-
-    // Paid flow — open LS immediately (browser popup blocker fix), insert pending in background
-    if (!isFree) {
-      const { email, arrivalDate, nights, parks, promoCode, expiresAt } = collectFormData();
-      if (!email) { btn.textContent = 'Please enter your email'; btn.disabled = false; return; }
-      if (parks.length === 0) { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
-      if (parks[0].site_types.length === 0) { btn.textContent = 'Please select a site type'; btn.disabled = false; return; }
-
-      const lsLinks = {
-        basic: 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/c24ec1c6-7dda-4c37-91a0-215874653a17',
-        standard: 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/42ce96de-62dc-4f71-9536-00c222a21030',
-        premium: 'https://campsitealert-app.lemonsqueezy.com/checkout/buy/29a92863-fc6b-4889-887a-2b8efd53b155',
-      };
-      const checkoutUrl = lsLinks[plan] + '?checkout[email]=' + encodeURIComponent(email);
-
-      // Open checkout immediately (must be synchronous to avoid popup blocker)
-      const popupW = 520, popupH = 720;
-      const left = Math.round((screen.width - popupW) / 2);
-      const top = Math.round((screen.height - popupH) / 2);
-      window.open(checkoutUrl, 'lspayment', `width=${popupW},height=${popupH},left=${left},top=${top},scrollbars=yes,resizable=yes`);
-      btn.textContent = '⏳ Complete payment in the popup window...';
-      btn.disabled = true;
-      document.getElementById('pendingEmail').textContent = email;
-      form.style.display = 'none';
-      document.getElementById('pendingMsg').classList.add('visible');
-
-      // Insert pending rows in background (after popup opens)
-      for (const park of parks) {
-        const alertData = {
-          email,
-          park_name: park.park_name,
-          park_system: park.park_system,
-          parent_idno: park.parent_idno,
-          arrival_date: arrivalDate,
-          nights,
-          site_types: park.site_types,
-          plan,
-          expires_at: expiresAt.toISOString().split('T')[0],
-          free_user: false,
-          promo_code: null,
-          cancel_token: generateUUID(),
-          active: false,
-          payment_status: 'pending',
-        };
-        fetch(`${SUPABASE_URL_COUNTER}/rest/v1/alerts`, {
-          method: 'POST',
-          headers: {
-            'apikey': SUPABASE_KEY_COUNTER,
-            'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal',
-          },
-          body: JSON.stringify(alertData),
-        }).catch(e => console.error('Pending insert error:', e));
-      }
-
-      // Poll Supabase every 5s to detect payment completion, then show success
-      const pollStart = new Date().toISOString();
-      const pollInterval = setInterval(async () => {
-        try {
-          const res = await fetch(
-            `${SUPABASE_URL_COUNTER}/rest/v1/alerts?email=eq.${encodeURIComponent(email)}&plan=eq.${plan}&payment_status=eq.paid&active=eq.true&created_at=gte.${pollStart}&order=created_at.desc&limit=1`,
-            {
-              headers: {
-                'apikey': SUPABASE_KEY_COUNTER,
-                'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}`,
-              }
-            }
-          );
-          const rows = await res.json();
-          if (rows && rows.length > 0) {
-            clearInterval(pollInterval);
-            document.getElementById('pendingMsg').classList.remove('visible');
-            document.getElementById('successEmail').textContent = email;
-            document.getElementById('successMsg').classList.add('visible');
-          }
-        } catch(e) { console.error('Poll error:', e); }
-      }, 5000);
-
-      // Stop polling after 10 minutes
-      setTimeout(() => clearInterval(pollInterval), 10 * 60 * 1000);
-
-      return;
-    }
-
-    // Free Basic/Standard — direct Supabase submit
-    try {
-      const { email, expiresAt } = collectFormData();
-
-      // Check if this email already has a free alert
-      const existingRes = await fetch(
-        `${SUPABASE_URL_COUNTER}/rest/v1/alerts?email=eq.${encodeURIComponent(email)}&free_user=eq.true&promo_code=is.null&active=eq.true&limit=1`,
-        { headers: { 'apikey': SUPABASE_KEY_COUNTER, 'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}` } }
-      );
-      const existing = await existingRes.json();
-      if (existing && existing.length > 0) {
-        btn.textContent = 'This email already has a free alert — upgrade to a paid plan for more';
-        btn.disabled = false;
-        return;
-      }
-
-      const result = await submitAlerts(plan, true, null, expiresAt);
-      if (result.reason === 'no_park') { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
-      if (result.reason === 'no_site_type') { btn.textContent = 'Please select a site type'; btn.disabled = false; return; }
-      if (result.ok) {
-        await loadCounter();
-        document.getElementById('successEmail').textContent = document.getElementById('emailInput').value.trim();
-        form.style.display = 'none';
-        document.getElementById('successMsg').classList.add('visible');
-      } else { btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
-    } catch(err) { console.error(err); btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
+  if (error) throw error;
+}
+async function loadMyTrades(){
+  const { data } = await sb.from('trade_proposals').select('*').or(`from_user.eq.${profile.id},to_user.eq.${profile.id}`).order('created_at', {ascending:false});
+  // Filter out trades the current user has soft-deleted
+  myTrades = (data||[]).filter(t=>{
+    if (t.from_user === profile.id && t.hidden_from) return false;
+    if (t.to_user === profile.id && t.hidden_to) return false;
+    return true;
   });
-
-  const PROMO_CODES = {
-    'TRAILHEAD28': 'premium',
-    'FRIENDS2026': 'premium',
-  };
-  let promoActive = false;
-
-  function checkPromoCode(code) {
-    const msg = document.getElementById('promoMsg');
-    const plan = document.getElementById('planSelect');
-    if (PROMO_CODES[code.toUpperCase()]) {
-      promoActive = true;
-      msg.style.color = '#4A7C59';
-      msg.textContent = '✅ Promo code applied — Premium access unlocked!';
-      plan.value = 'premium';
-      highlightPlanOnly('premium');
-      const btn = document.getElementById('submitBtn');
-      if (btn) { btn.textContent = 'Set Up My Alert →'; btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
-    } else if (code.length > 3) {
-      promoActive = false;
-      msg.style.color = '#D4622A';
-      msg.textContent = '❌ Invalid promo code';
+}
+// Reduce giver's duplicate count — called on Approve
+async function reserveCodes(userId, rawCodes){
+  for (const raw of rawCodes){
+    const { code } = parseTradeCode(raw);
+    const { data: row } = await sb.from('collections').select('*').eq('user_id', userId).eq('sticker_code', code).maybeSingle();
+    if (row && row.status==='duplicate'){
+      const newCount = row.duplicate_count - 1;
+      await sb.from('collections').update({ status: newCount>0?'duplicate':'have', duplicate_count: Math.max(newCount,0), parallel: newCount>0?row.parallel:'normal', updated_at:new Date().toISOString() }).eq('user_id', userId).eq('sticker_code', code);
+    }
+  }
+}
+// Restore giver's duplicate count — called on Cancel after Approve
+async function unserveCodes(userId, rawCodes){
+  for (const raw of rawCodes){
+    const { code, parallel } = parseTradeCode(raw);
+    const { data: row } = await sb.from('collections').select('*').eq('user_id', userId).eq('sticker_code', code).maybeSingle();
+    if (row){
+      if (row.status==='have') await sb.from('collections').update({ status:'duplicate', duplicate_count:1, parallel, updated_at:new Date().toISOString() }).eq('user_id', userId).eq('sticker_code', code);
+      else if (row.status==='duplicate') await sb.from('collections').update({ duplicate_count:row.duplicate_count+1, updated_at:new Date().toISOString() }).eq('user_id', userId).eq('sticker_code', code);
+    }
+  }
+}
+// Give cards to receiver only — giver side already reserved on Approve
+async function giveToReceiver(receiverId, rawCodes){
+  for (const raw of rawCodes){
+    const { code, parallel } = parseTradeCode(raw);
+    const { data: receiverRow } = await sb.from('collections').select('*').eq('user_id', receiverId).eq('sticker_code', code).maybeSingle();
+    if (receiverRow){
+      let newStatus, newCount;
+      if (receiverRow.status==='missing'){ newStatus='have'; newCount=0; }
+      else if (receiverRow.status==='have'){ newStatus='duplicate'; newCount=1; }
+      else { newStatus='duplicate'; newCount=receiverRow.duplicate_count+1; }
+      await sb.from('collections').update({ status:newStatus, duplicate_count:newCount, parallel, updated_at:new Date().toISOString() }).eq('user_id', receiverId).eq('sticker_code', code);
     } else {
-      promoActive = false;
-      msg.textContent = '';
+      await sb.from('collections').insert({ user_id:receiverId, sticker_code:code, status:'have', duplicate_count:0, parallel });
     }
-    updateSubmitBtn();
   }
+}
+async function handleAccept(tradeId){
+  const { data: trade } = await sb.from('trade_proposals').select('*').eq('id', tradeId).maybeSingle();
+  if (!trade) return;
+  await sb.from('trade_proposals').update({ status:'accepted', updated_at:new Date().toISOString() }).eq('id', tradeId);
+  // Reserve cards from both sides so they disappear from each person's trade board
+  await reserveCodes(trade.from_user, trade.offer_codes);
+  await reserveCodes(trade.to_user, trade.request_codes);
+  // Remove offered cards from other pending proposals by the same giver
+  const offeredCodes = trade.offer_codes.map(r=>parseTradeCode(r).code);
+  const { data: otherPending } = await sb.from('trade_proposals').select('*').eq('from_user', trade.from_user).eq('status','pending').neq('id', tradeId);
+  for (const other of (otherPending||[])){
+    const newOffer = other.offer_codes.filter(r=>!offeredCodes.includes(parseTradeCode(r).code));
+    if (newOffer.length===0 && other.request_codes.length===0) await sb.from('trade_proposals').update({ status:'cancelled', updated_at:new Date().toISOString() }).eq('id', other.id);
+    else if (newOffer.length!==other.offer_codes.length) await sb.from('trade_proposals').update({ offer_codes:newOffer, updated_at:new Date().toISOString() }).eq('id', other.id);
+  }
+  await loadMyCollection();
+  renderShell();
+}
+async function handleComplete(tradeId){
+  const { data: trade } = await sb.from('trade_proposals').select('*').eq('id', tradeId).maybeSingle();
+  if (!trade || trade.status==='completed') return;
+  try{
+    await sb.from('trade_proposals').update({ status:'completed', updated_at:new Date().toISOString() }).eq('id', tradeId);
+    // Giver side already reserved on Approve — only give to receivers now
+    await giveToReceiver(trade.to_user, trade.offer_codes);
+    await giveToReceiver(trade.from_user, trade.request_codes);
+    await loadMyCollection();
+    currentTab = 'trades';
+    renderShell();
+  }catch(e){ alert('Trade failed: '+e.message); }
+}
+async function handleRespond(tradeId, newStatus){
+  // If cancelling an approved trade, restore both sides' reserved cards
+  if (newStatus==='cancelled'){
+    const { data: trade } = await sb.from('trade_proposals').select('*').eq('id', tradeId).maybeSingle();
+    if (trade && trade.status==='accepted'){
+      await unserveCodes(trade.from_user, trade.offer_codes);
+      await unserveCodes(trade.to_user, trade.request_codes);
+    }
+  }
+  await sb.from('trade_proposals').update({ status:newStatus, updated_at:new Date().toISOString() }).eq('id', tradeId);
+  await loadMyCollection();
+  renderShell();
+}
 
-  function updateSubmitBtn() {
-    const cb = document.getElementById('termsCheckbox');
-    const btn = document.getElementById('submitBtn');
-    const plan = document.getElementById('planSelect').value;
-    const remaining = parseInt(document.getElementById('spotsRemaining').textContent) || 0;
-    const isFree = remaining > 0;
-    if (cb && btn) {
-      btn.disabled = !cb.checked;
-      btn.style.opacity = cb.checked ? '1' : '0.5';
-      btn.style.cursor = cb.checked ? 'pointer' : 'not-allowed';
-      if (cb.checked) {
-        if (plan === 'premium') btn.textContent = 'Pay $20 & Set Up My Alert →';
-        else if (isFree) btn.textContent = 'Set Up My Alert →';
-        else btn.textContent = plan === 'basic' ? 'Pay $5 & Set Up My Alert →' : 'Pay $10 & Set Up My Alert →';
+/* ============================================================ MY TRADES ============================================================ */
+async function renderMyTrades(main){
+  main.innerHTML = `
+    <div class="help-box">
+      <h3>📬 How My Trades works</h3>
+      <ul>
+        <li><strong>Waiting on you</strong> — someone sent you a proposal. Approve or Reject.</li>
+        <li><strong>Sent by you</strong> — proposals you sent, waiting for the other person. You can Cancel.</li>
+        <li><strong>Approved — not applied yet</strong> — both agreed. Once you've physically swapped the stickers, click <strong>Deal done ✓</strong> to update both albums automatically.</li>
+        <li><strong>History</strong> — past deals. You can delete finished entries to keep it clean.</li>
+      </ul>
+    </div>
+    <div class="panel"><h2>My Trades</h2><div class="loading">Loading…</div></div>`;
+  await loadAllMembers();
+  await loadMyTrades();
+  const pseudoOf = id => (allMembers.find(m=>m.id===id)||{}).pseudo || 'someone';
+  const waitingOnYou = myTrades.filter(t=>t.status==='pending' && t.to_user===profile.id);
+  const sentByYou = myTrades.filter(t=>t.status==='pending' && t.from_user===profile.id);
+  const accepted = myTrades.filter(t=>t.status==='accepted');
+  const history = myTrades.filter(t=>!['pending','accepted'].includes(t.status)).slice(0,20);
+
+  document.getElementById('main').innerHTML = `
+    <div class="panel">
+      <h2>My Trades</h2>
+      <p class="lead">Accept just means you agree — nothing changes in either album until someone hits "Deal done" below, once the stickers have actually changed hands.</p>
+      <h3 style="font-size:15px;margin:18px 0 8px;">Waiting on you (${waitingOnYou.length})</h3>
+      ${waitingOnYou.length===0?'<p class="empty-note">Nothing pending.</p>':waitingOnYou.map(t=>`
+        <div class="member-row" style="cursor:default;align-items:flex-start;">
+          <div>
+            <div class="name">${pseudoOf(t.from_user)} offers you</div>
+            <div class="sticker-chips" style="margin-top:6px;">${t.offer_codes.map(c=>tradeChip(c,'get')).join('')}</div>
+            <div style="margin:8px 0 6px;font-size:12px;color:var(--mist);">in exchange for your:</div>
+            <div class="sticker-chips">${t.request_codes.map(c=>tradeChip(c,'give')).join('')}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <button class="btn" data-approve="${t.id}">Approve</button>
+            <button class="btn ghost" data-reject="${t.id}">Reject</button>
+          </div>
+        </div>`).join('')}
+      <h3 style="font-size:15px;margin:18px 0 8px;">Sent by you (${sentByYou.length})</h3>
+      ${sentByYou.length===0?'<p class="empty-note">Nothing sent.</p>':sentByYou.map(t=>`
+        <div class="member-row" style="cursor:default;align-items:flex-start;">
+          <div>
+            <div class="name">To ${pseudoOf(t.to_user)} — you give</div>
+            <div class="sticker-chips" style="margin-top:6px;">${t.offer_codes.map(c=>tradeChip(c,'give')).join('')}</div>
+            <div style="margin:8px 0 6px;font-size:12px;color:var(--mist);">for their:</div>
+            <div class="sticker-chips">${t.request_codes.map(c=>tradeChip(c,'get')).join('')}</div>
+          </div>
+          <button class="btn ghost" data-cancel="${t.id}">Cancel</button>
+        </div>`).join('')}
+      <h3 style="font-size:15px;margin:18px 0 8px;">Approved — not applied yet (${accepted.length})</h3>
+      ${accepted.length===0?'<p class="empty-note">Nothing here. Trades land here once accepted, and stay until someone confirms the swap actually happened.</p>':accepted.map(t=>{
+        const otherId = t.from_user===profile.id ? t.to_user : t.from_user;
+        const youGive = t.from_user===profile.id ? t.offer_codes : t.request_codes;
+        const youGet = t.from_user===profile.id ? t.request_codes : t.offer_codes;
+        return `
+        <div class="member-row" style="cursor:default;align-items:flex-start;">
+          <div style="flex:1;">
+            <div class="name">With ${pseudoOf(otherId)} — you give</div>
+            <div class="sticker-chips" style="margin-top:6px;">${youGive.map(c=>tradeChip(c,'give')).join('')}</div>
+            <div style="margin:8px 0 6px;font-size:12px;color:var(--mist);">you get:</div>
+            <div class="sticker-chips">${youGet.map(c=>tradeChip(c,'get')).join('')}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <button class="btn" data-complete="${t.id}">Deal done ✓</button>
+            <button class="btn ghost" data-cancel="${t.id}" style="font-size:12px;padding:5px 10px;">Cancel</button>
+            <button class="btn ghost" data-delete-history="${t.id}" style="font-size:12px;padding:5px 10px;color:var(--red);border-color:var(--red);background:var(--paper);">Delete</button>
+          </div>
+        </div>`;
+      }).join('')}
+      <h3 style="font-size:15px;margin:18px 0 8px;">History</h3>
+      ${history.length===0?'<p class="empty-note">No finished trades yet.</p>':history.map(t=>{
+        const sent = t.from_user===profile.id;
+        return `
+        <div class="member-row" style="cursor:default;align-items:flex-start;" id="mytrade-${t.id}">
+          <div style="flex:1;">
+            <div class="name"><span class="badge-pill ${sent?'promo':'special'}">${sent?'SENT':'RECEIVED'}</span>&nbsp; ${sent?'To':'From'} ${pseudoOf(sent?t.to_user:t.from_user)}</div>
+            <div class="sticker-chips" style="margin-top:6px;">${(sent?t.offer_codes:t.request_codes).map(c=>tradeChip(c, sent?'give':'get')).join('')}</div>
+            <div style="margin:8px 0 6px;font-size:12px;color:var(--mist);">⇄</div>
+            <div class="sticker-chips">${(sent?t.request_codes:t.offer_codes).map(c=>tradeChip(c, sent?'get':'give')).join('')}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+            <div class="count" style="text-transform:capitalize;">${t.status}</div>
+            ${t.status==='completed'?'':''}
+            <button class="btn ghost" data-delete-history="${t.id}" style="padding:5px 10px;font-size:12px;color:var(--red);border-color:var(--red);background:var(--paper);">Delete</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  document.querySelectorAll('[data-approve]').forEach(b=>b.onclick=async()=>{ try{ b.disabled=true; await handleAccept(b.dataset.approve); }catch(e){ b.disabled=false; alert('Error: '+e.message); }});
+  document.querySelectorAll('[data-reject]').forEach(b=>b.onclick=async()=>{ try{ b.disabled=true; await handleRespond(b.dataset.reject,'rejected'); }catch(e){ b.disabled=false; alert('Error: '+e.message); }});
+  document.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=async()=>{ try{ b.disabled=true; await handleRespond(b.dataset.cancel,'cancelled'); }catch(e){ b.disabled=false; alert('Error: '+e.message); }});
+  document.querySelectorAll('[data-complete]').forEach(b=>b.onclick=async()=>{ try{ b.disabled=true; await handleComplete(b.dataset.complete); }catch(e){ b.disabled=false; alert('Error: '+e.message); }});
+  document.querySelectorAll('[data-delete-history]').forEach(btn=>{
+    btn.onclick = async ()=>{
+      btn.disabled=true; btn.textContent='…';
+      const t = (await sb.from('trade_proposals').select('*').eq('id', btn.dataset.deleteHistory).maybeSingle()).data;
+      if (!t) return;
+      const col = t.from_user === profile.id ? 'hidden_from' : 'hidden_to';
+      await sb.from('trade_proposals').update({ [col]: true, updated_at:new Date().toISOString() }).eq('id', btn.dataset.deleteHistory);
+      const row = document.getElementById('mytrade-'+btn.dataset.deleteHistory);
+      if (row) row.remove();
+    };
+  });
+}
+
+/* ============================================================ MOST WANTED ============================================================ */
+async function renderWanted(main){
+  main.innerHTML = `<div class="help-box"><h3>🔥 How Most Wanted works</h3><ul><li><strong>Your Most Wanted</strong> — your duplicates ranked by how many people need them. Click Trade → to go straight there.</li><li><strong>Most Wanted</strong> — stickers the most people are missing — with who has them.</li></ul></div><div class="panel"><h2>Most Wanted</h2><div class="loading">Crunching the numbers…</div></div>`;
+  await loadAllMembers();
+
+  // Build demand map: code -> list of members missing it (excluding yourself)
+  const demand = new Map();
+  for (const m of allMembers){
+    if (m.id === profile.id) continue;
+    for (const [code, v] of m.collection.entries()){
+      if (v.status === 'missing'){
+        if (!demand.has(code)) demand.set(code, []);
+        demand.get(code).push(m);
       }
     }
   }
 
-  highlightPlan('standard');
-</script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-  // Initialize map
-  const map = L.map('campsitealert-map', {
-    center: [36.5, -119.5],
-    zoom: 6,
-    scrollWheelZoom: false
-  });
-
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap © CARTO',
-    maxZoom: 19
-  }).addTo(map);
-
-  // Custom markers
-  function makeIcon(color) {
-    return L.divIcon({
-      className: '',
-      html: `<div style="width:14px;height:14px;background:${color};border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>`,
-      iconSize: [14, 14],
-      iconAnchor: [7, 7],
-      popupAnchor: [0, -10]
-    });
+  // Section 1: YOUR duplicates ranked by demand
+  const myRows = [];
+  for (const [code, v] of myCollection.entries()){
+    if (v.status !== 'duplicate') continue;
+    const neededBy = demand.get(code) || [];
+    if (neededBy.length === 0) continue;
+    myRows.push({ code, parallel: v.parallel||'normal', count: v.count, neededBy });
   }
+  myRows.sort((a,b) => b.neededBy.length - a.neededBy.length || Math.random()-0.5);
 
-  const sbIcon = makeIcon('#4A7C59');
-  const scIcon = makeIcon('#2C4A3E');
-  const sdIcon = makeIcon('#D4622A');
+  // Section 2: Office-wide most missing (all members, any code)
+  const activeMembers = allMembers.filter(m=>m.collection.size>0).length;
 
-  const parks = [
-    // ReserveCalifornia State Parks
-    { name: 'Leo Carrillo State Beach', lat: 34.0453, lng: -118.9344, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/665', county: 'California State Parks' },
-    { name: 'Carpinteria State Beach', lat: 34.3897, lng: -119.5181, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/6', county: 'California State Parks' },
-    { name: 'El Capitan State Beach', lat: 34.4583, lng: -120.0228, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/8', county: 'California State Parks' },
-    { name: 'Doheny State Beach', lat: 33.4614, lng: -117.6764, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/639', county: 'California State Parks' },
-    { name: 'San Clemente State Beach', lat: 33.4014, lng: -117.6100, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/708', county: 'California State Parks' },
-    { name: 'Malibu Creek State Park', lat: 34.10077, lng: -118.71134, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B6CA8;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.reservecalifornia.com/park/670', county: 'California State Parks' },
-    // Santa Barbara
-    { name: 'Jalama Beach', lat: 34.5147, lng: -120.5009, color: sbIcon, url: 'https://santabarbara.camava.com/reservation/camping/index.asp', county: 'Santa Barbara County' },
-    { name: 'Cachuma Lake', lat: 34.5814, lng: -119.9700, color: sbIcon, url: 'https://santabarbara.camava.com/reservation/camping/index.asp', county: 'Santa Barbara County' },
-    // Santa Clara
-    { name: 'Coyote Lake', lat: 37.0988, lng: -121.5275, color: scIcon, url: 'https://gooutsideandplay.org/reservation/camping/index.asp', county: 'Santa Clara County' },
-    { name: 'Joseph Grant Park', lat: 37.2869, lng: -121.7436, color: scIcon, url: 'https://gooutsideandplay.org/reservation/camping/index.asp', county: 'Santa Clara County' },
-    { name: 'Mt Madonna Park', lat: 37.0011, lng: -121.7169, color: scIcon, url: 'https://gooutsideandplay.org/reservation/camping/index.asp', county: 'Santa Clara County' },
-    { name: 'Sanborn', lat: 37.2383, lng: -122.0827, color: scIcon, url: 'https://gooutsideandplay.org/reservation/camping/index.asp', county: 'Santa Clara County' },
-    { name: 'Uvas Canyon Park', lat: 37.0786, lng: -121.7836, color: scIcon, url: 'https://gooutsideandplay.org/reservation/camping/index.asp', county: 'Santa Clara County' },
-    // San Diego
-    { name: 'Agua Caliente', lat: 32.9397, lng: -116.3044, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
-    { name: 'Dos Picos', lat: 33.0233, lng: -116.9197, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
-    { name: 'Guajome', lat: 33.2483, lng: -117.2864, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
-    { name: 'Lake Morena', lat: 32.6886, lng: -116.5228, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
-    { name: 'Potrero', lat: 32.5983, lng: -116.5997, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
-    { name: 'Sweetwater', lat: 32.6969, lng: -117.0036, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
-    { name: 'Tijuana River Valley', lat: 32.5572, lng: -117.1006, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
-    { name: 'Vallecito', lat: 32.9794, lng: -116.3769, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
-    { name: 'William Heise', lat: 33.0786, lng: -116.5308, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
-  ];
+  // Build "who has it" map for general section: code -> members with that duplicate
+  const whoHasIt = new Map();
+  for (const m of allMembers){
+    for (const [code, v] of m.collection.entries()){
+      if (v.status === 'duplicate'){
+        if (!whoHasIt.has(code)) whoHasIt.set(code, []);
+        whoHasIt.get(code).push(m);
+      }
+    }
+  }
+  const generalRows = [...demand.entries()]
+    .map(([code, members])=>({ code, count: members.length, holders: whoHasIt.get(code)||[] }))
+    .sort((a,b)=> b.count - a.count || Math.random()-0.5)
+    .slice(0, 15);
 
-  parks.forEach(park => {
-    L.marker([park.lat, park.lng], { icon: park.color })
-      .addTo(map)
-      .bindPopup(`
-        <div style="font-family:'DM Sans',sans-serif; min-width:160px;">
-          <strong style="color:#2C4A3E; font-size:14px;">${park.name}</strong><br>
-          <span style="font-size:11px; color:#8B5E3C;">${park.county}</span><br><br>
-          <a href="${park.url}" target="_blank" style="background:#2C4A3E; color:white; padding:6px 12px; border-radius:100px; font-size:12px; text-decoration:none; display:inline-block;">View availability →</a>
+  document.getElementById('main').innerHTML = `
+    <div class="help-box"><h3>🔥 How Most Wanted works</h3><ul><li><strong>Your Most Wanted</strong> — your duplicates ranked by how many people need them, with Trade → buttons.</li><li><strong>Most Wanted</strong> — stickers the most people are missing, with who has them available.</li></ul></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
+      <div class="panel">
+        <h2>🎯 Your Most Wanted</h2>
+        <div style="margin-bottom:12px;">
+          <select id="wantedMemberFilter" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font:inherit;font-size:13px;background:var(--paper);cursor:pointer;">
+            <option value="">Show for all members</option>
+            ${[...new Map(myRows.flatMap(r=>r.neededBy).map(m=>[m.id,m])).values()].sort((a,b)=>a.pseudo.localeCompare(b.pseudo)).map(m=>`<option value="${m.id}">${m.pseudo}</option>`).join('')}
+          </select>
         </div>
-      `);
+        <div id="yourMostWantedList">
+          ${renderYourMostWantedList(myRows, '')}
+        </div>
+      </div>
+      <div class="panel">
+        <h2>🌍 Most Wanted</h2>
+        <p class="lead">Most missing — who can supply them.</p>
+        ${generalRows.length===0?'<p class="empty-note">Not enough data yet.</p>':
+        generalRows.map(r=>`
+          <div style="border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px;${r.holders.some(m=>m.id===profile.id)?'background:linear-gradient(135deg,#FFF9B0,var(--yellow) 80%);border-color:var(--yellow-deep);':''}">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <span class="sticker" style="border:1.5px solid var(--ink);font-size:12px;">${r.code}</span>
+              <span class="count">${r.count} need it</span>
+            </div>
+            ${r.holders.length?`<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">
+              ${r.holders.map(m=>`<button class="btn ghost" style="padding:4px 10px;font-size:12px;${m.id===profile.id?'background:var(--yellow);border-color:var(--yellow-deep);':''}" data-wanted-member="${m.id}">${m.id===profile.id?'You →':m.pseudo+' →'}</button>`).join('')}
+            </div>`:'<p class="empty-note" style="margin:6px 0 0;font-size:12px;">No one has a spare yet.</p>'}
+          </div>`).join('')}
+      </div>
+    </div>`;
+
+  document.querySelectorAll('[data-wanted-member]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const member = allMembers.find(m=>m.id===btn.dataset.wantedMember);
+      if (!member) return;
+      selectedTradeMember = member;
+      tradeSelection = { give: new Set(), get: new Set() };
+      sentDealsThisSession = [];
+      currentTab = 'trade';
+      renderShell();
+      setTimeout(async ()=>{
+        const builderPanel = document.getElementById('builderPanel');
+        if (builderPanel){ await renderTradeBuilder(); builderPanel.scrollIntoView({behavior:'smooth', block:'start'}); }
+      }, 100);
+    };
   });
+  const filterSel = document.getElementById('wantedMemberFilter');
+  if (filterSel) filterSel.onchange = ()=>{
+    const memberId = filterSel.value;
+    const filtered = memberId
+      ? myRows.filter(r=>r.neededBy.some(m=>m.id===memberId))
+      : myRows;
+    document.getElementById('yourMostWantedList').innerHTML = renderYourMostWantedList(filtered, memberId);
+    document.querySelectorAll('#yourMostWantedList [data-wanted-member]').forEach(btn=>{
+      btn.onclick = ()=>{
+        const member = allMembers.find(m=>m.id===btn.dataset.wantedMember);
+        if (!member) return;
+        selectedTradeMember = member;
+        tradeSelection = { give: new Set(), get: new Set() };
+        sentDealsThisSession = [];
+        currentTab = 'trade';
+        renderShell();
+        setTimeout(async ()=>{
+          const builderPanel = document.getElementById('builderPanel');
+          if (builderPanel){ await renderTradeBuilder(); builderPanel.scrollIntoView({behavior:'smooth', block:'start'}); }
+        }, 100);
+      };
+    });
+  };
+}
+
+function renderYourMostWantedList(rows, memberId){
+  if (!rows.length) return '<p class="empty-note">None of your duplicates are needed right now.</p>';
+  return rows.map(r=>{
+    const showFor = memberId ? r.neededBy.filter(m=>m.id===memberId) : r.neededBy;
+    return `
+    <div style="border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+        <span class="sticker give" style="${parallelChipStyle(r.parallel)}" title="${reservationTitle(r.code)}">${reservationWarning(r.code)}${r.code}${r.count>1?` (${r.count}x)`:''}</span>
+        ${memberId?'':`<span class="count">${r.neededBy.length} need it</span>`}
+      </div>
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">
+        ${showFor.map(m=>`<button class="btn ghost" style="padding:4px 10px;font-size:12px;" data-wanted-member="${m.id}">Trade with ${m.pseudo} →</button>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function renderSearch(main){
+  main.innerHTML = `
+    <div class="help-box">
+      <h3>🔍 How Find a sticker works</h3>
+      <ul>
+        <li>Type a <strong>sticker code</strong> (e.g. FRA17, CC6, FWC9)</li>
+        <li>Instantly see <strong>who has a spare</strong> of that card</li>
+        <li>Click <strong>Trade →</strong> to jump straight to the Trade Board with that person pre-selected</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h2>Find a sticker</h2>
+      <p class="lead">Type a code (e.g. FRA17) to see who has a duplicate. Click their name to go straight to trading with them.</p>
+      <input type="text" id="searchInput" placeholder="e.g. FRA17, MEX3, FWC9…">
+      <div id="searchResults" style="margin-top:18px;"></div>
+    </div>`;
+  await loadAllMembers();
+  document.getElementById('searchInput').oninput = (e)=>{
+    const q = e.target.value.trim().toUpperCase();
+    const out = document.getElementById('searchResults');
+    if (!q){ out.innerHTML=''; return; }
+    if (!MASTER_BY_CODE.has(q)){ out.innerHTML = `<p class="empty-note">"${q}" isn't a known sticker code.</p>`; return; }
+    const holders = allMembers.filter(m=>m.id!==profile.id).map(m=>{
+      const v = m.collection.get(q);
+      return v && v.status==='duplicate' ? {id:m.id, pseudo:m.pseudo, count:v.count, parallel:v.parallel||'normal'} : null;
+    }).filter(Boolean);
+    if (holders.length===0){ out.innerHTML = `<p class="empty-note">No one has a duplicate ${q} right now.</p>`; return; }
+    out.innerHTML = holders.map(h=>`
+      <div class="search-result-row" style="cursor:pointer;" data-member-id="${h.id}">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="sticker give" style="${parallelChipStyle(h.parallel)}">${q}</span>
+          <strong>${h.pseudo}</strong>
+          <span style="color:var(--mist);font-size:13px;">${h.count} duplicate${h.count>1?'s':''}</span>
+        </div>
+        <button class="btn ghost" style="padding:6px 12px;font-size:13px;">Trade →</button>
+      </div>`).join('');
+    out.querySelectorAll('[data-member-id]').forEach(row=>{
+      row.onclick = ()=>{
+        const member = allMembers.find(m=>m.id===row.dataset.memberId);
+        if (!member) return;
+        selectedTradeMember = member;
+        tradeSelection = { give: new Set(), get: new Set() };
+        sentDealsThisSession = [];
+        currentTab = 'trade';
+        renderShell();
+        // After shell renders, open the builder for this member
+        setTimeout(async ()=>{
+          const builderPanel = document.getElementById('builderPanel');
+          if (builderPanel){ await renderTradeBuilder(); builderPanel.scrollIntoView({behavior:'smooth', block:'start'}); }
+        }, 100);
+      };
+    });
+  };
+}
+
+/* ============================================================ MEMBERS ============================================================ */
+async function renderMembers(main){
+  main.innerHTML = `<div class="help-box"><h3>👥 How Members works</h3><ul><li><strong>Complete %</strong> — how much of the full 994-sticker album each person has</li><li><strong>Duplicates</strong> — total spare copies available to trade</li><li>🥇🥈🥉 medals go to the top 3 in each category</li></ul></div><div class="panel"><h2>Members</h2><div class="loading">Loading…</div></div>`;
+  await loadAllMembers();
+  const rows = allMembers.map(m=>{
+    let have=0,dup=0;
+    for (const v of m.collection.values()){ if (v.status==='have') have++; else if (v.status==='duplicate'){have++;dup+=v.count||1;} }
+    const pct = m.collection.size? Math.round(100*have/MASTER.length) : 0;
+    return {pseudo:m.pseudo, pct, dup, isMe:m.id===profile.id};
+  }).sort((a,b)=>b.pct-a.pct);
+
+  const dupRanked = [...rows].sort((a,b)=>b.dup-a.dup);
+
+  const rankIcon = (i, val) => {
+    if (val === 0) return '';
+    if (i === 0) return '🏆';
+    if (i === 1) return '🥈';
+    if (i === 2) return '🥉';
+    return `${i+1}.`;
+  };
+
+  document.getElementById('main').innerHTML = `
+    <div class="help-box"><h3>👥 How Members works</h3><ul><li><strong>Complete %</strong> — how much of the full 994-sticker album each person has</li><li><strong>Duplicates</strong> — total spare copies available to trade</li><li>🏆🥈🥉 for top 3, numbers for the rest</li></ul></div>
+    <div class="panel">
+      <h2>Members (${rows.length})</h2>
+      <table class="members-table">
+        <thead><tr><th style="width:40px;text-align:center;">#</th><th>Name</th><th>Complete</th><th style="text-align:right;">Duplicates</th><th style="width:40px;text-align:center;">#</th></tr></thead>
+        <tbody>${rows.map((r,i)=>{
+          const dupIdx = dupRanked.findIndex(d=>d.pseudo===r.pseudo);
+          return `
+          <tr style="${r.isMe?'background:var(--blue-soft);font-weight:700;':''}">
+            <td style="text-align:center;font-size:${i<3?'20px':'14px'};font-weight:700;color:var(--mist);">${rankIcon(i, r.pct)}</td>
+            <td>${r.pseudo}${r.isMe?' (you)':''}</td>
+            <td class="mono">${r.pct}%</td>
+            <td class="mono" style="text-align:right;">${r.dup}</td>
+            <td style="text-align:center;font-size:${dupIdx<3?'20px':'14px'};font-weight:700;color:var(--mist);">${rankIcon(dupIdx, r.dup)}</td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+init();
 </script>
 </body>
 </html>
