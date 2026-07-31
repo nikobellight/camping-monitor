@@ -1,4 +1,4 @@
-<!-- VERSION: v1.2 — 2026-07-31 — Ajout Serrano Campground (Recreation.gov, facility 232250) : dropdown formulaire, types de site, carte, section Parks we cover, TOTAL_SPOTS 22→23. Reprend v1.1 (site en pause, promo requis). -->
+<!-- VERSION: v1.3 — 2026-07-31 — FIX: collectFormData() stockait le label affiché de la checkbox au lieu de la valeur brute (cb.value) pour tous les systèmes non-RC. Cassait le matching pour Serrano (recreation_gov) et latent pour county parks avec labels raccourcis. Reprend v1.2 (Serrano) + v1.1 (site en pause). -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1206,7 +1206,7 @@
       const opt = sel.options[sel.selectedIndex];
       const siteTypeCheckboxes = document.querySelectorAll(`#siteTypeCheckboxes_${i} input[type="checkbox"]:checked`);
       const parkSystem = opt.dataset.system || '';
-      const siteTypes = Array.from(siteTypeCheckboxes).map(cb => parkSystem === 'reserve_california' ? cb.value : (cb.parentElement ? cb.parentElement.textContent.trim() : cb.value));
+      const siteTypes = Array.from(siteTypeCheckboxes).map(cb => cb.value);
       parks.push({
         park_name: opt.value,
         park_system: opt.dataset.system || '',
