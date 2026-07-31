@@ -1,7 +1,7 @@
 import requests
 import json
-import sys
 import random
+import sys
 
 def p(msg):
     print(msg, flush=True)
@@ -20,23 +20,33 @@ headers = {
 
 URL = 'https://california-rdr.prod.cali.rd12.recreation-management.tylerapp.com/rdr/search/place'
 
-p("Testing PlaceId 670 (Malibu Creek) with same headers as monitor.py...")
+# Test all RC parks including Malibu Creek
+PARKS = [
+    ('Leo Carrillo', 665),
+    ('Carpinteria', 6),
+    ('Doheny', 639),
+    ('Malibu Creek', 670),
+]
 
-payload = {
-    'PlaceId': 670,
-    'StartDate': '2026-08-15',
-    'Nights': 2,
-    'CountNearby': False,
-    'NearbyLimit': 0,
-    'CustomerID': '0',
-    'UnitCategoryId': 0,
-    'UnitTypeId': 0,
-    'IsADA': False,
-    'InSeasonOnly': True,
-    'ShowNearby': False,
-}
+for name, pid in PARKS:
+    payload = {
+        'PlaceId': pid,
+        'StartDate': '2026-08-15',
+        'Nights': 2,
+        'CountNearby': False,
+        'NearbyLimit': 0,
+        'CustomerID': '0',
+        'UnitCategoryId': 0,
+        'UnitTypeId': 0,
+        'IsADA': False,
+        'InSeasonOnly': True,
+        'ShowNearby': False,
+    }
+    r = requests.post(URL, headers=headers, json=payload, timeout=15)
+    p(f"{name} (PlaceId {pid}): Status {r.status_code} | Length {len(r.text)}")
+    if r.status_code == 200:
+        data = json.loads(r.text)
+        pname = data.get('SelectedPlace', {}).get('Name', 'unknown')
+        p(f"  → Name: {pname}")
 
-r = requests.post(URL, headers=headers, json=payload, timeout=15)
-p(f"Status: {r.status_code}")
-p(f"Response length: {len(r.text)}")
-p(f"Response: {r.text[:3000]}")
+p("Done!")
