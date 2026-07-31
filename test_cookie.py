@@ -1,6 +1,7 @@
 import requests
 import json
 import sys
+import time
 
 def p(msg):
     print(msg, flush=True)
@@ -14,12 +15,11 @@ headers = {
 
 URL = 'https://california-rdr.prod.cali.rd12.recreation-management.tylerapp.com/rdr/search/place'
 
-# Try a range of PlaceIds around likely numbers for Malibu Creek
-# Known IDs: Leo Carrillo=665, Doheny=639, San Clemente=708
-# Try IDs around these
-candidates = list(range(650, 700)) + list(range(700, 750)) + [586, 587, 588, 589, 590]
+# Search broader range - print ALL valid park names found
+candidates = list(range(550, 750))
 
 p("Searching for Malibu Creek State Park PlaceId...")
+p("Printing all valid parks found in range 550-750:")
 
 for place_id in candidates:
     payload = {
@@ -40,13 +40,12 @@ for place_id in candidates:
         if r.status_code == 200 and len(r.text) > 100:
             data = json.loads(r.text)
             name = data.get('SelectedPlace', {}).get('Name', '')
-            if 'malibu' in name.lower() or 'creek' in name.lower():
-                p(f"FOUND! PlaceId: {place_id} → Name: {name}")
-                p(json.dumps(data.get('SelectedPlace', {}), indent=2)[:500])
-                break
-            elif name:
+            if name:
                 p(f"  PlaceId {place_id} → {name}")
+                if 'malibu' in name.lower() or 'creek' in name.lower():
+                    p(f"*** FOUND MALIBU CREEK! PlaceId: {place_id} ***")
     except Exception as e:
         pass
+    time.sleep(0.2)
 
 p("Done!")
