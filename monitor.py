@@ -1,3 +1,4 @@
+# VERSION: 2026-07-31 18:40 UTC — Ajout Recreation.gov (Serrano, facility 232250) comme 4e système
 import os
 import json
 import time
@@ -215,6 +216,79 @@ def check_rc_park(place_id, arrival_date, nights):
         return []
 
 # ============================================================
+# API CALLS — RECREATION.GOV (Serrano + future USFS/NPS/BLM parks)
+# ============================================================
+RG_URL = 'https://www.recreation.gov/api/camps/availability/campground/{facility_id}/month'
+RG_BOOKING_URL = 'https://www.recreation.gov/camping/campgrounds/{facility_id}'
+
+RG_TYPE_LABELS = {
+    'STANDARD NONELECTRIC': 'Standard Campsite (Tent/Non-Electric)',
+    'RV ELECTRIC': 'RV Site (Electric Hookup)',
+}
+
+def _rg_fetch_month(facility_id, month_start_date):
+    """Fetch one month's availability grid from recreation.gov. month_start_date = date object, day=1."""
+    headers = {'User-Agent': random.choice(USER_AGENTS)}
+    params = {'start_date': month_start_date.strftime('%Y-%m-01T00:00:00.000Z')}
+    r = requests.get(RG_URL.format(facility_id=facility_id), headers=headers, params=params, timeout=15)
+    r.raise_for_status()
+    return r.json().get('campsites', {})
+
+def check_recreation_gov(facility_id, arrival_date, nights):
+    """
+    Returns a list of available "unit-like" dicts, one per campsite that is
+    Available for EVERY night of the stay (arrival_date .. arrival_date+nights-1).
+    Handles stays that span two calendar months by fetching both months and merging.
+    """
+    arrive = datetime.strptime(arrival_date, '%Y-%m-%d').date()
+    stay_dates = [arrive + timedelta(days=i) for i in range(nights)]
+
+    # Which distinct months do we need? (best-effort: fetch each unique month once)
+    months_needed = sorted(set((d.year, d.month) for d in stay_dates))
+
+    campsites_by_id = {}
+    try:
+        for (yr, mo) in months_needed:
+            month_start = date(yr, mo, 1)
+            month_data = _rg_fetch_month(facility_id, month_start)
+            for site_id, site in month_data.items():
+                if site_id not in campsites_by_id:
+                    campsites_by_id[site_id] = {
+                        'campsite_type': site.get('campsite_type', ''),
+                        'loop': site.get('loop', ''),
+                        'availabilities': {}
+                    }
+                # merge availabilities dicts across months
+                campsites_by_id[site_id]['availabilities'].update(site.get('availabilities', {}))
+    except Exception as e:
+        p(f"Recreation.gov API error (facility {facility_id}): {e}")
+        return []
+
+    # Build the exact set of ISO keys recreation.gov uses for each stay night
+    stay_keys = [d.strftime('%Y-%m-%dT00:00:00Z') for d in stay_dates]
+
+    available_units = []
+    for site_id, site in campsites_by_id.items():
+        avail = site['availabilities']
+        # Every night of the stay must be "Available" on this specific site
+        if all(avail.get(k) == 'Available' for k in stay_keys):
+            available_units.append({
+                'type_name': site['campsite_type'],
+                'unit_type_id': site['campsite_type'],  # recreation.gov has no numeric type id, use the label itself
+                'site_id': site_id,
+                'facility_name': '',
+            })
+    return available_units
+
+def match_recreation_gov(available_units, customer_site_types):
+    matched = []
+    for unit in available_units:
+        if unit['unit_type_id'] in customer_site_types:
+            display_label = RG_TYPE_LABELS.get(unit['unit_type_id'], unit['type_name'])
+            matched.append({**unit, 'type_name': display_label})
+    return matched
+
+# ============================================================
 # MATCH AVAILABLE SITES TO CUSTOMER PREFERENCES
 # ============================================================
 def match_county(available_sites, customer_site_types):
@@ -257,6 +331,10 @@ def send_alert_email(customer, park_name, park_system, available_sites, arrival_
     if park_system == 'reserve_california':
         booking_url = RC_BOOKING_URL.format(place_id=customer['parent_idno'])
         booking_platform = 'ReserveCalifornia'
+        site_desc = ', '.join(set([s['type_name'] for s in available_sites[:3]]))
+    elif park_system == 'recreation_gov':
+        booking_url = RG_BOOKING_URL.format(facility_id=customer['parent_idno'])
+        booking_platform = 'Recreation.gov'
         site_desc = ', '.join(set([s['type_name'] for s in available_sites[:3]]))
     else:
         booking_url = COUNTY_BOOKING_URLS[park_system]
@@ -375,6 +453,8 @@ def main():
 
         if park_system == 'reserve_california':
             available = check_rc_park(parent_idno, arrival_date, nights)
+        elif park_system == 'recreation_gov':
+            available = check_recreation_gov(parent_idno, arrival_date, nights)
         else:
             available = check_county_park(park_system, parent_idno, arrival_date, nights)
 
@@ -389,6 +469,8 @@ def main():
 
             if park_system == 'reserve_california':
                 matched = match_rc(available, site_types)
+            elif park_system == 'recreation_gov':
+                matched = match_recreation_gov(available, site_types)
             else:
                 matched = match_county(available, site_types)
 
@@ -426,3 +508,13 @@ if __name__ == '__main__':
 # They get full Premium treatment — 3 parks, 16 weeks, all site types
 # They are NOT counted in the 15 free user counter
 # Script handles them identically to paid premium users
+
+# ============================================================
+# NOTE ON RECREATION.GOV (Serrano) — park_system = 'recreation_gov'
+# ============================================================
+# - parent_idno = facility ID (e.g. 232250 for Serrano)
+# - customer['site_types'] should store the exact campsite_type string(s),
+#   e.g. 'STANDARD NONELECTRIC' — matched literally against the API response.
+# - A stay spanning 2 calendar months triggers 2 API calls (one per month),
+#   merged before matching — "best effort" per Nicolas's instruction, not
+#   optimized for 3+ month spans (not expected given max 14-night stays).
