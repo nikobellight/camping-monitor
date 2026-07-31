@@ -22,27 +22,30 @@ if r.status_code == 200:
     campsites = data.get('campsites', {})
     p(f"  → Nombre de sites trouvés: {len(campsites)}")
 
-    # Show first site's structure as a sample
-    if campsites:
-        first_id = next(iter(campsites))
-        first = campsites[first_id]
-        p(f"  → Exemple site ID {first_id}:")
-        p(f"     site_type: {first.get('campsite_type')}")
-        p(f"     loop: {first.get('loop')}")
-        avail = first.get('availabilities', {})
-        # Print a few sample dates
-        sample_dates = list(avail.items())[:5]
-        for date, status in sample_dates:
-            p(f"     {date}: {status}")
-
-    # Count how many sites are Available on Aug 15 as a test
-    test_date = '2026-08-15T00:00:00Z'
-    available_count = 0
+    # Collect all unique site types and loops
+    site_types = {}
     for site_id, site in campsites.items():
-        status = site.get('availabilities', {}).get(test_date)
-        if status == 'Available':
-            available_count += 1
-    p(f"  → Sites disponibles le {test_date}: {available_count}")
+        st = site.get('campsite_type', 'UNKNOWN')
+        site_types[st] = site_types.get(st, 0) + 1
+
+    p("  → Types de sites uniques (site_type: nombre de sites):")
+    for st, count in sorted(site_types.items(), key=lambda x: -x[1]):
+        p(f"     {st}: {count}")
+
+    # Count availability across the WHOLE month per site_type (any date available)
+    p("  → Disponibilité sur tout le mois d'août, par type de site:")
+    type_avail_any = {}
+    for site_id, site in campsites.items():
+        st = site.get('campsite_type', 'UNKNOWN')
+        avail = site.get('availabilities', {})
+        has_any = any(status == 'Available' for status in avail.values())
+        if has_any:
+            type_avail_any[st] = type_avail_any.get(st, 0) + 1
+    if type_avail_any:
+        for st, count in type_avail_any.items():
+            p(f"     {st}: {count} site(s) avec au moins 1 nuit dispo en août")
+    else:
+        p("     Aucune disponibilité trouvée en août pour aucun type")
 else:
     p(f"  → Erreur: {r.text[:500]}")
 
