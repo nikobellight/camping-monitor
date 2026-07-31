@@ -1,4 +1,4 @@
-# VERSION: 2026-07-31 18:40 UTC — Ajout Recreation.gov (Serrano, facility 232250) comme 4e système
+# VERSION: v1.2 — 2026-07-31 18:40 UTC — Ajout Recreation.gov (Serrano, facility 232250) comme 4e système
 import os
 import json
 import time
