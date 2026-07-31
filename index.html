@@ -1,3 +1,4 @@
+<!-- VERSION: v1.1 — 2026-07-31 — Site mis en pause : blocage de tout submit sans code promo valide -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1275,6 +1276,15 @@
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
     const btn = form.querySelector('.form-submit');
+
+    // SITE PAUSED — v1.0 — 2026-07-31 — Only promo-code submissions allowed.
+    // Blocks all public signups; only valid promo codes (TRAILHEAD28, FRIENDS2026) can proceed.
+    if (!promoActive) {
+      btn.textContent = '🚧 Signups paused right now — check back soon!';
+      btn.disabled = true;
+      return;
+    }
+
     const plan = document.getElementById('planSelect').value;
     const remaining = parseInt(document.getElementById('spotsRemaining').textContent) || 0;
     const isFree = remaining > 0;
