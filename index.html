@@ -1,4 +1,4 @@
-<!-- VERSION: v1.3 — 2026-07-31 — FIX: collectFormData() stockait le label affiché de la checkbox au lieu de la valeur brute (cb.value) pour tous les systèmes non-RC. Cassait le matching pour Serrano (recreation_gov) et latent pour county parks avec labels raccourcis. Reprend v1.2 (Serrano) + v1.1 (site en pause). -->
+<!-- VERSION: v1.5 — 2026-07-31 — Retrait de TOUT vocabulaire transactionnel/monétaire visible : "Pricing" → "Plans" (nav, footer, section, ancre #pricing → #plans), "Free" retiré des cartes de plan (plus de label prix du tout), "Simple. No subscriptions." → "Choose your coverage.". Identifiants techniques internes non touchés (classe CSS .pricing-card, colonne Supabase free_user) pour éviter de casser le style et monitor.py. Reprend v1.4 (site 100% gratuit, mode amis). -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,9 +33,9 @@
   "applicationCategory": "UtilitiesApplication",
   "operatingSystem": "Web",
   "offers": [
-    {"@type": "Offer", "name": "Basic", "price": "5.00", "priceCurrency": "USD"},
-    {"@type": "Offer", "name": "Standard", "price": "10.00", "priceCurrency": "USD"},
-    {"@type": "Offer", "name": "Premium", "price": "20.00", "priceCurrency": "USD"}
+    {"@type": "Offer", "name": "Basic", "price": "0.00", "priceCurrency": "USD"},
+    {"@type": "Offer", "name": "Standard", "price": "0.00", "priceCurrency": "USD"},
+    {"@type": "Offer", "name": "Premium", "price": "0.00", "priceCurrency": "USD"}
   ]
 }
 </script>
@@ -252,7 +252,7 @@
   <div class="nav-links">
     <a href="#how">How it works</a>
     <a href="#parks">Parks</a>
-    <a href="#pricing">Pricing</a>
+    <a href="#plans">Plans</a>
     <a href="#alert" class="nav-cta">Get Alerted</a>
   </div>
 </nav>
@@ -270,7 +270,7 @@
     </svg>
   </div>
   <div class="hero-content">
-    <div class="badge">🎁 Free Early Access — <span id="spotsRemainingHero">...</span> spots left</div>
+    <div class="badge">🏕 Invite-only alerts — promo code required</div>
     <h1>Never miss a<br><em>California campsite</em><br>again.</h1>
     <p class="hero-sub">Coastal state beaches & county parks — all in one alert service.<br>23 California parks. One simple email when a spot opens.</p>
     <div class="speed-stats">
@@ -279,7 +279,7 @@
       <div class="speed-stat"><strong>2 min</strong><span>to set up</span></div>
     </div>
     <div class="hero-cta">
-      <a href="#alert" class="btn-primary">Get My Alert — from $5</a>
+      <a href="#alert" class="btn-primary">Get My Alert →</a>
       <a href="#how" class="btn-secondary">How it works ↓</a>
     </div>
   </div>
@@ -504,21 +504,20 @@
   <p style="font-size:13px; color:var(--bark); font-weight:300;">Don't see your park? <a href="#alert" style="color:var(--moss); text-decoration:none; font-weight:500;">Request it →</a></p>
 </section>
 
-<section class="pricing" id="pricing">
-  <p class="section-label">Pricing</p>
+<section class="pricing" id="plans">
+  <p class="section-label">Plans</p>
   <div style="background:linear-gradient(135deg, var(--forest), var(--moss)); border-radius:20px; padding:32px 40px; max-width:600px; margin:0 auto 48px; text-align:center;">
-    <div style="font-size:28px; margin-bottom:8px;">🎁</div>
-    <h3 style="font-family:'Playfair Display',serif; font-size:24px; color:var(--sand); margin-bottom:8px; font-weight:700;">First 15 users get Basic & Standard for free</h3>
-    <p style="color:#7CC8A0; font-size:14px; font-weight:500; margin:0;"><span id="spotsRemainingPricing">...</span> spots remaining</p>
+    <div style="font-size:28px; margin-bottom:8px;">🏕</div>
+    <h3 style="font-family:'Playfair Display',serif; font-size:24px; color:var(--sand); margin-bottom:8px; font-weight:700;">For friends & family</h3>
+    <p style="color:#7CC8A0; font-size:14px; font-weight:500; margin:0;">Invite-only — promo code required to sign up</p>
   </div>
-  <h2>Simple. No subscriptions.</h2>
-  <p>Pay once. Choose your monitoring window and number of parks.</p>
+  <h2>Choose your coverage.</h2>
+  <p>Pick your monitoring window and number of parks.</p>
   <div class="pricing-note">⚡ All plans include smart speed escalation — checks get faster as your arrival date approaches</div>
   <div class="pricing-cards" id="pricingCards">
 
     <div class="pricing-card" id="card-basic">
       <div class="plan-name">Basic</div>
-      <div class="plan-price" id="basicPrice"><span>$</span>5</div>
       <div class="plan-desc">1 park · 4 weeks (1 month)</div>
       <p style="font-size:12px; color:var(--bark); font-style:italic; margin-bottom:4px;">One park, one chance</p>
       <p style="font-size:12px; color:var(--bark); margin-bottom:16px; line-height:1.5;">Best if your arrival date is within the next month.</p>
@@ -539,7 +538,6 @@
     <div class="pricing-card featured" id="card-standard">
       <div class="featured-badge">Most popular</div>
       <div class="plan-name">Standard</div>
-      <div class="plan-price" id="standardPrice"><span>$</span>10</div>
       <div class="plan-desc">2 parks · 8 weeks (2 months)</div>
       <p style="font-size:12px; color:rgba(242,232,213,0.5); font-style:italic; margin-bottom:4px;">More options, more time</p>
       <p style="font-size:12px; color:rgba(242,232,213,0.5); margin-bottom:8px; line-height:1.5;">2 months of monitoring across 2 parks — significantly more chances to catch a cancellation.</p>
@@ -560,7 +558,6 @@
 
     <div class="pricing-card" id="card-premium">
       <div class="plan-name">Premium</div>
-      <div class="plan-price"><span>$</span>20</div>
       <div class="plan-desc">3 parks · 16 weeks (4 months)</div>
       <p style="font-size:12px; color:var(--bark); font-style:italic; margin-bottom:4px;">Maximum coverage, best chance</p>
       <p style="font-size:12px; color:var(--bark); margin-bottom:8px; line-height:1.5;">4 months watching 3 parks — the longest window gives you the best odds of securing a spot.</p>
@@ -588,8 +585,8 @@
   <p>Takes 2 minutes. Confirmation email sent immediately after.</p>
   <div class="alert-form">
     <div class="founding-banner">
-      🔥
-      <div><strong>🎁 Free early access</strong> — <span id="spotsRemaining" class="founding-loading">loading...</span> spots remaining</div>
+      🏕
+      <div><strong>Invite-only</strong> — a valid promo code is required to set up an alert</div>
     </div>
     <form id="alertForm">
       <div class="form-row">
@@ -630,9 +627,9 @@
       <div class="form-row" style="margin-top:20px">
         <label>Alert plan</label>
         <select name="plan" id="planSelect">
-          <option value="basic" id="planOptBasic">Basic — $5 · 🎁 waived (1 park · 4 weeks)</option>
-          <option value="standard" id="planOptStandard" selected>Standard — $10 · 🎁 waived (2 parks · 8 weeks)</option>
-          <option value="premium">Premium — $20 · 🎁 waived (3 parks · 16 weeks)</option>
+          <option value="basic" id="planOptBasic">Basic (1 park · 4 weeks)</option>
+          <option value="standard" id="planOptStandard" selected>Standard (2 parks · 8 weeks)</option>
+          <option value="premium">Premium (3 parks · 16 weeks)</option>
         </select>
       </div>
       <div style="background:var(--mist); border-radius:12px; padding:14px 18px; margin-bottom:20px; font-size:13px; color:var(--forest); line-height:1.6;">💡 <strong>Tip:</strong> create your account on the park booking website now — so you can book in seconds when the alert arrives.</div>
@@ -702,7 +699,7 @@
   <strong>CampSiteAlert</strong>
   Built by a camper, for campers. SoCal based. 🌊🏕🌲<br><br>
   © 2026 CampSiteAlert · campsitealert.com · Not affiliated with California State Parks or any county park system<br><br>
-  <a href="#alert">Get Alerted</a> · <a href="#how">How it works</a> · <a href="#parks">Parks</a> · <a href="#pricing">Pricing</a> · <a href="#legal">Legal</a>
+  <a href="#alert">Get Alerted</a> · <a href="#how">How it works</a> · <a href="#parks">Parks</a> · <a href="#plans">Plans</a> · <a href="#legal">Legal</a>
 </footer>
 
 <script>
@@ -728,51 +725,9 @@
     });
   });
 
-  // Live founding counter
-  const TOTAL_SPOTS = 23;
+  // Site is invite-only via promo code — no free-spot counter needed anymore.
   const SUPABASE_URL_COUNTER = 'https://wqbxylnrgdtcnxlbemdf.supabase.co';
   const SUPABASE_KEY_COUNTER = 'sb_publishable_T9dDFWDk4lB4p7mjRpkrsg_VPlzbEMK';
-
-  function updateAllCounters(remaining) {
-    ['spotsRemaining', 'spotsRemainingPricing', 'spotsRemainingHero'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.textContent = remaining;
-        el.classList.remove('founding-loading');
-        if (remaining <= 5) el.style.color = '#D4622A';
-      }
-    });
-    if (remaining === 0) {
-      const pricingBanner = document.getElementById('spotsRemainingPricing');
-      if (pricingBanner) pricingBanner.parentElement.parentElement.style.display = 'none';
-    }
-    updatePlanLabels(remaining);
-  }
-
-  async function loadCounter() {
-    try {
-      const res = await fetch(`${SUPABASE_URL_COUNTER}/rest/v1/alerts?free_user=eq.true&promo_code=is.null&select=id`, {
-        headers: {
-          'apikey': SUPABASE_KEY_COUNTER,
-          'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}`,
-        }
-      });
-      const data = await res.json();
-      const used = Array.isArray(data) ? data.length : 0;
-      const remaining = Math.max(0, TOTAL_SPOTS - used);
-      updateAllCounters(remaining);
-      return remaining;
-    } catch(e) {
-      updateAllCounters(20);
-      return 20;
-    }
-  }
-
-  async function incrementCounter() {
-    // Counter now derived from Supabase directly — no action needed
-  }
-
-  loadCounter();
 
   // Park options HTML
   const parkOptionsHTML = `
@@ -1060,7 +1015,7 @@
     document.querySelectorAll('.pricing-card').forEach(c => c.classList.remove('active-plan'));
     const card = document.getElementById('card-' + val);
     if (card) card.classList.add('active-plan');
-    updatePlanLabels(parseInt(document.getElementById('spotsRemaining').textContent) || 0);
+    updatePlanLabels();
     updateParkCount(val);
     // Refresh site type limits for all visible park slots
     const count = planParks[val] || 1;
@@ -1131,41 +1086,15 @@
   // Form submit
   const form = document.getElementById('alertForm');
   
-  function updatePlanLabels(remaining) {
-    const isFree = remaining > 0;
-    const optBasic = document.getElementById('planOptBasic');
-    const optStandard = document.getElementById('planOptStandard');
-    const freeBanner = document.getElementById('freeBanner');
-    const paidBanner = document.getElementById('paidBanner');
+  function updatePlanLabels() {
     const btn = document.querySelector('.form-submit');
-    
-    if (isFree) {
-      if (optBasic) optBasic.textContent = 'Basic — $5 · 🎁 waived (1 park · 4 weeks)';
-      if (optStandard) optStandard.textContent = 'Standard — $10 · 🎁 waived (2 parks · 8 weeks)';
-      if (freeBanner) freeBanner.style.display = 'block';
-      if (paidBanner) paidBanner.style.display = 'none';
-    } else {
-      if (optBasic) optBasic.textContent = 'Basic — $5 (1 park · 4 weeks)';
-      if (optStandard) optStandard.textContent = 'Standard — $10 (2 parks · 8 weeks)';
-      if (freeBanner) freeBanner.style.display = 'none';
-      if (paidBanner) paidBanner.style.display = 'block';
-    }
-    
-    const plan = document.getElementById('planSelect').value;
     if (btn && !promoActive) {
-      if (plan === 'premium') {
-        btn.textContent = 'Pay $20 & Set Up My Alert →';
-      } else if (isFree) {
-        btn.textContent = 'Set Up My Alert →';
-      } else {
-        btn.textContent = plan === 'basic' ? 'Pay $5 & Set Up My Alert →' : 'Pay $10 & Set Up My Alert →';
-      }
+      btn.textContent = '🚧 Signups paused right now — check back soon!';
     }
   }
 
   document.getElementById('planSelect').addEventListener('change', function() {
-    const remaining = parseInt(document.getElementById('spotsRemaining').textContent) || 0;
-    updatePlanLabels(remaining);
+    updatePlanLabels();
     highlightPlanOnly(this.value);
   });
 
@@ -1303,30 +1232,30 @@
     }
 
     const plan = document.getElementById('planSelect').value;
-    const remaining = parseInt(document.getElementById('spotsRemaining').textContent) || 0;
-    const isFree = remaining > 0;
 
     btn.textContent = 'Setting up your alert...';
     btn.disabled = true;
 
-    // Promo code — Premium free, direct to Supabase
-    if (promoActive) {
-      try {
-        const { expiresAt } = collectFormData();
-        const result = await submitAlerts('premium', true, document.getElementById('promoField').value.trim().toUpperCase(), expiresAt);
-        if (result.reason === 'no_park') { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
-        if (result.reason === 'no_site_type') { btn.textContent = 'Please select a site type'; btn.disabled = false; return; }
-        if (result.ok) {
-          document.getElementById('successEmail').textContent = document.getElementById('emailInput').value.trim();
-          form.style.display = 'none';
-          document.getElementById('successMsg').classList.add('visible');
-        } else { btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
-      } catch(err) { console.error(err); btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
-      return;
-    }
+    // Promo code — free access at whichever plan (park count/weeks) was selected
+    try {
+      const { expiresAt } = collectFormData();
+      const result = await submitAlerts(plan, true, document.getElementById('promoField').value.trim().toUpperCase(), expiresAt);
+      if (result.reason === 'no_park') { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
+      if (result.reason === 'no_site_type') { btn.textContent = 'Please select a site type'; btn.disabled = false; return; }
+      if (result.ok) {
+        document.getElementById('successEmail').textContent = document.getElementById('emailInput').value.trim();
+        form.style.display = 'none';
+        document.getElementById('successMsg').classList.add('visible');
+      } else { btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
+    } catch(err) { console.error(err); btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
+    return;
 
-    // Paid flow — open LS immediately (browser popup blocker fix), insert pending in background
-    if (!isFree) {
+    // ─────────────────────────────────────────────────────────
+    // DISABLED — 2026-07-31 — Lemon Squeezy paid flow + old free
+    // Basic/Standard direct-submit flow. Kept for later re-activation
+    // if the site ever goes back to a paid model. Not currently reachable.
+    // ─────────────────────────────────────────────────────────
+    if (false) {
       const { email, arrivalDate, nights, parks, promoCode, expiresAt } = collectFormData();
       if (!email) { btn.textContent = 'Please enter your email'; btn.disabled = false; return; }
       if (parks.length === 0) { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
@@ -1405,36 +1334,37 @@
 
       // Stop polling after 10 minutes
       setTimeout(() => clearInterval(pollInterval), 10 * 60 * 1000);
-
       return;
     }
 
-    // Free Basic/Standard — direct Supabase submit
-    try {
-      const { email, expiresAt } = collectFormData();
+    if (false) {
+      // Old free Basic/Standard direct-submit flow — superseded by the
+      // promo-code branch above, which now handles ALL submissions.
+      try {
+        const { email, expiresAt } = collectFormData();
 
-      // Check if this email already has a free alert
-      const existingRes = await fetch(
-        `${SUPABASE_URL_COUNTER}/rest/v1/alerts?email=eq.${encodeURIComponent(email)}&free_user=eq.true&promo_code=is.null&active=eq.true&limit=1`,
-        { headers: { 'apikey': SUPABASE_KEY_COUNTER, 'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}` } }
-      );
-      const existing = await existingRes.json();
-      if (existing && existing.length > 0) {
-        btn.textContent = 'This email already has a free alert — upgrade to a paid plan for more';
-        btn.disabled = false;
-        return;
-      }
+        // Check if this email already has a free alert
+        const existingRes = await fetch(
+          `${SUPABASE_URL_COUNTER}/rest/v1/alerts?email=eq.${encodeURIComponent(email)}&free_user=eq.true&promo_code=is.null&active=eq.true&limit=1`,
+          { headers: { 'apikey': SUPABASE_KEY_COUNTER, 'Authorization': `Bearer ${SUPABASE_KEY_COUNTER}` } }
+        );
+        const existing = await existingRes.json();
+        if (existing && existing.length > 0) {
+          btn.textContent = 'This email already has a free alert — upgrade to a paid plan for more';
+          btn.disabled = false;
+          return;
+        }
 
-      const result = await submitAlerts(plan, true, null, expiresAt);
-      if (result.reason === 'no_park') { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
-      if (result.reason === 'no_site_type') { btn.textContent = 'Please select a site type'; btn.disabled = false; return; }
-      if (result.ok) {
-        await loadCounter();
-        document.getElementById('successEmail').textContent = document.getElementById('emailInput').value.trim();
-        form.style.display = 'none';
-        document.getElementById('successMsg').classList.add('visible');
-      } else { btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
-    } catch(err) { console.error(err); btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
+        const result = await submitAlerts(plan, true, null, expiresAt);
+        if (result.reason === 'no_park') { btn.textContent = 'Please select a park'; btn.disabled = false; return; }
+        if (result.reason === 'no_site_type') { btn.textContent = 'Please select a site type'; btn.disabled = false; return; }
+        if (result.ok) {
+          document.getElementById('successEmail').textContent = document.getElementById('emailInput').value.trim();
+          form.style.display = 'none';
+          document.getElementById('successMsg').classList.add('visible');
+        } else { btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
+      } catch(err) { console.error(err); btn.textContent = 'Something went wrong — try again'; btn.disabled = false; }
+    }
   });
 
   const PROMO_CODES = {
@@ -1468,17 +1398,12 @@
   function updateSubmitBtn() {
     const cb = document.getElementById('termsCheckbox');
     const btn = document.getElementById('submitBtn');
-    const plan = document.getElementById('planSelect').value;
-    const remaining = parseInt(document.getElementById('spotsRemaining').textContent) || 0;
-    const isFree = remaining > 0;
     if (cb && btn) {
-      btn.disabled = !cb.checked;
-      btn.style.opacity = cb.checked ? '1' : '0.5';
-      btn.style.cursor = cb.checked ? 'pointer' : 'not-allowed';
+      btn.disabled = !cb.checked || !promoActive;
+      btn.style.opacity = (cb.checked && promoActive) ? '1' : '0.5';
+      btn.style.cursor = (cb.checked && promoActive) ? 'pointer' : 'not-allowed';
       if (cb.checked) {
-        if (plan === 'premium') btn.textContent = 'Pay $20 & Set Up My Alert →';
-        else if (isFree) btn.textContent = 'Set Up My Alert →';
-        else btn.textContent = plan === 'basic' ? 'Pay $5 & Set Up My Alert →' : 'Pay $10 & Set Up My Alert →';
+        btn.textContent = promoActive ? 'Set Up My Alert →' : '🚧 Signups paused right now — check back soon!';
       }
     }
   }
