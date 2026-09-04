@@ -1,4 +1,4 @@
-<!-- VERSION: v1.5 — 2026-07-31 — Retrait de TOUT vocabulaire transactionnel/monétaire visible : "Pricing" → "Plans" (nav, footer, section, ancre #pricing → #plans), "Free" retiré des cartes de plan (plus de label prix du tout), "Simple. No subscriptions." → "Choose your coverage.". Identifiants techniques internes non touchés (classe CSS .pricing-card, colonne Supabase free_user) pour éviter de casser le style et monitor.py. Reprend v1.4 (site 100% gratuit, mode amis). -->
+<!-- VERSION: v1.6 — 2026-09-04 — Ajout Azalea Campground (Sequoia & Kings Canyon NP, Recreation.gov, facility 10124502) : nouveau groupe "National Park (Recreation.gov)" distinct de Serrano (National Forest), couleur teal #1B8A8A, 3 types de site (Tent Only/Standard/RV — tous non-électriques, aucun hookup à ce camping), dropdown, carte, section Parks we cover, compteur 23→24. Reprend v1.5. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -272,7 +272,7 @@
   <div class="hero-content">
     <div class="badge">🏕 Invite-only alerts — promo code required</div>
     <h1>Never miss a<br><em>California campsite</em><br>again.</h1>
-    <p class="hero-sub">Coastal state beaches & county parks — all in one alert service.<br>23 California parks. One simple email when a spot opens.</p>
+    <p class="hero-sub">Coastal state beaches & county parks — all in one alert service.<br>24 California parks. One simple email when a spot opens.</p>
     <div class="speed-stats">
       <div class="speed-stat"><strong>5 min</strong><span>fastest check</span></div>
       <div class="speed-stat"><strong>24/7</strong><span>monitoring</span></div>
@@ -444,13 +444,14 @@
 <section class="parks" id="parks">
   <p class="section-label">Coverage</p>
   <h2>Parks we cover</h2>
-  <p>23 California parks — coastal state beaches & county parks. Click any pin on the map or park name below to view availability.</p>
+  <p>24 California parks — coastal state beaches & county parks. Click any pin on the map or park name below to view availability.</p>
   <div class="parks-legend">
     <span><span class="legend-dot" style="background:#1B6CA8;"></span> CA State Parks</span>
     <span><span class="legend-dot" style="background:#4A7C59;"></span> Santa Barbara</span>
     <span><span class="legend-dot" style="background:#2C4A3E;"></span> Santa Clara</span>
     <span><span class="legend-dot" style="background:#D4622A;"></span> San Diego</span>
     <span><span class="legend-dot" style="background:#6B4E9F;"></span> National Forest</span>
+    <span><span class="legend-dot" style="background:#1B8A8A;"></span> National Park</span>
   </div>
   <div id="campsitealert-map" style="width:100%; max-width:860px; height:420px; border-radius:20px; margin:0 auto 40px; box-shadow:0 8px 32px rgba(44,74,62,0.15); overflow:hidden;"></div>
   <div style="margin-bottom:32px;">
@@ -499,6 +500,12 @@
     <p style="font-size:12px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:var(--moss); margin-bottom:16px;">National Forest (Recreation.gov)</p>
     <div class="parks-grid">
       <a href="https://www.recreation.gov/camping/campgrounds/232250" target="_blank" class="park-tag"><span class="park-dot" style="background:#6B4E9F;"></span>Serrano Campground</a>
+    </div>
+  </div>
+  <div style="margin-bottom:32px;">
+    <p style="font-size:12px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:var(--moss); margin-bottom:16px;">National Park (Recreation.gov)</p>
+    <div class="parks-grid">
+      <a href="https://www.recreation.gov/camping/campgrounds/10124502" target="_blank" class="park-tag"><span class="park-dot" style="background:#1B8A8A;"></span>Azalea Campground</a>
     </div>
   </div>
   <p style="font-size:13px; color:var(--bark); font-weight:300;">Don't see your park? <a href="#alert" style="color:var(--moss); text-decoration:none; font-weight:500;">Request it →</a></p>
@@ -765,6 +772,9 @@
     <optgroup label="National Forest (Recreation.gov)">
       <option value="Serrano Campground" data-watchers="6" data-platform="Recreation.gov" data-system="recreation_gov" data-idno="232250">Serrano Campground</option>
     </optgroup>
+    <optgroup label="National Park (Recreation.gov)">
+      <option value="Azalea Campground" data-watchers="6" data-platform="Recreation.gov" data-system="recreation_gov" data-idno="10124502">Azalea Campground</option>
+    </optgroup>
   `;
 
   const planParks = { basic: 1, standard: 2, premium: 3 };
@@ -954,6 +964,11 @@
     recreation_gov_serrano: [
       {value: 'STANDARD NONELECTRIC', label: 'Standard Campsite (Tent/Non-Electric)'},
       {value: 'RV ELECTRIC', label: 'RV Site (Electric Hookup)'},
+    ],
+    recreation_gov_azalea: [
+      {value: 'TENT ONLY NONELECTRIC', label: 'Tent Only (Non-Electric)'},
+      {value: 'STANDARD NONELECTRIC', label: 'Standard Campsite (Non-Electric)'},
+      {value: 'RV NONELECTRIC', label: 'RV Site (Non-Electric, no hookup)'},
     ]
   };
 
@@ -975,6 +990,7 @@
     if (system === 'san_diego') return systemSiteTypes.san_diego;
     if (system === 'recreation_gov') {
       if (parkValue === 'Serrano Campground') return systemSiteTypes.recreation_gov_serrano;
+      if (parkValue === 'Azalea Campground') return systemSiteTypes.recreation_gov_azalea;
     }
     return [];
   }
@@ -1468,6 +1484,8 @@
     { name: 'William Heise', lat: 33.0786, lng: -116.5308, color: sdIcon, url: 'https://parksres.sandiegocounty.gov/reservation/camping/index.asp', county: 'San Diego County' },
     // National Forest (Recreation.gov)
     { name: 'Serrano Campground', lat: 34.2685, lng: -116.9614, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#6B4E9F;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.recreation.gov/camping/campgrounds/232250', county: 'San Bernardino National Forest' },
+    // National Park (Recreation.gov)
+    { name: 'Azalea Campground', lat: 36.7398, lng: -118.9665, color: L.divIcon({className:'',html:'<div style="width:14px;height:14px;background:#1B8A8A;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]}), url: 'https://www.recreation.gov/camping/campgrounds/10124502', county: 'Kings Canyon National Park' },
   ];
 
   parks.forEach(park => {
